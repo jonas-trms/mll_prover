@@ -34,6 +34,14 @@ let aux_par seq i =
     | _ -> failwith "Bad construction" in
   aux_par1 seq i
 
+let aux_unpar seq i =
+  let rec aux_par1 seq acc = 
+    match seq, acc with
+    | P(x, y)::ys, 1 -> x::y::ys
+    | x::ys, i when i > 1 -> x::(aux_par1 ys (i-1))
+    | _ -> failwith "Bad construction" in
+  aux_par1 seq i
+
 let aux_tensor seq1 seq2 =
 match List.rev seq1, seq2 with
 | x::xs, y::ys -> (List.rev xs) @ (T(x, y)::ys)
@@ -171,9 +179,35 @@ let encode proof =
 
   (encode_aux proof, get_seq proof)
 
+(*Decode*)
+let psi_1_inv n = function
+  | (i, Left::w) when i = n -> (n, w)
+  | (i, Right::w) when i = n -> (n+1, w)
+  | (i, w) when i > n -> (i+1, w)
+  | (i, w) -> (i, w)
+
+let rec decode (t, s) = 
+  match t with
+  | F(_, _) -> begin
+    match s with
+    | [A(i); NA(j)] when i = j -> Atom1(i)
+    | [NA(i); A(j)] when i = j -> Atom2(i)
+    | _ -> failwith "Bad construction"
+    end
+  | N_P((n, w), t0) -> Par(n, decode ((map_psi psi_1_inv n t0), aux_unpar s n)) 
+  | N_T(_, _, _) -> failwith "Not implemented"
+
 (*Main*)
-let proof_1 = Par(2, Permutation([|2; 1; 3; 4|], Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))))));;
+(* let proof_1 = Par(2, Permutation([|2; 1; 3; 4|], Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))))));;
 
 let () = print_proof proof_1; print_newline();;
 
-let () = print_rep (encode proof_1); print_newline();;
+let () = print_rep (encode proof_1); print_newline();; *)
+
+let proof_2 = Par(1, Permutation([|2; 1|], Atom2(1)));;
+
+let () = print_proof proof_2; print_newline();;
+
+let () = print_rep (encode proof_2); print_newline();;
+
+let () = print_proof (decode (encode proof_2));;
