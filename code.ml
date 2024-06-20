@@ -25,6 +25,7 @@ type tree =
   
 type representation = tree * sequent
 
+
 (*Manipulating sequents*)
 (*Merge formulas i and i+1 into a par*)
 let aux_par seq i =
@@ -88,6 +89,7 @@ let rec get_seq = function
   | Tensor (p1, p2) -> aux_tensor (get_seq p1) (get_seq p2)
   | Permutation (sigma, p) -> aux_perm (get_seq p) sigma
 
+
 (*Printing*)
 let rec print_formula = function
   | A (i) -> Printf.printf "(A %d)" i
@@ -129,6 +131,7 @@ let print_rep (t, s) =
     | N_T(add, t1, t2) -> print_string "T "; print_add add;
                           print_string "\nLeft begins\n"; print_tree t1; print_string "Left ends\nRight begins\n"; print_tree t2; print_string "Right ends\n"
   in print_seq s; print_newline(); print_tree t 
+
 
 (*Encoding*)
 (*Define an order on addresses*)
@@ -199,6 +202,7 @@ let encode proof =
   | Permutation(sigma, p) -> map_sigma sigma (encode_aux p) in
 
   (encode_aux proof, get_seq proof)
+
 
 (*Decoding*)
 (*Given a tree (g or d), extract the subset of the shuffle G><D linked to it*)
@@ -312,6 +316,7 @@ and aux_tensor (n, w) t1 t2 s =
     let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
     Permutation(get_perm sigma1 sigma2 n, Tensor(p1, p2))
 
+    
 (*Examples*)
 let proof_1 = Par(2, Permutation([|2; 1; 3; 4|], Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))))));;
 
