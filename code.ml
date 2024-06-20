@@ -200,113 +200,96 @@ let encode proof =
 
   (encode_aux proof, get_seq proof)
 
-(*Decode*)
+(*Decoding*)
+(*Given a tree (g or d), extract the subset of the shuffle G><D linked to it*)
+let extract_from_shuffle t = 
+  let rec aux = function
+    | F((n1, []), (n2, [])) -> [n1; n2]
+    | F((n1, []), _) -> [n1]
+    | F(_, (n2, [])) -> [n2]
+    | F(_, _) -> []
+
+    | N_P((n, []), t1) -> n::(aux t1)
+    | N_P(_, t1) -> aux t1
+
+    | N_T((n, []), t1, t2) -> n::(aux t1)@(aux t2)
+    | N_T(_, t1, t2) -> (aux t1)@(aux t2) in
+  List.sort (fun x y -> x - y) (aux t)
+
+(*Given the two subsets G and D of a shuffle G><D, merge them into their concatenation G.D*)
+let sigma_merge sigma1 sigma2 n =
+  let m1 = Array.length sigma1 in
+  let m2 = Array.length sigma2 in
+  let merged = Array.make (m1 + m2 + 1) (-1) in
+
+  for i = 0 to m1-1 do
+    if sigma1.(i) < 1 || sigma1.(i) > m1 + m2 + 1 then failwith "Bad construction1"
+    else merged.(sigma1.(i) - 1) <- i + 1
+  done;
+  
+  for i = 0 to m2-1 do
+    if sigma2.(i) < 1 || sigma2.(i) > m1 + m2 + 1 then failwith "Bad construction2"
+    else merged.(sigma2.(i) - 1) <- m1 + i + 1
+  done;
+
+  for i = 0 to m1 + m2 do
+    if (i + 1) <> n && merged.(i) = -1 then failwith "Bad construction3"
+  done;
+
+  merged
+
+(*Given a sequent, the concatenation G.D, n and |G|, build G,A and B,D*)
+let seq_split s merged n m1 =
+  let rec aux s m m1 merged gamma delta acc =
+    match s with
+    | [] when acc = m+1 -> (gamma, delta)
+    | [] -> Printf.printf "wrong acc %d\n" acc; failwith "Bad construction4"
+    | x::xs when acc = n -> aux xs m m1 merged gamma delta (acc+1)
+    | x::xs -> let k = merged.(acc-1) in
+                if k < m1+1 then aux xs m m1 merged (x::gamma) delta (acc+1)
+                else aux xs m m1 merged gamma (x::delta) (acc+1) in
+
+  let f1, f2 = aux_untensor s n in
+  let gamma, delta = aux s (List.length s) m1 merged [] [] 1 in
+  List.rev (f1::gamma), f2::(List.rev delta)
+
+(*Given the subsets G, D and n, build the permutation from (G, AXB, D) to the initial set*)
+let get_perm sigma1 sigma2 n = 
+  let m1, m2 = Array.length sigma1, Array.length sigma2 in
+  let perm = Array.make (m1 + m2 + 1) (-1) in
+  for i = 0 to m1 - 1 do
+    perm.(i) <- sigma1.(i)
+  done;
+
+  perm.(m1) <- n;
+
+  for i = 0 to m2 - 1 do
+    perm.(m1 + i + 1) <- sigma2.(i)
+  done;
+
+  perm
+
 (*Reindexing functions used for the decoding*)
-(*In cas of a par*)
-let psi_1_inv n = function
+(*In case of a par*)
+let psi_1_merged n = function
   | (i, Left::w) when i = n -> (n, w)
   | (i, Right::w) when i = n -> (n+1, w)
   | (i, w) when i > n -> (i+1, w)
   | (i, w) -> (i, w)
 
+(*In case of a tensor*)
+(*m1 corresponds to |G|*)
+let alpha_1 merged m1 n = function
+| (i, Left::w) when i = n -> (m1 + 1, w)
+| (i, w) when i <> n -> (merged.(i-1), w)
+| _ -> failwith "Bad construction"
+
+let alpha_2 merged m1 n = function
+  | (i, Right::w) when i = n -> (1, w)
+  | (i, w) when i <> n -> (merged.(i-1) - m1 + 1, w)
+  | _ -> failwith "Bad construction"
+
 let rec decode (t, s) = 
-  let sigma_build rep = 
-    let rec aux = function
-      | F((n1, []), (n2, [])) -> [n1; n2]
-      | F((n1, []), _) -> [n1]
-      | F(_, (n2, [])) -> [n2]
-      | F(_, _) -> []
-
-      | N_P((n, []), t) -> n::(aux t)
-      | N_P(_, t) -> aux t
-
-      | N_T((n, []), t1, t2) -> n::(aux t1)@(aux t2)
-      | N_T(_, t1, t2) -> (aux t1)@(aux t2) in
-    List.sort (fun x y -> x - y) (aux rep) in
-  
-  let sigma_inv sigma1 sigma2 n =
-    let m1 = Array.length sigma1 in
-    let m2 = Array.length sigma2 in
-    let inv = Array.make (m1 + m2 + 1) (-1) in
-
-    for i = 0 to m1-1 do
-(*       Printf.printf "sigma1 %d %d\n" (i+1) sigma1.(i);
- *)      if sigma1.(i) < 1 || sigma1.(i) > m1 + m2 + 1 then failwith "Bad construction1"
-      else inv.(sigma1.(i) - 1) <- i + 1
-    done;
-    
-    for i = 0 to m2-1 do
-(*       Printf.printf "sigma2 %d %d\n" (i+1) sigma2.(i);
- *)      if sigma2.(i) < 1 || sigma2.(i) > m1 + m2 + 1 then failwith "Bad construction2"
-      else inv.(sigma2.(i) - 1) <- m1 + i + 1
-    done;
-
-    for i = 0 to m1 + m2 do
-(*       Printf.printf "bruh %d %d\n" (i+1) inv.(i);
- *)      if (i + 1) <> n && inv.(i) = -1 then failwith "Bad construction3"
-    done;
-
-    inv in
-
-  let seq_split s inv n m1 =
-    let rec aux s m m1 inv gamma delta acc =
-      match s with
-      | [] when acc = m+1 -> (gamma, delta)
-      | [] -> Printf.printf "wrong acc %d\n" acc; failwith "Bad construction4"
-      | x::xs when acc = n -> aux xs m m1 inv gamma delta (acc+1)
-      | x::xs -> let k = inv.(acc-1) in
-                 if k < m1+1 then aux xs m m1 inv (x::gamma) delta (acc+1)
-                 else aux xs m m1 inv gamma (x::delta) (acc+1) in
-
-    let f1, f2 = aux_untensor s n in
-    let gamma, delta = aux s (List.length s) m1 inv [] [] 1 in
-    List.rev (f1::gamma), f2::(List.rev delta) in
-
-  let get_perm sigma1 sigma2 n = 
-    let m1, m2 = Array.length sigma1, Array.length sigma2 in
-    let perm = Array.make (m1 + m2 + 1) (-1) in
-    for i = 0 to m1 - 1 do
-      perm.(i) <- sigma1.(i)
-    done;
-
-    perm.(m1) <- n;
-
-    for i = 0 to m2 - 1 do
-      perm.(m1 + i + 1) <- sigma2.(i)
-    done;
-
-    perm in
-
-  let aux_tensor (n, w) t1 t2 s = 
-    let sigma1 = Array.of_list (sigma_build t1) in
-    let m1 = Array.length sigma1 in
-    let sigma2 = Array.of_list (sigma_build t2) in
-
-(*     print_string "étape0 passée\n";
- *)    let inv = sigma_inv sigma1 sigma2 n in
-(*     print_string "étape0.5 passée\n";
- *)
-    let sigma1_map n = function
-      | (i, Left::w) when i = n -> (m1 + 1, w)
-      | (i, w) when i <> n -> (inv.(i-1), w)
-      | _ -> failwith "Bad construction" in
-    
-    let sigma2_map n = function
-      | (i, Right::w) when i = n -> (1, w)
-      | (i, w) when i <> n -> (inv.(i-1) - m1 + 1, w)
-      | _ -> failwith "Bad construction" in
-
-(*     print_string "début étape1\n";
- *)    let s1, s2 = seq_split s inv n m1 in
-(*     print_string "étape1 passée\n";
- *)    print_seq s1; print_newline ();
-    print_seq s2; print_newline ();
-    let t1_map, t2_map = map_psi sigma1_map n t1, map_psi sigma2_map n t2 in
-(*     print_string "étape2 passée\n";
- *)    let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
-(*     print_string "étape3 passée\n\n";
- *)    Permutation(get_perm sigma1 sigma2 n, Tensor(p1, p2)) in
-
   match t with
   | F(_, _) -> begin
     match s with
@@ -314,10 +297,22 @@ let rec decode (t, s) =
     | [NA(i); A(j)] when i = j -> Atom2(i)
     | _ -> print_seq s; print_newline (); failwith "Bad construction666"
     end
-  | N_P((n, w), t0) -> Par(n, decode ((map_psi psi_1_inv n t0), aux_unpar s n)) 
+  | N_P((n, w), t0) -> Par(n, decode ((map_psi psi_1_merged n t0), aux_unpar s n)) 
   | N_T((n, w), t1, t2) -> aux_tensor (n, w) t1 t2 s
 
-(*Main*)
+and aux_tensor (n, w) t1 t2 s = 
+    let sigma1 = Array.of_list (extract_from_shuffle t1) in
+    let m1 = Array.length sigma1 in
+    let sigma2 = Array.of_list (extract_from_shuffle t2) in
+
+    let merged = sigma_merge sigma1 sigma2 n in
+
+    let s1, s2 = seq_split s merged n m1 in
+    let t1_map, t2_map = map_psi (alpha_1 merged m1) n t1, map_psi (alpha_2 merged m1) n t2 in
+    let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
+    Permutation(get_perm sigma1 sigma2 n, Tensor(p1, p2))
+
+(*Examples*)
 let proof_1 = Par(2, Permutation([|2; 1; 3; 4|], Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))))));;
 
 let proof_2 = Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))));;
