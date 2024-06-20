@@ -25,15 +25,17 @@ type tree =
   
 type representation = tree * sequent
 
-(*Working on proofs*)
+(*Manipulating sequents*)
+(*Merge formulas i and i+1 into a par*)
 let aux_par seq i =
   let rec aux_par1 seq acc = 
     match seq, acc with
     | x::y::ys, 1 -> P(x, y)::ys
     | x::ys, i when i > 1 -> x::(aux_par1 ys (i-1))
-    | _ -> failwith "Bad construction" in
+    | _ -> failwith "Bad construction aux_par" in
   aux_par1 seq i
 
+(*Split the ith formula, supposing it's a par*)
 let aux_unpar seq i =
   let rec aux_par1 seq acc = 
     match seq, acc with
@@ -42,11 +44,13 @@ let aux_unpar seq i =
     | _ -> failwith "Bad construction" in
   aux_par1 seq i
 
+(*Merge two sequents using the tensor rule*)
 let aux_tensor seq1 seq2 =
   match List.rev seq1, seq2 with
   | x::xs, y::ys -> (List.rev xs) @ (T(x, y)::ys)
-  | _, _ -> failwith "Bad construction"
+  | _, _ -> failwith "Bad construction aux_tensor"
 
+(*Unfold the ith formula supposing it's a tensor, getting its two sons*)
 let aux_untensor seq i =
   let rec aux seq acc = 
     match seq, acc with
@@ -55,9 +59,9 @@ let aux_untensor seq i =
     | _ -> failwith "Bad construction" in
     aux seq i
 
+(*Apply a permutation to a sequent*)
 let aux_perm seq sigma =
-  if List.length seq <> Array.length sigma then
-    failwith "Bad construction"
+  if List.length seq <> Array.length sigma then failwith "Bad construction aux_perm1"
   else begin
     let m = Array.length sigma in
     let tab_ant = Array.of_list seq in
@@ -65,17 +69,18 @@ let aux_perm seq sigma =
 
     for i = 0 to m-1 do
       let j = sigma.(i) in
-      if j < 1 || j > m then failwith "Bad construction"
+      if j < 1 || j > m then failwith "Bad construction aux_perm2"
       else tab_img.(j-1) <- tab_ant.(i)
     done;
 
     for i = 0 to m-1 do
-      if tab_img.(i) = A (-1) then failwith "Bad construction"
+      if tab_img.(i) = A (-1) then failwith "Bad construction aux_perm3"
     done;
 
     Array.to_list tab_img
   end
 
+(*Calculate the sequent linked to a proof*)
 let rec get_seq = function
   | Atom1 i -> [A i; NA i]
   | Atom2 i -> [NA i; A i]
@@ -108,6 +113,7 @@ let rec print_proof p =
   | Tensor (p1, p2) -> print_string "Tensor \nLeft begins\n"; print_proof p1; print_string "Left ends\nRight begins\n"; print_proof p2; print_string "Right ends\n";
   | Permutation (sigma, p) -> print_string "Permutation\n"; print_permutation sigma; print_newline (); print_proof p
 
+(*Print an address*)
 let print_add ((n, w) : address) = 
   let rec print_dir = function
   | [] -> ()
@@ -115,16 +121,17 @@ let print_add ((n, w) : address) =
   | Left::xs -> print_string "l"; print_dir xs in
   print_int n; print_dir w
 
+(*Print a representation*)
 let print_rep (t, s) = 
   let rec print_tree = function
     | F(add1, add2) -> print_string "F "; print_add add1; print_string " "; print_add add2; print_newline ()
     | N_P(add, t) -> print_string "P "; print_add add; print_newline (); print_tree t
     | N_T(add, t1, t2) -> print_string "T "; print_add add;
                           print_string "\nLeft begins\n"; print_tree t1; print_string "Left ends\nRight begins\n"; print_tree t2; print_string "Right ends\n"
-
   in print_seq s; print_newline(); print_tree t 
 
 (*Encoding*)
+(*Define an order on addresses*)
 let add_cmp add1 add2 = 
   (*Left < Right*)
   let rec dir_cmp d1 d2 = 
@@ -140,22 +147,27 @@ let add_cmp add1 add2 =
   | (n1, add1), (n2, add2) when n1 > n2 -> 1
   | (n1, add1), (n2, add2) -> dir_cmp add1 add2
 
+(*Sort two addresses*)
 let add_sort add1 add2 = 
   if add_cmp add1 add2 <= 0 then add1, add2
   else add2, add1
 
+(*Given a function manipulating indexes, map it to a representation*)
 let rec map_psi psi n rep = 
   match rep with
   | F(add1, add2) -> let a, b = add_sort (psi n add1) (psi n add2) in F(a, b)
   | N_T(add, t1, t2) -> N_T(psi n add, map_psi psi n t1, map_psi psi n t2)
   | N_P(add, t) -> N_P(psi n add, map_psi psi n t)
 
+(*Reindexing functions used for the encoding*)
+(*In case of a par*)
 let psi_1 n = function
   | (i, w) when i = n -> (n, Left::w)
   | (i, w) when i = n+1 -> (n, Right::w)
   | (i, w) when i > n+1 -> (i-1, w)
   | (i, w) -> (i, w)
 
+(*In case of a tensor*)
 let psi_2 n = function
   | (i, w) when i = n -> (n, Left::w) 
   | (i, w) -> (i, w)
@@ -164,6 +176,7 @@ let psi_3 n = function
   | (1, w) -> (n, Right::w)
   | (i, w) -> (n + i - 1, w)
 
+(*Given a permutation, map it to a representation*)
 let add_sigma sigma = function
   | n, w -> sigma.(n-1), w
 
@@ -188,6 +201,8 @@ let encode proof =
   (encode_aux proof, get_seq proof)
 
 (*Decode*)
+(*Reindexing functions used for the decoding*)
+(*In cas of a par*)
 let psi_1_inv n = function
   | (i, Left::w) when i = n -> (n, w)
   | (i, Right::w) when i = n -> (n+1, w)
@@ -215,20 +230,20 @@ let rec decode (t, s) =
     let inv = Array.make (m1 + m2 + 1) (-1) in
 
     for i = 0 to m1-1 do
-      Printf.printf "sigma1 %d %d\n" (i+1) sigma1.(i);
-      if sigma1.(i) < 1 || sigma1.(i) > m1 + m2 + 1 then failwith "Bad construction1"
+(*       Printf.printf "sigma1 %d %d\n" (i+1) sigma1.(i);
+ *)      if sigma1.(i) < 1 || sigma1.(i) > m1 + m2 + 1 then failwith "Bad construction1"
       else inv.(sigma1.(i) - 1) <- i + 1
     done;
     
     for i = 0 to m2-1 do
-      Printf.printf "sigma2 %d %d\n" (i+1) sigma2.(i);
-      if sigma2.(i) < 1 || sigma2.(i) > m1 + m2 + 1 then failwith "Bad construction2"
+(*       Printf.printf "sigma2 %d %d\n" (i+1) sigma2.(i);
+ *)      if sigma2.(i) < 1 || sigma2.(i) > m1 + m2 + 1 then failwith "Bad construction2"
       else inv.(sigma2.(i) - 1) <- m1 + i + 1
     done;
 
     for i = 0 to m1 + m2 do
-      Printf.printf "bruh %d %d\n" (i+1) inv.(i);
-      if (i + 1) <> n && inv.(i) = -1 then failwith "Bad construction3"
+(*       Printf.printf "bruh %d %d\n" (i+1) inv.(i);
+ *)      if (i + 1) <> n && inv.(i) = -1 then failwith "Bad construction3"
     done;
 
     inv in
@@ -267,10 +282,10 @@ let rec decode (t, s) =
     let m1 = Array.length sigma1 in
     let sigma2 = Array.of_list (sigma_build t2) in
 
-    print_string "étape0 passée\n";
-    let inv = sigma_inv sigma1 sigma2 n in
-    print_string "étape0.5 passée\n";
-
+(*     print_string "étape0 passée\n";
+ *)    let inv = sigma_inv sigma1 sigma2 n in
+(*     print_string "étape0.5 passée\n";
+ *)
     let sigma1_map n = function
       | (i, Left::w) when i = n -> (m1 + 1, w)
       | (i, w) when i <> n -> (inv.(i-1), w)
@@ -281,16 +296,16 @@ let rec decode (t, s) =
       | (i, w) when i <> n -> (inv.(i-1) - m1 + 1, w)
       | _ -> failwith "Bad construction" in
 
-    print_string "début étape1\n";
-    let s1, s2 = seq_split s inv n m1 in
-    print_string "étape1 passée\n";
-    print_seq s1; print_newline ();
+(*     print_string "début étape1\n";
+ *)    let s1, s2 = seq_split s inv n m1 in
+(*     print_string "étape1 passée\n";
+ *)    print_seq s1; print_newline ();
     print_seq s2; print_newline ();
     let t1_map, t2_map = map_psi sigma1_map n t1, map_psi sigma2_map n t2 in
-    print_string "étape2 passée\n";
-    let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
-    print_string "étape3 passée\n\n";
-    Permutation(get_perm sigma1 sigma2 n, Tensor(p1, p2)) in
+(*     print_string "étape2 passée\n";
+ *)    let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
+(*     print_string "étape3 passée\n\n";
+ *)    Permutation(get_perm sigma1 sigma2 n, Tensor(p1, p2)) in
 
   match t with
   | F(_, _) -> begin
@@ -304,22 +319,23 @@ let rec decode (t, s) =
 
 (*Main*)
 let proof_1 = Par(2, Permutation([|2; 1; 3; 4|], Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))))));;
-let proof_1_rep = encode proof_1;;
-let proof_1_back = decode proof_1_rep;;
-
 
 let proof_2 = Tensor(Atom1(1), Permutation ([|3; 1; 2|], Tensor (Atom2(2), Atom2(3))));;
-let proof_2_rep = encode proof_2;;
-let proof_2_back = decode proof_2_rep;;
 
-let () = print_proof proof_1; print_newline();;
+let proof_3 = Permutation([|3;2;1;4|], Tensor(Atom1(1), Permutation([|2;1;3|], Tensor(Atom2(2), Atom2(3)))));;
 
-let () = print_rep proof_1_rep; print_newline();;
+let proof_4 = Permutation([|1;6;2;3;4;5|],
+                          Tensor(Atom1(1),
+                                Permutation([|2;1;3;4;5|],
+                                            Tensor(Atom1(2),
+                                                    Permutation([|2; 1; 4; 3|], 
+                                                                Tensor(Atom1(3),
+                                                                        Permutation([|3;1;2|], 
+                                                                                    Tensor(Atom1(4), 
+                                                                                    Atom2(5)))))))));;
 
-let () = print_proof proof_1_back;;print_newline();;print_newline();;
-
-let () = print_proof proof_2; print_newline();;
-
-let () = print_rep proof_2_rep; print_newline();;
-
-let () = print_proof proof_2_back;;
+let a = proof_4;;
+print_proof a; print_newline();print_newline();
+print_rep (encode a); print_newline();print_newline();
+print_proof (decode (encode a)); print_newline(); print_newline();;
+print_rep (encode (decode (encode a))); print_newline();print_newline();
