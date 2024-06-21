@@ -7,7 +7,7 @@
 \usepackage{ebproof}
 
 \newtheorem{example}{Exemple}
-\newtheorem{definition}{Definition}
+\newtheorem{definition}{Définition}
 
 % dessins arbres : tikz
 
@@ -42,6 +42,8 @@
 
 \newcommand*{\Left}{\textit{Left}}
 \newcommand*{\Right}{\textit{Right}}
+\newcommand*{\proofs}{\ensuremath{\mathcal{P}}}
+\newcommand*{\addresses}{\ensuremath{\mathcal{A}}}
 \newcommand*{\trees}{\ensuremath{\mathcal{T}}}
 
 
@@ -57,10 +59,18 @@
 
 \section{Définitions}
 
-\todo formules
+\subsection{Formules}
+\begin{definition}[Formules]
+On se donne un ensemble $X$ infini d'atomes. Les formules en logique linéaire sont définies par la grammaire suivante :
+\begin{equation*}
+F := X | X\orth | F \parr F | F \tensor F
+\end{equation*}
+\end{definition}
 
 \subsection{Preuves}
-Les séquents sont des listes de formulas. On définit alors l'ensemble $\mathcal{P}$ des preuves en logique linéaire, par induction :
+Les séquents sont des listes de formules. On définit alors l'ensemble \proofs{} des preuves en logique linéaire.
+\begin{definition}[Preuves]
+\proofs{} est défini par les règles d'induction suivantes :
 \begin{equation*}
 \begin{prooftree}
   \axv{X\orth, X}
@@ -82,21 +92,32 @@ Les séquents sont des listes de formulas. On définit alors l'ensemble $\mathca
   \tensorv{\Gamma, A \tensor B, \Delta}
 \end{prooftree}
 \end{equation*}
+\end{definition}
 
 \subsection{Représentations}
 On choisit de représenter une preuve $p \in \mathcal{P}$ par un couple $(t, s) \in \trees \times \mathcal{S}$, où $t$ est un arbre encodant le squelette de la preuve, et $s$ est le séquent prouvé.
-\\
 
-On pose donc l'ensemble $\mathcal{A} = \mathbb{N} \times \mathcal{L} ( \{ \Left | \Right\}^{*} )$, et on considère que l'adresse $(n, \rho) \in \mathcal{A}$ représente la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $s$ (chaque formule pouvant être vue comme un arbre).
-\\
-
+\begin{definition}[Adresses]
+On définit d'abord un ensemble d'adresses :
+\begin{equation*}
+\mathcal{A} = \mathbb{N} \times \mathcal{L} ( \{ \Left | \Right\}^{*} )   
+\end{equation*}
+On considère que, dans un séquent $s$, l'adresse $(n, \rho) \in \mathcal{A}$ représente la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $s$ (chaque formule pouvant être vue comme un arbre).
+\end{definition}
 
 \begin{example}
-  \todo
+Considérons le séquent suivant : 
+\begin{equation*}
+X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth
+\end{equation*}
+
+$(1, \epsilon)$ représente $X_1\orth$, et $(2, \Right \Left)$ représente $X_2$. 
 \end{example}
 
-\begin{definition}[Arbre]
-On définit inductivement l'ensemble \trees{} des arbres, en se donnant trois constructeurs:
+Cette notion d'adresse permet d'établir la correspondance entre l'arbre $t$ et la preuve $p$.
+
+\begin{definition}[Arbres]
+L'ensemble \trees{} des arbres est défini inductivement, par trois constructeurs :
 \begin{itemize}
   \item un constructeur 0-aire étiquetté par deux adresses : $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
   \item un constructeur unaire étiquetté par une adresse : $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
@@ -104,7 +125,7 @@ On définit inductivement l'ensemble \trees{} des arbres, en se donnant trois co
 \end{itemize}
 \end{definition}
 
-Chaque n\oe ud de $t$ représente une règle utilisée dans $p$. Afin d'établir la correspondance, on définit une notion d'adresse, avec l'idée que chaque noeud porte une adresse qui pointe vers la sous-formule de $s$ sur laquelle la règle qu'il représente est appliquée. Le cas d'une règle axiome est particulier: un axiome est représenté par une feuille, qui a deux adresses pointant vers les deux atomes utilisés.
+Chaque n\oe ud de l'arbre représente une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier : un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes utilisés.
 
 \begin{example}
   \todo
