@@ -100,7 +100,7 @@ On choisit de représenter une preuve $p \in \mathcal{P}$ par un couple $(t, s) 
 \begin{definition}[Adresses]
 On définit d'abord un ensemble d'adresses :
 \begin{equation*}
-\mathcal{A} = \mathbb{N} \times \mathcal{L} ( \{ \Left | \Right\}^{*} )   
+\mathcal{A} = \mathbb{N} \times \{ \Left, \Right\}^{*}  
 \end{equation*}
 On considère que, dans un séquent $s$, l'adresse $(n, \rho) \in \mathcal{A}$ représente la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $s$ (chaque formule pouvant être vue comme un arbre).
 \end{definition}
@@ -110,12 +110,8 @@ Considérons le séquent suivant :
 \begin{equation*}
 X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth
 \end{equation*}
-
-$(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \Left)$ représente la sous-formule $X_2$.
-\todo cas non atomique 
+$(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \Left)$ représente la sous-formule $X_2$. $(2, Right)$ représente la sous-formule $(X_2 \tensor X_3)$.
 \end{example}
-
-Cette notion d'adresse permet d'établir la correspondance entre l'arbre $t$ et la preuve $p$.
 
 \begin{definition}[Arbres]
 L'ensemble \trees{} des arbres est défini inductivement, par trois constructeurs :
