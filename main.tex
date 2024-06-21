@@ -61,7 +61,7 @@
 
 \subsection{Formules}
 \begin{definition}[Formules]
-On se donne un ensemble $X$ infini d'atomes. Les formules en logique linéaire sont définies par la grammaire suivante :
+On se donne un ensemble $\mathcal{X}$ infini d'atomes. Les formules en logique linéaire sont définies par la grammaire suivante :
 \begin{equation*}
 F := X | X\orth | F \parr F | F \tensor F
 \end{equation*}
@@ -111,7 +111,8 @@ Considérons le séquent suivant :
 X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth
 \end{equation*}
 
-$(1, \epsilon)$ représente $X_1\orth$, et $(2, \Right \Left)$ représente $X_2$. 
+$(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \Left)$ représente la sous-formule $X_2$.
+\todo cas non atomique 
 \end{example}
 
 Cette notion d'adresse permet d'établir la correspondance entre l'arbre $t$ et la preuve $p$.
@@ -125,7 +126,7 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 \end{itemize}
 \end{definition}
 
-Chaque n\oe ud de l'arbre représente ainsi une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier : un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes utilisés.
+Chaque n\oe ud de l'arbre représente ainsi une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier : un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes duaux utilisés.
 
 \begin{example}
   \todo
