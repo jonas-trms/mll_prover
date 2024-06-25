@@ -5,6 +5,9 @@
 \usepackage{amsmath,amsthm}
 \usepackage{amssymb,cmll}
 \usepackage{ebproof}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usetikzlibrary{trees}
 
 \newtheorem{example}{Exemple}
 \newtheorem{definition}{Définition}
@@ -22,8 +25,6 @@
 \newcommand*{\hypv}[1]{\hypo{\vdash #1}}
 \newcommand*{\exv}[2]{\infer{1}[\ensuremath{\mathit{ex}}]{\vdash #2}}
 \newcommand*{\axv}[1]{\infer{0}[\ensuremath{\mathit{ax}}]{\vdash #1}}
-\newcommand*{\axIv}[1]{\infer{0}[\ensuremath{\mathit{ax1}}]{\vdash #1}}
-\newcommand*{\axIIv}[1]{\infer{0}[\ensuremath{\mathit{ax2}}]{\vdash #1}}
 \newcommand*{\cutv}[1]{\infer{2}[\ensuremath{\mathit{cut}}]{\vdash #1}}
 \newcommand*{\onev}[1]{\infer{0}[\ensuremath{\one}]{\vdash #1}}
 \newcommand*{\botv}[1]{\infer{1}[\ensuremath{\bot}]{\vdash #1}}
@@ -43,9 +44,12 @@
 \newcommand*{\Left}{\textit{Left}}
 \newcommand*{\Right}{\textit{Right}}
 \newcommand*{\proofs}{\ensuremath{\mathcal{P}}}
+\newcommand*{\sequents}{\ensuremath{\mathcal{S}}}
 \newcommand*{\addresses}{\ensuremath{\mathcal{A}}}
 \newcommand*{\trees}{\ensuremath{\mathcal{T}}}
-
+\newcommand*{\representationslarge}{\ensuremath{\trees \times \sequents}}
+\newcommand*{\representations}{\ensuremath{\mathcal{R}}}
+\newcommand*{\encode}{\ensuremath{\varphi}}
 
 \newcommand*{\todo}{{\normalfont \textbf{TODO}} }
 
@@ -95,7 +99,7 @@ Les séquents sont des listes de formules. On définit alors l'ensemble \proofs{
 \end{definition}
 
 \subsection{Représentations}
-On choisit de représenter une preuve $p \in \mathcal{P}$ par un couple $(t, s) \in \trees \times \mathcal{S}$, où $t$ est un arbre encodant le squelette de la preuve, et $s$ est le séquent prouvé.
+On choisit de représenter une preuve $p \in \mathcal{P}$ par un couple $(t, s) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $s$ est le séquent prouvé.
 
 \begin{definition}[Adresses]
 On définit d'abord un ensemble d'adresses :
@@ -125,7 +129,111 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 Chaque n\oe ud de l'arbre représente ainsi une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier : un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes duaux utilisés.
 
 \begin{example}
-  \todo
+%à modifier (alignement notamment)
+Une preuve et sa représenation.
+\begin{equation*}
+\begin{prooftree}
+    \axv{{X_1}\orth, X_1}
+    \axv{{X_2}\orth, X_2}
+    \permv{X_2, {X_2}\orth}
+    \tensorv{{X_1}\orth, X_1 \tensor X_2, {X_2}\orth}
+    \parrv{{X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth}
+\end{prooftree}
+\qquad
+\left(
+\begin{tikzpicture}%
+    [level distance=1.5cm,
+    level 2/.style={sibling distance=3.5cm}]
+    \node {$U_{1 \epsilon}$}
+    child {node {$B_{1 \Right}$}
+        child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
+        child {node {$F_{1 \Right \cdot \Right, \; 2 \epsilon}$}}
+    };
+\end{tikzpicture}
+, \left( \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth \right)
+\right)
+\end{equation*}
 \end{example}
+
+\subsection{Traduction}
+Notre objectif est de définir une fonction d'encodage des preuves vers les représentations, puis de l'inverser.
+
+\subsubsection{Encodage}
+On cherche d'abord à restreindre l'ensemble des représentations, pour ne conserver que celles qui représentent effectivement une preuve.
+
+\begin{definition}[Représentations correctes]
+    On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, s)$ de $\representationslarge$ vérifiant les trois conditions suivantes :
+    \item[(i) Bon adressage :] Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $s$. De plus, l'arité d'un n\oe ud est égale à celle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.
+    
+    \item[(ii) Linéarité :] Chaque sous-formule de $s$ apparaît exactement une fois dans les adresses de $t$.
+
+    \item[(iii) Descendance :] Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.
+\end{definition}
+
+\begin{definition}[Fonction d'encodage]
+    On identifie une fonction dans $\mathcal{F}(\addresses, \addresses)$ et son extension dans $\mathcal{F}(\trees, \trees)$, qui remplace chaque adresse de l'arbre par son image. On définit alors $\encode' : \proofs \rightarrow \trees$ par induction sur $\proofs$ :
+    \item[Axiome :] 
+    $\encode' \left(
+    \begin{prooftree}
+        \axv{{X}\orth, X}
+    \end{prooftree}
+    \right) = F(1 \epsilon, \; 2 \epsilon)$
+
+    \item[Permutation :] 
+    $\encode' \left(
+    \begin{prooftree}
+      \hypv{\Gamma}
+      \permv{\Gamma{\sigma}}
+    \end{prooftree}
+    \right) = \sigma \left( \encode ' \left( \vdash \Gamma \right) \right)$
+
+    \item[Parr :] 
+    $\encode' \left(
+    \begin{prooftree}
+      \hypv{\Gamma, A, B, \Delta}
+      \parrv{\Gamma, A \parr B, \Delta}
+    \end{prooftree}
+    \right) = \begin{tikzpicture}%
+    [level distance=1.5cm,
+    level 2/.style={sibling distance=3.5cm}]
+    \node {$U_{n \epsilon}$}
+        child {node {$\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$}
+    };
+    \end{tikzpicture}$
+    
+    où $n = | \Gamma | + 1$, $\psi_1 : \addresses \rightarrow \addresses =
+    \begin{cases*}
+        (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
+        (n+1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
+        (i, \sigma), \; i \geq n+2 \mapsto (i-1, \sigma)
+    \end{cases*}$
+
+    \item[Tenseur :] 
+    $\encode' \left(
+    \begin{prooftree}
+      \hypv{\Gamma, A}
+      \hypv{B, \Delta}
+      \tensorv{\Gamma, A \tensor B, \Delta}
+    \end{prooftree}
+    \right) = \begin{tikzpicture}%
+    [level distance=1.5cm,
+    level 1/.style={sibling distance=3.5cm}]
+    \node {$B_{n \epsilon}$}
+        child {node {$\psi_2 \left( \encode' \left( \vdash \Gamma, A \right) \right)$}}
+        child {node {$\psi_3 \left( \encode' \left( \vdash B, \Delta \right) \right)$}
+    };
+    \end{tikzpicture}$
+    
+    où $n = | \Gamma | + 1$, $\psi_2 : \addresses \rightarrow \addresses =
+    \begin{cases*}
+        (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
+        (i, \sigma), \; i \neq n \mapsto (i, \sigma)
+    \end{cases*}$,
+    $\psi_3 : \addresses \rightarrow \addresses =
+    \begin{cases*}
+        (1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
+        (i, \sigma), \; i \geq 2 \mapsto (i + n - 1, \sigma)
+    \end{cases*}$
+\end{definition}
 
 \end{document}
