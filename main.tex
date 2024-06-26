@@ -6,11 +6,14 @@
 \usepackage{amssymb,cmll}
 \usepackage{ebproof}
 \usepackage{mathtools}
+\usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{trees}
 
 \newtheorem{example}{Exemple}
 \newtheorem{definition}{Définition}
+\newtheorem{theorem}{Théorème}
+\newtheorem{demonstration}{Démonstration}
 
 % dessins arbres : tikz
 \tikzset{baseline=(current bounding box.center)}
@@ -115,7 +118,7 @@ Considérons le séquent suivant :
 \begin{equation*}
 X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth
 \end{equation*}
-$(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \Left)$ représente la sous-formule $X_2$. $(2, Right)$ représente la sous-formule $(X_2 \tensor X_3)$.
+$(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Left)$ représente la sous-formule $X_2$. $(2, \Right)$ représente la sous-formule $(X_2 \tensor X_3)$.
 \end{example}
 
 \begin{definition}[Arbres]
@@ -140,7 +143,7 @@ Une preuve et sa représenation.
     \tensorv{{X_1}\orth, X_1 \tensor X_2, {X_2}\orth}
     \parrv{{X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth}
 \end{prooftree}
-\qquad
+\mathrel{\leadsto}
 \left(
 \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -151,7 +154,7 @@ Une preuve et sa représenation.
         child {node {$F_{1 \Right \cdot \Right, \; 2 \epsilon}$}}
     };
 \end{tikzpicture}
-, \left( \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth \right)
+\vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
 \right)
 \end{equation*}
 \end{example}
@@ -163,32 +166,38 @@ Notre objectif est de définir une fonction d'encodage des preuves vers les repr
 On cherche d'abord à restreindre l'ensemble des représentations, pour ne conserver que celles qui représentent effectivement une preuve.
 
 \begin{definition}[Représentations correctes]
+    \label{def_rep}
     On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, s)$ de $\representationslarge$ vérifiant les trois conditions suivantes :
-    \item[(i) Bon adressage :] Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $s$. De plus, l'arité d'un n\oe ud est égale à celle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.
     
-    \item[(ii) Linéarité :] Chaque sous-formule de $s$ apparaît exactement une fois dans les adresses de $t$.
+    \begin{itemize}
+    \item[(i) Bon adressage :]{ Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $s$. De plus, l'arité d'un n\oe ud est égale à celle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.}
+    
+    \item[(ii) Linéarité :]{ Chaque sous-formule de $s$ apparaît exactement une fois dans les adresses de $t$.}
 
-    \item[(iii) Descendance :] Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.
+    \item[(iii) Descendance :]{ Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.}
+    \end{itemize}
 \end{definition}
 
 \begin{definition}[Fonction d'encodage]
-    On identifie une fonction dans $\mathcal{F}(\addresses, \addresses)$ et son extension dans $\mathcal{F}(\trees, \trees)$, qui remplace chaque adresse de l'arbre par son image. On définit alors $\encode' : \proofs \rightarrow \trees$ par induction sur $\proofs$ :
-    \item[Axiome :] 
+    On identifie une fonction dans $\mathcal{F}(\addresses, \addresses)$ et son extension dans $\mathcal{F}(\trees, \trees)$, qui remplace chaque adresse de l'arbre par son image. On définit d'abord une fonction $\encode' : \proofs \rightarrow \trees$, par induction sur $\proofs$ :
+
+    \begin{itemize}
+    \item[(i) Axiome :]{ 
     $\encode' \left(
     \begin{prooftree}
         \axv{{X}\orth, X}
     \end{prooftree}
-    \right) = F(1 \epsilon, \; 2 \epsilon)$
+    \right) = F(1 \epsilon, \; 2 \epsilon)$}
 
-    \item[Permutation :] 
+    \item[(ii) Permutation :]{
     $\encode' \left(
     \begin{prooftree}
       \hypv{\Gamma}
       \permv{\Gamma{\sigma}}
     \end{prooftree}
-    \right) = \sigma \left( \encode ' \left( \vdash \Gamma \right) \right)$
+    \right) = \sigma \left( \encode ' \left( \vdash \Gamma \right) \right)$}
 
-    \item[Parr :] 
+    \item[(iii) Parr :]{ 
     $\encode' \left(
     \begin{prooftree}
       \hypv{\Gamma, A, B, \Delta}
@@ -202,14 +211,16 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     };
     \end{tikzpicture}$
     
-    où $n = | \Gamma | + 1$, $\psi_1 : \addresses \rightarrow \addresses =
+    où $n = | \Gamma | + 1$
+    
+    $\psi_1 : \addresses \rightarrow \addresses =
     \begin{cases*}
         (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
         (n+1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
         (i, \sigma), \; i \geq n+2 \mapsto (i-1, \sigma)
-    \end{cases*}$
+    \end{cases*}$}
 
-    \item[Tenseur :] 
+    \item[(iv) Tenseur :]{ 
     $\encode' \left(
     \begin{prooftree}
       \hypv{\Gamma, A}
@@ -225,16 +236,89 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     };
     \end{tikzpicture}$
     
-    où $n = | \Gamma | + 1$, $\psi_2 : \addresses \rightarrow \addresses =
+    où $n = | \Gamma | + 1$
+    
+    $\psi_2 : \addresses \rightarrow \addresses =
     \begin{cases*}
         (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
         (i, \sigma), \; i \neq n \mapsto (i, \sigma)
-    \end{cases*}$,
+    \end{cases*}$
+    
     $\psi_3 : \addresses \rightarrow \addresses =
     \begin{cases*}
         (1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
         (i, \sigma), \; i \geq 2 \mapsto (i + n - 1, \sigma)
-    \end{cases*}$
+    \end{cases*}$}
+    \end{itemize}
+
+    On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representations$ :
+    \begin{equation*}
+    \forall p \in \proofs, \encode \left( p \right) = \left( \encode' \left( p \right), \; s \right), \; \text{où $s$ est le séquent prouvé par $p$.}
+    \end{equation*}
 \end{definition}
+
+\begin{theorem}[Image de l'encodage]
+    \begin{equation*}
+    \forall p \in \proofs, \encode \left( p \right) \in \representations
+    \end{equation*}
+
+    Autrement dit, l'encodage d'une preuve est une représentation correcte.
+\end{theorem}
+
+\begin{demonstration}
+    Par induction sur $p \in \proofs$ :
+
+    \begin{itemize}
+    \item[(i) Axiome :]$p =
+    \begin{prooftree}
+        \axv{X\orth, X}
+    \end{prooftree}$,
+    et donc $\encode \left( p \right) = F(1 \epsilon, \; 2 \epsilon), \; \left( X\orth, X \right)$
+
+    On vérifie aisément les conditions (i), (ii) et (iii) de la définition \ref{def_rep}, d'où $\encode \left( p \right) \in \representations$.
+
+    \item[(ii) Permutation :]$p = 
+    \begin{prooftree}
+        \hypv{\Gamma}
+        \permv{\Gamma{\sigma}}
+    \end{prooftree}$.
+    
+    Par hypothèse d'induction, $\encode \left( \vdash \Gamma \right) = \left( \encode ' \left( \vdash \Gamma \right), \; \Gamma \right)$ vérifie (i), (ii) et (iii). Les trois conditions sont stables par ré-adressage par $\sigma$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement.
+
+    On en déduit que $\encode \left( p \right) = \left( \sigma \left( \encode ' \left( \vdash \Gamma \right) \right), \; \Gamma{\sigma} \right)$ vérifie (i), (ii) et (iii), d'où $\encode \left( p \right) \in \representations$.
+
+    \item[(iii) Parr :]$p =
+    \begin{prooftree}
+      \hypv{\Gamma, A, B, \Delta}
+      \parrv{\Gamma, A \parr B, \Delta}
+    \end{prooftree}$
+
+    Par hypothèse d'induction, $\encode \left( \vdash \Gamma, A, B, \Delta \right) = \left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$ vérifie (i), (ii) et (iii).
+    
+    On a, de plus :
+
+    \begin{equation*}
+    \encode ( p ) = \left( \begin{tikzpicture}%
+    [level distance=1.5cm,
+    level 2/.style={sibling distance=3.5cm}]
+    \node {$U_{n \epsilon}$}
+        child {node {$\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$}
+    };
+    \end{tikzpicture}, \; \left( \Gamma, A \parr B, \Delta \right) \right)
+    \end{equation*}
+
+    Vérifions les trois conditions :
+    \begin{itemize}
+        \item[(i) :]{L'adresse $n \epsilon$, adressant un parr, étiquette la racine d'arité 1. Cette adresse est donc correcte. Par ailleurs, (i) est vérifié pour $\left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$, d'où, grâce au ré-adressage effectué par $\psi_1$, les adresses de $\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
+        }
+        
+        \item[(ii) :]
+        \item[(iii) :]
+    \end{itemize}
+
+    \end{itemize}
+
+    
+\end{demonstration}
 
 \end{document}
