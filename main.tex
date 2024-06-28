@@ -251,7 +251,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     \end{cases*}$}
     \end{itemize}
 
-    On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representations$ :
+    On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representationslarge$ :
     \begin{equation*}
     \forall p \in \proofs, \encode \left( p \right) = \left( \encode' \left( p \right), \; s \right), \; \text{où $s$ est le séquent prouvé par $p$.}
     \end{equation*}
@@ -309,7 +309,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :]{L'adresse $n \epsilon$, adressant un parr, étiquette la racine d'arité 1. Cette adresse est donc correcte. Par ailleurs, (i) est vérifié pour $\left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$, d'où, grâce au ré-adressage effectué par $\psi_1$, les adresses de $\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
+        \item[(i) :]{L'adresse $n \epsilon$, adressant un parr, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$, d'où, grâce au ré-adressage effectué par $\psi_1$, les adresses de $\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
         }
         
         \item[(ii) :]
