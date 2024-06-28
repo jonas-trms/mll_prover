@@ -26,6 +26,7 @@
 \newcommand*{\zero}{0}
 \newcommand*{\limp}{\multimap}
 
+\newcommand*{\namedproofv}[2]{\hypo{#1}\infer[no rule]{1}{\vdash #2}}
 \newcommand*{\hypv}[1]{\hypo{\vdash #1}}
 \newcommand*{\exv}[2]{\infer{1}[\ensuremath{\mathit{ex}}]{\vdash #2}}
 \newcommand*{\axv}[1]{\infer{0}[\ensuremath{\mathit{ax}}]{\vdash #1}}
@@ -35,7 +36,7 @@
 \newcommand*{\topv}[1]{\infer{0}[\ensuremath{\top}]{\vdash #1}}
 \newcommand*{\tensorv}[1]{\infer{2}[\ensuremath{\tensor}]{\vdash #1}}
 \newcommand*{\parrv}[1]{\infer{1}[\ensuremath{\parr}]{\vdash #1}}
-\newcommand*{\permv}[1]{\infer{1}[\ensuremath{\sigma}]{\vdash #1}}
+\newcommand*{\permv}[2]{\infer{1}[\ensuremath{\textit{ex}_{#1}}]{\vdash #2}}
 \newcommand*{\withv}[1]{\infer{2}[\ensuremath{\with}]{\vdash #1}}
 \newcommand*{\pluslv}[1]{\infer{1}[\ensuremath{\plus_1}]{\vdash #1}}
 \newcommand*{\plusrv}[1]{\infer{1}[\ensuremath{\plus_2}]{\vdash #1}}
@@ -44,6 +45,12 @@
 \newcommand*{\cov}[1]{\infer{1}[\ensuremath{?\mathit{c}}]{\vdash #1}}
 \newcommand*{\dev}[1]{\infer{1}[\ensuremath{?\mathit{d}}]{\vdash #1}}
 \newcommand*{\defv}[1]{\infer[dashed]{1}[\ensuremath{\mathit{def}}]{\vdash #1}}
+\newcommand*{\permapp}[2]{#2 #1}
+\newcommand*{\someperm}{\varsigma}
+\newcommand*{\someproof}{\pi}
+\newcommand*{\sequent}{\Gamma}
+\newcommand*{\size}[1]{\mathopen{|}#1\mathclose{|}}
+
 
 \newcommand*{\Left}{\textnormal{\texttt{L}}}
 \newcommand*{\Right}{\textnormal{\texttt{R}}}
@@ -54,6 +61,7 @@
 \newcommand*{\representationslarge}{\ensuremath{\trees \times \sequents}}
 \newcommand*{\representations}{\ensuremath{\mathcal{R}}}
 \newcommand*{\encode}{\ensuremath{\varphi}}
+
 
 \newcommand*{\todo}{{\normalfont \textbf{TODO}} }
 
@@ -71,7 +79,7 @@
 \begin{definition}[Formules]
 On se donne un ensemble $\mathcal{X}$ infini d'atomes. Les formules en logique linéaire sont définies par la grammaire suivante :
 \begin{equation*}
-F := X | X\orth | F \parr F | F \tensor F
+F := X \mid X\orth \mid F \parr F \mid F \tensor F
 \end{equation*}
 \end{definition}
 
@@ -86,7 +94,7 @@ Les séquents sont des listes de formules. On définit alors l'ensemble \proofs{
 \qquad\qquad
 \begin{prooftree}
   \hypv{\Gamma}
-  \permv{\Gamma{\sigma}}
+  \permv{\someperm}{\permapp{\someperm}{\Gamma}}
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
@@ -103,14 +111,14 @@ Les séquents sont des listes de formules. On définit alors l'ensemble \proofs{
 \end{definition}
 
 \subsection{Représentations}
-On choisit de représenter une preuve $p \in \mathcal{P}$ par un couple $(t, s) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $s$ est le séquent prouvé.
+On choisit de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $\sequent$ est le séquent prouvé.
 
 \begin{definition}[Adresses]
 On définit d'abord un ensemble d'adresses :
 \begin{equation*}
 \mathcal{A} = \mathbb{N} \times \{ \Left, \Right\}^{*}  
 \end{equation*}
-On considère que, dans un séquent $s$, l'adresse $(n, \rho) \in \mathcal{A}$ représente la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $s$ (chaque formule pouvant être vue comme un arbre).
+On considère que, dans un séquent $\sequent$, l'adresse $(n, \rho) \in \mathcal{A}$ représente la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $\sequent$ (chaque formule pouvant être vue comme un arbre).
 \end{definition}
 
 \begin{example}
@@ -133,18 +141,16 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 Chaque n\oe ud de l'arbre représente ainsi une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier : un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes duaux utilisés.
 
 \begin{example}
-%à modifier (alignement notamment)
 Une preuve et sa représenation.
 \begin{equation*}
 \begin{prooftree}
     \axv{{X_1}\orth, X_1}
     \axv{{X_2}\orth, X_2}
-    \permv{X_2, {X_2}\orth}
+    \permv{(1,2)}{X_2, {X_2}\orth}
     \tensorv{{X_1}\orth, X_1 \tensor X_2, {X_2}\orth}
     \parrv{{X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth}
 \end{prooftree}
-\mathrel{\leadsto}
-\left(
+\quad\leadsto\quad
 \begin{tikzpicture}%
     [level distance=1.5cm,
     level 2/.style={sibling distance=3.5cm}]
@@ -155,7 +161,6 @@ Une preuve et sa représenation.
     };
 \end{tikzpicture}
 \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
-\right)
 \end{equation*}
 \end{example}
 
@@ -167,19 +172,19 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
 \begin{definition}[Représentations correctes]
     \label{def_rep}
-    On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, s)$ de $\representationslarge$ vérifiant les trois conditions suivantes :
+    On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationslarge$ vérifiant les trois conditions suivantes :
     
     \begin{itemize}
-    \item[(i) Bon adressage :]{ Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $s$. De plus, l'arité d'un n\oe ud est égale à celle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.}
+    \item[(i) Bon adressage :]{ Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.}
     
-    \item[(ii) Linéarité :]{ Chaque sous-formule de $s$ apparaît exactement une fois dans les adresses de $t$.}
+    \item[(ii) Linéarité :]{ Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.}
 
     \item[(iii) Descendance :]{ Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.}
     \end{itemize}
 \end{definition}
 
 \begin{definition}[Fonction d'encodage]
-    On identifie une fonction dans $\mathcal{F}(\addresses, \addresses)$ et son extension dans $\mathcal{F}(\trees, \trees)$, qui remplace chaque adresse de l'arbre par son image. On définit d'abord une fonction $\encode' : \proofs \rightarrow \trees$, par induction sur $\proofs$ :
+    On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de $\trees$ dans $\trees$, qui remplace chaque adresse de l'arbre par son image. On définit d'abord une fonction $\encode' : \proofs \rightarrow \trees$, par induction sur $\proofs$ :
 
     \begin{itemize}
     \item[(i) Axiome :]{ 
@@ -189,127 +194,144 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     \end{prooftree}
     \right) = F(1 \epsilon, \; 2 \epsilon)$}
 
-    \item[(ii) Permutation :]{
+    \item[(ii) Échange :]{
     $\encode' \left(
     \begin{prooftree}
-      \hypv{\Gamma}
-      \permv{\Gamma{\sigma}}
+      \namedproofv{\pi}{\Gamma}
+      \permv{\someperm}{\permapp{\someperm}{\Gamma}}
     \end{prooftree}
-    \right) = \sigma \left( \encode ' \left( \vdash \Gamma \right) \right)$}
+    \right) = \someperm \left( \encode ' \left(
+           \begin{prooftree}
+             \namedproofv{\pi}{\Gamma}
+           \end{prooftree} \right) \right)$}
 
-    \item[(iii) Parr :]{ 
+    \item[(iii) Par :]{
     $\encode' \left(
     \begin{prooftree}
-      \hypv{\Gamma, A, B, \Delta}
+      \namedproofv{\pi}{\Gamma, A, B, \Delta}
       \parrv{\Gamma, A \parr B, \Delta}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
     level 2/.style={sibling distance=3.5cm}]
     \node {$U_{n \epsilon}$}
-        child {node {$\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$}
+        child {node {$\psi_\parr \left( \encode' \left(
+           \begin{prooftree}
+             \namedproofv{\pi}{\Gamma, A, B, \Delta}
+           \end{prooftree} \right) \right)$}
     };
     \end{tikzpicture}$
     
-    où $n = | \Gamma | + 1$
+    où $n = \size{\Gamma} + 1$
     
-    $\psi_1 : \addresses \rightarrow \addresses =
+    $\psi_\parr : \addresses \rightarrow \addresses =
     \begin{cases*}
+        (i, \sigma) \mapsto (i, \sigma) & si $i < n$ \\
         (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
         (n+1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
-        (i, \sigma), \; i \geq n+2 \mapsto (i-1, \sigma)
+        (i, \sigma) \mapsto (i-1, \sigma) & si $i \geq n+2$
     \end{cases*}$}
 
     \item[(iv) Tenseur :]{ 
     $\encode' \left(
     \begin{prooftree}
-      \hypv{\Gamma, A}
-      \hypv{B, \Delta}
+      \namedproofv{\pi_1}{\Gamma, A}
+      \namedproofv{\pi_2}{B, \Delta}
       \tensorv{\Gamma, A \tensor B, \Delta}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
     level 1/.style={sibling distance=3.5cm}]
     \node {$B_{n \epsilon}$}
-        child {node {$\psi_2 \left( \encode' \left( \vdash \Gamma, A \right) \right)$}}
-        child {node {$\psi_3 \left( \encode' \left( \vdash B, \Delta \right) \right)$}
+        child {node {$\psi_{\tensor\Left} \left( \encode' \left(
+                \begin{prooftree}
+                  \namedproofv{\pi_1}{\Gamma, A}
+                \end{prooftree}
+              \right) \right)$}}
+        child {node {$\psi_{\tensor\Right} \left( \encode' \left(
+                \begin{prooftree}
+                  \namedproofv{\pi_2}{B, \Delta}
+                \end{prooftree}
+              \right) \right)$}
     };
     \end{tikzpicture}$
     
-    où $n = | \Gamma | + 1$
+    où $n = \size{\Gamma} + 1$
     
-    $\psi_2 : \addresses \rightarrow \addresses =
+    $\psi_{\tensor\Left} : \addresses \rightarrow \addresses =
     \begin{cases*}
         (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
-        (i, \sigma), \; i \neq n \mapsto (i, \sigma)
+        (i, \sigma) \mapsto (i, \sigma) & si $i \neq n$
     \end{cases*}$
     
-    $\psi_3 : \addresses \rightarrow \addresses =
+    $\psi_{\tensor\Right} : \addresses \rightarrow \addresses =
     \begin{cases*}
         (1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
-        (i, \sigma), \; i \geq 2 \mapsto (i + n - 1, \sigma)
+        (i, \sigma) \mapsto (i + n - 1, \sigma) & si $i \geq 2$
     \end{cases*}$}
     \end{itemize}
 
     On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representationslarge$ :
     \begin{equation*}
-    \forall p \in \proofs, \encode \left( p \right) = \left( \encode' \left( p \right), \; s \right), \; \text{où $s$ est le séquent prouvé par $p$.}
+    \forall \someproof \in \proofs, \encode \left( \someproof \right) = \left( \encode' \left( \someproof \right), \; \sequent \right), \; \text{noté $\encode' \left( \someproof \right) \vdash \sequent$, où $\sequent$ est le séquent prouvé par $\someproof$.}
     \end{equation*}
 \end{definition}
 
 \begin{theorem}[Image de l'encodage]
     \begin{equation*}
-    \forall p \in \proofs, \encode \left( p \right) \in \representations
+    \forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations
     \end{equation*}
 
     Autrement dit, l'encodage d'une preuve est une représentation correcte.
 \end{theorem}
 
 \begin{demonstration}
-    Par induction sur $p \in \proofs$ :
+    Par induction sur $\someproof \in \proofs$ :
 
     \begin{itemize}
-    \item[(i) Axiome :]$p =
+    \item[(i) Axiome :]$\someproof =
     \begin{prooftree}
         \axv{X\orth, X}
     \end{prooftree}$,
-    et donc $\encode \left( p \right) = F(1 \epsilon, \; 2 \epsilon), \; \left( X\orth, X \right)$
+    et donc $\encode \left( \someproof \right) = F(1 \epsilon, \; 2 \epsilon) \vdash X\orth, X$
 
-    On vérifie aisément les conditions (i), (ii) et (iii) de la définition \ref{def_rep}, d'où $\encode \left( p \right) \in \representations$.
+    On vérifie aisément les conditions (i), (ii) et (iii) de la définition \ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.
 
-    \item[(ii) Permutation :]$p = 
+    \item[(ii) Échange :]$\someproof =
     \begin{prooftree}
-        \hypv{\Gamma}
-        \permv{\Gamma{\sigma}}
+        \namedproofv{\pi_1}{\Gamma}
+        \permv{\someperm}{\permapp{\someperm}{\Gamma}}
     \end{prooftree}$.
     
-    Par hypothèse d'induction, $\encode \left( \vdash \Gamma \right) = \left( \encode ' \left( \vdash \Gamma \right), \; \Gamma \right)$ vérifie (i), (ii) et (iii). Les trois conditions sont stables par ré-adressage par $\sigma$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie (i), (ii) et (iii). Les trois conditions sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement.
 
-    On en déduit que $\encode \left( p \right) = \left( \sigma \left( \encode ' \left( \vdash \Gamma \right) \right), \; \Gamma{\sigma} \right)$ vérifie (i), (ii) et (iii), d'où $\encode \left( p \right) \in \representations$.
+    On en déduit que $\encode \left( \someproof \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
 
-    \item[(iii) Parr :]$p =
+\todo attention à (i) : il peut falloir ré-ordonner des feuilles si c'est des couples et pas des paires
+
+    \item[(iii) Par :]$\someproof =
     \begin{prooftree}
-      \hypv{\Gamma, A, B, \Delta}
+      \namedproofv{\pi_1}{\Gamma, A, B, \Delta}
       \parrv{\Gamma, A \parr B, \Delta}
     \end{prooftree}$
 
-    Par hypothèse d'induction, $\encode \left( \vdash \Gamma, A, B, \Delta \right) = \left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$ vérifie (i), (ii) et (iii).
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$ vérifie (i), (ii) et (iii).
     
     On a, de plus :
 
     \begin{equation*}
-    \encode ( p ) = \left( \begin{tikzpicture}%
+    \encode ( \someproof ) = \begin{tikzpicture}%
     [level distance=1.5cm,
     level 2/.style={sibling distance=3.5cm}]
     \node {$U_{n \epsilon}$}
-        child {node {$\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$}
+        child {node {$\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$}
     };
-    \end{tikzpicture}, \; \left( \Gamma, A \parr B, \Delta \right) \right)
+    \end{tikzpicture} \vdash \Gamma, A \parr B, \Delta
     \end{equation*}
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :]{L'adresse $n \epsilon$, adressant un parr, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\left( \encode ' \left( \vdash \Gamma, A, B, \Delta \right), \; \left( \Gamma, A, B, \Delta \right) \right)$, d'où, grâce au ré-adressage effectué par $\psi_1$, les adresses de $\psi_1 \left( \encode' \left( \vdash \Gamma, A, B, \Delta \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
+        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
         }
         
         \item[(ii) :]
