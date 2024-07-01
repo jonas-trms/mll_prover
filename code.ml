@@ -17,26 +17,15 @@ type dir =
 
 type address = int * dir list
 
+type address_tree = dir list
+
 type tree = 
+  | Unknown
   | F of address * address
   | U of address * tree
   | B of address * tree * tree
   
 type representation = tree * sequent
-
-type tree_partial =
-  | Unknown
-  | F_partial of address * address
-  | U_partial of address * tree_partial
-  | B_partial of address * tree_partial * tree_partial
-
-type tree_context =
-  | Hole
-  | U_context of address * tree_context
-  | B1_context of address * tree_partial * tree_context
-  | B2_context of address * tree_context * tree_partial
-
-type representation_context = tree_context * sequent
 
 (*Manipulating sequents*)
 (*Merge formulas i and i+1 into a par*)
@@ -131,6 +120,7 @@ let print_mapping m =
 (*Print a representation*)
 let print_rep (t, s) = 
   let rec print_tree = function
+    | Unknown -> print_string "?"; print_newline ()
     | F (add1, add2) -> print_string "F "; print_add add1; print_string " "; print_add add2; print_newline ()
     | U (add, t) -> print_string "P "; print_add add; print_newline (); print_tree t
     | B (add, t1, t2) -> print_string "T "; print_add add;
@@ -162,6 +152,7 @@ let add_sort add1 add2 =
 
 (*Given a function manipulating indexes, map it to a representation*)
 let rec map_psi psi = function
+  | Unknown -> Unknown
   | F (add1, add2) -> let a, b = add_sort (psi add1) (psi add2) in F(a, b)
   | B (add, t1, t2) -> B (psi add, map_psi psi t1, map_psi psi t2)
   | U (add, t) -> U (psi add, map_psi psi t)
@@ -189,6 +180,7 @@ let add_sigma sigma = function
   | n, w -> sigma.(n-1), w
 
 let rec map_sigma sigma = function
+  | Unknown -> Unknown
   | F (add1, add2) -> let a, b = add_sort (add_sigma sigma add1) (add_sigma sigma add2) in F (a, b)
   | B (add, t1, t2) -> B (add_sigma sigma add, map_sigma sigma t1, map_sigma sigma t2)
   | U (add, t) -> U (add_sigma sigma add, map_sigma sigma t)
@@ -210,6 +202,8 @@ let encode proof =
 (*Given a tree, extract the sorted indexes of its root addresses*)
 let list_of_roots t =
   let rec aux = function
+    | Unknown -> []
+
     | F ((n1, []), (n2, [])) -> [n1; n2]
     | F ((n1, []), _) -> [n1]
     | F (_, (n2, [])) -> [n2]
@@ -300,6 +294,7 @@ let alpha_2 merged m1 n = function
 
 let rec decode (t, s) =
   match t with
+  | Unknown -> failwith "Bad construction: incomplete tree"
   | F ((1, []), (2, [])) -> begin
     match s with
     | [A i; NA j] when i = j -> Permutation ([|2; 1|], Axiom i)
@@ -319,37 +314,6 @@ let rec decode (t, s) =
       let t1_map, t2_map = map_psi (alpha_1 merged m1 n) t1, map_psi (alpha_2 merged m1 n) t2 in
       let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
       Permutation (get_perm sigma1 sigma2 n, Tensor (p1, p2))
-
-
-(*Working on partial trees*)
-(*Given a function manipulating indexes, map it to a contextual representation*)
-let rec map_psi_partial psi = function
-  | Unknown -> Unknown
-  | F_partial (add1, add2) -> let a, b = add_sort (psi add1) (psi add2) in F_partial(a, b)
-  | B_partial (add, t1, t2) -> B_partial(psi add, map_psi_partial psi t1, map_psi_partial psi t2)
-  | U_partial (add, t) -> U_partial(psi add, map_psi_partial psi t)
-
-let rec map_psi_context psi = function
-  | Hole -> Hole
-  | U_context(a, t) -> U_context(psi a, map_psi_context psi t)
-  | B1_context(a, t, t_c) -> B1_context(psi a, map_psi_partial psi t, map_psi_context psi t_c)
-  | B2_context(a, t_c, t) -> B2_context(psi a, map_psi_context psi t_c, map_psi_partial psi t)
-
-(*Given a partial tree, extract the sorted indexes of its root addresses*)
-let list_of_roots_partial t =
-  let rec aux = function
-    | Unknown -> []
-    | F_partial ((n1, []), (n2, [])) -> [n1; n2]
-    | F_partial ((n1, []), _) -> [n1]
-    | F_partial (_, (n2, [])) -> [n2]
-    | F_partial (_, _) -> []
-
-    | U_partial ((n, []), t1) -> n::(aux t1)
-    | U_partial (_, t1) -> aux t1
-
-    | B_partial ((n, []), t1, t2) -> n::(aux t1)@(aux t2)
-    | B_partial (_, t1, t2) -> (aux t1)@(aux t2) in
-  List.sort (fun x y -> x - y) (aux t)
 
 (*Given a mapping function from N to A, update it in case of a par*)
 let mapping_update_par mapping n = 
@@ -418,19 +382,29 @@ let rec print_list l = match l with
   | [] -> ()
   | i::is -> print_int i; (print_list is)
 
-let high_approx (t, s) =
+let high_approx (t, s) a =
+  (*a: address of context in t, with the convention that left is used in case of an unary node*)
   (*mapping: N -> A*)
-  let rec approx_aux t s mapping =
-    match t with
-    | Hole -> mapping, s
-    | U_context((n,w), t) -> 
-      approx_aux (map_psi_context (psi_1_merged n) t) 
+  let rec approx_aux t s a mapping =
+    match t, a with
+    | Unknown, [] -> mapping, s
+    | U((n,w), t), Left::xs -> 
+      approx_aux (map_psi (psi_1_merged n) t) 
                  (aux_unpar s n) 
+                  xs
                  (mapping_update_par mapping n)
-    | B1_context((n,w), t, t_c) -> 
+    | B((n,w), t_l, t_r), dir::xs -> 
+      let t_c = 
+        if dir = Left then t_l
+        else t_r
+      in
+
+      let t = 
+        if dir = Right then t_l
+        else t_r
+      in
       let m = List.length s in
-      let indexes_t = list_of_roots_partial t in
-      let dir = Right in
+      let indexes_t = list_of_roots t in
       let s_untensored = aux_untensor_dir s n dir in
       let s_new = set_remove s_untensored indexes_t in
       
@@ -449,12 +423,14 @@ let high_approx (t, s) =
         | (i, w) when i <> n -> (sigma.(i), w)
         | _ -> failwith "Bad construction high_approx3" in
     
-      let t_c_new = map_psi_context (reindex n) t_c in
+      let t_c_new = map_psi (reindex n) t_c in
       let m' = List.length s_new in
-      approx_aux t_c_new s_new (mapping_update_tensor mapping n m' dir sigma)
-    | _ -> failwith "Not implemented yet"
+      approx_aux t_c_new s_new xs (mapping_update_tensor mapping n m' dir sigma)
+    | _ -> failwith "Bad construction"
+
     in let mapping_base = Array.init (List.length s) (fun i -> (i + 1, [])) in
-    approx_aux t s mapping_base
+    approx_aux t s a mapping_base
+    
 
 (*Examples*)
 let proof_1 = Par (2, Permutation([|2; 1; 3; 4|], Tensor (Permutation ([|2; 1|], Axiom 1), Permutation ([|3; 1; 2|], Tensor (Axiom 2, Axiom 3)))));;
@@ -477,27 +453,34 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
 print_proof a; print_newline();print_newline();
 print_rep (encode a); print_newline();print_newline();
 print_proof (decode (encode a)); print_newline(); print_newline();;
-print_rep (encode (decode (encode a))); print_newline();print_newline(); *)
+print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
 
-let tree_context_1 = B1_context((2, []), Unknown, Hole);;
+let tree_context_1 = B((2, []), Unknown, Unknown);;
 let seq_context_1 = [NA(1); T(A(1), A(2)); NA(2)];;
 
-let approx_1, seq_modif_1 = high_approx (tree_context_1, seq_context_1);;
+let approx_1, seq_modif_1 = high_approx (tree_context_1, seq_context_1) [Right];;
 print_seq seq_modif_1;; print_newline ();;
 print_mapping approx_1;; 
 
 print_newline()
 
-let tree_context_2 = B1_context((1, []), Unknown, Hole);;
+let tree_context_2 = B((1, []), Unknown, Unknown);;
 let seq_context_2 = [T(A(1), A(2)); NA(1); NA(2)];;
 
-let approx_2, seq_modif_2 = high_approx (tree_context_2, seq_context_2);;
+let approx_2, seq_modif_2 = high_approx (tree_context_2, seq_context_2) [Right];;
 print_seq seq_modif_2;; print_newline ();;
 print_mapping approx_2;; 
 
-let tree_context_3 = B1_context((1, []), F_partial((1, [Left]), (2, [])), Hole);;
+let tree_context_3 = B((1, []), F((1, [Left]), (2, [])), Unknown);;
 let seq_context_3 = [T(A(1), A(2)); NA(1); NA(2)];; print_newline ();;
 
-let approx_3, seq_modif_3 = high_approx (tree_context_3, seq_context_3);;
+let approx_3, seq_modif_3 = high_approx (tree_context_3, seq_context_3) [Right];;
 print_seq seq_modif_3;; print_newline ();;
 print_mapping approx_3;; 
+
+let tree_context_4 = B((1, []), Unknown, F((1, [Left]), (2, [])));;
+let seq_context_4 = [T(A(1), A(2)); NA(1); NA(2)];; print_newline ();;
+
+let approx_4, seq_modif_4 = high_approx (tree_context_4, seq_context_4) [Left];;
+print_seq seq_modif_4;; print_newline ();;
+print_mapping approx_4;; 
