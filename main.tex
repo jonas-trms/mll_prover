@@ -200,10 +200,12 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
       \namedproofv{\pi}{\Gamma}
       \permv{\someperm}{\permapp{\someperm}{\Gamma}}
     \end{prooftree}
-    \right) = \someperm \left( \encode ' \left(
+    \right) = \someperm' \left( \encode ' \left(
            \begin{prooftree}
              \namedproofv{\pi}{\Gamma}
-           \end{prooftree} \right) \right)$}
+           \end{prooftree} \right) \right)$
+           
+    où $\someperm'$ est la fonction qui applique $\someperm$ à l'arbre, puis trie les deux adresses de chaque feuille par ordre lexicographique.}
 
     \item[(iii) Par :]{
     $\encode' \left(
@@ -303,11 +305,9 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
         \permv{\someperm}{\permapp{\someperm}{\Gamma}}
     \end{prooftree}$.
     
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie (i), (ii) et (iii). Les trois conditions sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie (i), (ii) et (iii). Les conditions (ii) et (iii) sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition (i) est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
 
-    On en déduit que $\encode \left( \someproof \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
-
-\todo attention à (i) : il peut falloir ré-ordonner des feuilles si c'est des couples et pas des paires
+    On en déduit que $\encode \left( \someproof' \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
 
     \item[(iii) Par :]$\someproof =
     \begin{prooftree}
@@ -331,7 +331,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. Toutes les adresses sont donc correctes.
+        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites, et un décalage est effectué sur les adresses de $\Delta$, étant donné que $A$ et $B$ ont été fusionnées. Toutes les adresses sont donc correctes.
         }
         
         \item[(ii) :]
