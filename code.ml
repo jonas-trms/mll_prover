@@ -478,8 +478,8 @@ let approx_3, seq_modif_3 = high_approx (tree_context_3, seq_context_3) [Right];
 print_seq seq_modif_3;; print_newline ();;
 print_mapping approx_3;; 
 
-let tree_context_4 = B((1, []), Unknown, F((1, [Left]), (2, [])));;
-let seq_context_4 = [T(A(1), A(2)); NA(1); NA(2)];; print_newline ();;
+let tree_context_4 = B((2, []), Unknown, F((1, []), (2, [Left])));;
+let seq_context_4 = [NA(1); T(A(2), A(1)); NA(2)];; print_newline ();;
 
 let approx_4, seq_modif_4 = high_approx (tree_context_4, seq_context_4) [Left];;
 print_seq seq_modif_4;; print_newline ();;
