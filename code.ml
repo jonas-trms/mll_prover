@@ -86,10 +86,14 @@ let rec print_formula = function
   | P (f1, f2) -> print_string "("; print_formula f1; print_string ") | ("; print_formula f2; print_string ")"
   | T (f1, f2) -> print_string "("; print_formula f1; print_string ") * ("; print_formula f2; print_string ")"
 
-let rec print_seq = function
+let rec print_list p = function
   | [] -> ()
-  | [x] -> print_formula x
-  | x::xs -> print_formula x; print_string ", "; print_seq xs
+  | [x] -> p x
+  | x::xs -> p x; print_string ", "; print_list p xs
+
+let print_int_list = print_list print_int
+
+let print_seq = print_list print_formula
 
 let print_permutation sigma =
   for i = 0 to Array.length sigma - 1 do
@@ -332,7 +336,7 @@ let mapping_update_par mapping n =
   new_mapping.(n-1) <- (n', Left::w');
   new_mapping.(n) <- (n', Right::w');
 
-  for i = n+1 to m-1 do
+  for i = n+1 to m do
     new_mapping.(i) <- mapping.(i-1)
   done;
 
@@ -362,33 +366,26 @@ let set_remove set indexes =
   aux set indexes 1
 
 (*Given a mapping function from N to A, update it in case of a tensor*)
+(* m is the number of formulas to be kept *)
 let mapping_update_tensor mapping n m dir sigma = 
-  print_string "appel à mapping_update_tensor\n";
   let new_mapping = Array.make (m) (-1, []) in
   let acc = ref 0 in
   for i = 0 to (Array.length mapping) - 1 do
     if sigma.(i) <> -1 then begin
       incr acc;
       match mapping.(i) with
-      | (j, w) when j = n -> Printf.printf "le pb est ici %d\n" !acc; new_mapping.(!acc - 1) <- (j, w@[dir])
+      | (j, w) when j = n -> new_mapping.(!acc - 1) <- (j, w@[dir])
       | (j, w) when j <> n -> new_mapping.(!acc - 1) <- (j, w)
       | _ -> failwith "Bad construction mapping_update_tensor1"
     end
   done;
 
-  if !acc <> m then begin
-    failwith "Bad construction mapping_update_tensor2" 
-  end
-  
-  else 
-    new_mapping
+  if !acc <> m then failwith "Bad construction mapping_update_tensor2"
+  else new_mapping
 
-let rec print_list l = match l with
-  | [] -> ()
-  | i::is -> print_int i; (print_list is)
 
 let high_approx (t, s) a =
-  (*a: address of context in t, with the convention that left is used in case of an unary node*)
+  (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   (*mapping: N -> A*)
   let rec approx_aux t s a mapping =
     match t, a with
@@ -399,14 +396,9 @@ let high_approx (t, s) a =
                   xs
                  (mapping_update_par mapping n)
     | B((n,w), t_l, t_r), dir::xs -> 
-      let t_c = 
-        if dir = Left then t_l
-        else t_r
-      in
-
-      let t = 
-        if dir = Right then t_l
-        else t_r
+      let t_c, t = match dir with
+          | Left -> (t_l, t_r)
+          | Right -> (t_r, t_l)
       in
       let m = List.length s in
       let indexes_t = list_of_roots t in
@@ -439,27 +431,17 @@ let high_approx (t, s) a =
 
 (*Interactive proving*)
 (*Given a tree, find the address of its first Unknown node, meaning the closest to the root, left to right*)
-let rec find_first_unknown t =
+let rec unknown_list t =
   match t with
-  | Unknown -> Some([])
-  | F _ -> None
-  | U(_, t') -> 
-    begin
-      match find_first_unknown t' with
-      | None -> None
-      | Some x -> Some(Left::x)
-    end
-  | B(_, t1, t2) ->
-    begin
-      match find_first_unknown t1 with
-      | None ->
-        begin
-          match find_first_unknown t2 with
-          | None -> None
-          | Some x -> Some(Right::x)
-        end
-      | Some x -> Some(Left::x)
-    end
+  | Unknown -> [[]]
+  | F _ -> []
+  | U(_, t') -> List.map (fun x -> Left::x) (unknown_list t')
+  | B(_, t1, t2) -> List.map (fun x -> Left::x) (unknown_list t1) @ List.map (fun x -> Right::x) (unknown_list t2)
+
+let find_first_unknown t =
+  match unknown_list t with
+  | [] -> None
+  | a::l -> Some a
 
 (*Given a sequent and an address, return the node_type of the subsequent addressed*)
 let get_node_type_of_add s a =
