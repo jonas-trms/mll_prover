@@ -375,8 +375,8 @@ let mapping_update_tensor mapping n m dir sigma =
     if sigma.(i) <> -1 then begin
       incr acc;
       match mapping.(i) with
-      | (j, w) when j = n -> new_mapping.(!acc - 1) <- (j, w@[dir])
-      | (j, w) when j <> n -> new_mapping.(!acc - 1) <- (j, w)
+      | (j, w) when j = n_mapped -> new_mapping.(!acc - 1) <- (j, w@[dir])
+      | (j, w) when j <> n_mapped -> new_mapping.(!acc - 1) <- (j, w)
       | _ -> failwith "Bad construction mapping_update_tensor1"
     end
   done;
