@@ -19,6 +19,8 @@ type address = int * dir list
 
 type address_tree = dir list
 
+type node_type = Leaf | Unary | Binary
+
 type tree = 
   | Unknown
   | F of address * address
@@ -114,7 +116,7 @@ let print_add ((n, w) : address) =
 (*Print a mapping*)
 let print_mapping m =
   for i = 0 to (Array.length m) - 1 do
-    print_add m.(i); print_newline ()
+    print_add m.(i); print_string " "
   done
 
 (*Print a representation*)
@@ -122,10 +124,10 @@ let print_rep (t, s) =
   let rec print_tree = function
     | Unknown -> print_string "?"; print_newline ()
     | F (add1, add2) -> print_string "F "; print_add add1; print_string " "; print_add add2; print_newline ()
-    | U (add, t) -> print_string "P "; print_add add; print_newline (); print_tree t
-    | B (add, t1, t2) -> print_string "T "; print_add add;
+    | U (add, t) -> print_string "U "; print_add add; print_newline (); print_tree t
+    | B (add, t1, t2) -> print_string "B "; print_add add;
                            print_string "\nLeft begins\n"; print_tree t1; print_string "Left ends\nRight begins\n"; print_tree t2; print_string "Right ends\n"
-  in print_seq s; print_newline(); print_tree t 
+  in print_tree t; print_newline(); print_seq s; print_newline ()
 
 
 (*Encoding*)
@@ -315,6 +317,8 @@ let rec decode (t, s) =
       let p1, p2 = decode (t1_map, s1), decode (t2_map, s2) in
       Permutation (get_perm sigma1 sigma2 n, Tensor (p1, p2))
 
+
+(*Approximations*)
 (*Given a mapping function from N to A, update it in case of a par*)
 let mapping_update_par mapping n = 
   let m = Array.length mapping in
@@ -417,10 +421,11 @@ let high_approx (t, s) a =
         | [] -> sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
         | _ -> failwith "Bad construction high_approx2" in
       aux indexes_t 1 1;
-    
+      
+      (*Problem here!*)
       let reindex n = function
-        | (i, dir::w) when i = n -> (sigma.(i), w)
-        | (i, w) when i <> n -> (sigma.(i), w)
+        | (i, dir::w) when i = n -> (sigma.(i-1), w)
+        | (i, w) when i <> n -> (sigma.(i-1), w)
         | _ -> failwith "Bad construction high_approx3" in
     
       let t_c_new = map_psi (reindex n) t_c in
@@ -430,6 +435,91 @@ let high_approx (t, s) a =
 
     in let mapping_base = Array.init (List.length s) (fun i -> (i + 1, [])) in
     approx_aux t s a mapping_base
+    
+
+(*Interactive proving*)
+(*Given a tree, find the address of its first Unknown node, meaning the closest to the root, left to right*)
+let rec find_first_unknown t =
+  match t with
+  | Unknown -> Some([])
+  | F _ -> None
+  | U(_, t') -> 
+    begin
+      match find_first_unknown t' with
+      | None -> None
+      | Some x -> Some(Left::x)
+    end
+  | B(_, t1, t2) ->
+    begin
+      match find_first_unknown t1 with
+      | None ->
+        begin
+          match find_first_unknown t2 with
+          | None -> None
+          | Some x -> Some(Right::x)
+        end
+      | Some x -> Some(Left::x)
+    end
+
+(*Given a sequent and an address, return the node_type of the subsequent addressed*)
+let get_node_type_of_add s a =
+  let n, w = a in
+  let rec aux f w_curr = 
+    match f, w_curr with
+    | A _, [] -> Leaf
+    | NA _, [] -> Leaf
+    | P(_, _), [] -> Unary
+    | T(_, _), [] -> Binary
+    | P(f1, _), Left::xs -> aux f1 xs
+    | P(_, f2), Right::xs -> aux f2 xs
+    | T(f1, _), Left::xs -> aux f1 xs
+    | T(_, f2), Right::xs -> aux f2 xs
+    | _ -> failwith "Bad construction get_node_type_of_add" in
+  aux (Array.of_list s).(n-1) w
+
+(*Replace an Unknown node in a tree*)
+let rec replace_unknown_node t a node_type node_adresses =
+  match t, a with
+  | U(a', t'), Left::xs -> U(a', replace_unknown_node t' xs node_type node_adresses)
+  | B(a', t1, t2), Left::xs -> B(a', replace_unknown_node t1 xs node_type node_adresses, t2)
+  | B(a', t1, t2), Right::xs -> B(a', t1, replace_unknown_node t2 xs node_type node_adresses)
+  | Unknown, [] ->
+    begin
+      match node_type, node_adresses with
+      | Leaf, [a1; a2] -> let a1', a2' = add_sort a1 a2 in F(a1', a2')
+      | Unary, [a1] -> U(a1, Unknown)
+      | Binary, [a1] -> B(a1, Unknown, Unknown)
+      | _ -> failwith "replace_unknown_node: wrong node arguments"
+    end
+  | _ -> failwith "replace_unknown_node: wrong tree arguments"
+
+let prove_sequent s =
+  let rec aux t_curr =
+    let a = find_first_unknown t_curr in
+    match a with 
+    | None -> print_string "Proven!\n\n"; print_proof (decode (t_curr, s))
+    | Some a' -> 
+      begin
+        print_rep (t_curr, s);
+        print_newline ();
+        let mapping, s' = high_approx (t_curr, s) a' in
+        print_seq s';  
+        print_newline ();
+        print_mapping mapping;
+        print_newline ();
+
+        let n = read_int () in
+        match get_node_type_of_add s' (n, []) with
+        | Unary -> print_newline (); aux (replace_unknown_node t_curr a' Unary [mapping.(n-1)])
+        | Binary -> print_newline (); aux (replace_unknown_node t_curr a' Binary [mapping.(n-1)])
+        | Leaf -> begin
+          let n' = read_int () in
+          match get_node_type_of_add s' (n', []) with
+          | Leaf -> print_newline (); aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
+          | _ -> failwith "prove_sequent: two atoms were expected"
+          end
+      end in
+  aux Unknown
     
 
 (*Examples*)
@@ -455,7 +545,7 @@ print_rep (encode a); print_newline();print_newline();
 print_proof (decode (encode a)); print_newline(); print_newline();;
 print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
 
-let tree_context_1 = B((2, []), Unknown, Unknown);;
+(* let tree_context_1 = B((2, []), Unknown, Unknown);;
 let seq_context_1 = [NA(1); T(A(1), A(2)); NA(2)];;
 
 let approx_1, seq_modif_1 = high_approx (tree_context_1, seq_context_1) [Right];;
@@ -483,4 +573,8 @@ let seq_context_4 = [NA(1); T(A(2), A(1)); NA(2)];; print_newline ();;
 
 let approx_4, seq_modif_4 = high_approx (tree_context_4, seq_context_4) [Left];;
 print_seq seq_modif_4;; print_newline ();;
-print_mapping approx_4;; 
+print_mapping approx_4;;  *)
+
+(* let _ = prove_sequent [NA(1); T(A(1), A(2)); NA(2)];;
+ *)
+ let _ = prove_sequent (get_seq proof_4);;
