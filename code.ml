@@ -370,6 +370,7 @@ let set_remove set indexes =
 let mapping_update_tensor mapping n m dir sigma = 
   let new_mapping = Array.make (m) (-1, []) in
   let acc = ref 0 in
+  let (n_mapped, _) = mapping.(n-1) in
   for i = 0 to (Array.length mapping) - 1 do
     if sigma.(i) <> -1 then begin
       incr acc;
@@ -388,7 +389,8 @@ let high_approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   (*mapping: N -> A*)
   let rec approx_aux t s a mapping =
-    match t, a with
+(*     print_string "appel à approx_aux\n"; print_rep (t, s); print_newline();
+ *)    match t, a with
     | Unknown, [] -> mapping, s
     | U((n,w), t), Left::xs -> 
       approx_aux (map_psi (psi_1_merged n) t) 
