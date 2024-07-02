@@ -363,13 +363,14 @@ let set_remove set indexes =
 
 (*Given a mapping function from N to A, update it in case of a tensor*)
 let mapping_update_tensor mapping n m dir sigma = 
+  print_string "appel à mapping_update_tensor\n";
   let new_mapping = Array.make (m) (-1, []) in
   let acc = ref 0 in
   for i = 0 to (Array.length mapping) - 1 do
     if sigma.(i) <> -1 then begin
       incr acc;
       match mapping.(i) with
-      | (j, w) when j = n -> new_mapping.(!acc - 1) <- (j, dir::w)
+      | (j, w) when j = n -> Printf.printf "le pb est ici %d\n" !acc; new_mapping.(!acc - 1) <- (j, w@[dir])
       | (j, w) when j <> n -> new_mapping.(!acc - 1) <- (j, w)
       | _ -> failwith "Bad construction mapping_update_tensor1"
     end
@@ -422,7 +423,6 @@ let high_approx (t, s) a =
         | _ -> failwith "Bad construction high_approx2" in
       aux indexes_t 1 1;
       
-      (*Problem here!*)
       let reindex n = function
         | (i, dir::w) when i = n -> (sigma.(i-1), w)
         | (i, w) when i <> n -> (sigma.(i-1), w)
