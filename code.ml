@@ -100,14 +100,22 @@ let print_permutation sigma =
     Printf.printf "%d " sigma.(i)
   done
 
-let rec print_proof p =
-  print_seq (get_seq p);
-  print_newline ();
-  match p with
-  | Axiom _ -> ()
-  | Par (i, p1) -> Printf.printf "Par %d \n" i; print_proof p1
-  | Tensor (p1, p2) -> print_string "Tensor \nLeft begins\n"; print_proof p1; print_string "Left ends\nRight begins\n"; print_proof p2; print_string "Right ends\n";
-  | Permutation (sigma, p) -> print_string "Permutation\n"; print_permutation sigma; print_newline (); print_proof p
+let rec repeat_string s n =
+  if n = 0 then "" else s ^ repeat_string s (n - 1)
+
+let space = "   "
+
+let print_proof p =
+  let rec aux p_curr depth =
+    Printf.printf "%s" (repeat_string space depth); print_seq (get_seq p_curr);
+    print_newline ();
+    match p_curr with
+    | Axiom _ -> ()
+    | Par (i, p1) -> Printf.printf "%sPar %d \n" (repeat_string space depth) i; aux p1 depth
+    | Tensor (p1, p2) -> aux p2 (depth + 1); Printf.printf "%sTensor \n" (repeat_string space depth); aux p1 (depth + 1);
+    | Permutation (sigma, p1) -> Printf.printf "%sPermutation : " (repeat_string space depth);
+                                print_permutation sigma; print_newline (); aux p1 depth in
+  aux p 0
 
 (*Print an address*)
 let print_add ((n, w) : address) = 
@@ -125,13 +133,12 @@ let print_mapping m =
 
 (*Print a representation*)
 let print_rep (t, s) = 
-  let rec print_tree = function
-    | Unknown -> print_string "?"; print_newline ()
-    | F (add1, add2) -> print_string "F "; print_add add1; print_string " "; print_add add2; print_newline ()
-    | U (add, t) -> print_string "U "; print_add add; print_newline (); print_tree t
-    | B (add, t1, t2) -> print_string "B "; print_add add;
-                           print_string "\nLeft begins\n"; print_tree t1; print_string "Left ends\nRight begins\n"; print_tree t2; print_string "Right ends\n"
-  in print_tree t; print_newline(); print_seq s; print_newline ()
+  let rec print_tree t depth = match t with
+  | Unknown -> Printf.printf "%s?\n" (repeat_string space depth);
+  | F (add1, add2) -> Printf.printf "%sF " (repeat_string space depth); print_add add1; print_string " "; print_add add2; print_newline ()
+  | U (add, t) -> Printf.printf "%sU " (repeat_string space depth); print_add add; print_newline (); print_tree t depth
+  | B (add, t1, t2) -> print_tree t2 (depth + 1); Printf.printf "%sB " (repeat_string space depth); print_add add; print_newline(); print_tree t1 (depth + 1);
+  in print_tree t 0; print_newline(); print_seq s; print_newline ()
 
 
 (*Encoding*)
@@ -389,8 +396,7 @@ let high_approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   (*mapping: N -> A*)
   let rec approx_aux t s a mapping =
-(*     print_string "appel à approx_aux\n"; print_rep (t, s); print_newline();
- *)    match t, a with
+    match t, a with
     | Unknown, [] -> mapping, s
     | U((n,w), t), Left::xs -> 
       approx_aux (map_psi (psi_1_merged n) t) 
@@ -479,17 +485,19 @@ let rec replace_unknown_node t a node_type node_adresses =
 
 let prove_sequent s =
   let rec aux t_curr =
-    let a = find_first_unknown t_curr in
-    match a with 
-    | None -> print_string "Proven!\n\n"; print_proof (decode (t_curr, s))
-    | Some a' -> 
+    let list_unknown = unknown_list t_curr in
+    match list_unknown with 
+    | [] -> print_string "Proven!\n\n"; print_proof (decode (t_curr, s))
+    | _ -> 
       begin
         print_rep (t_curr, s);
         print_newline ();
+        let n_hole =
+          if List.length list_unknown = 1 then 1
+          else read_int () in
+        let a' = (Array.of_list list_unknown).(n_hole - 1) in
         let mapping, s' = high_approx (t_curr, s) a' in
-        print_seq s';  
-        print_newline ();
-        print_mapping mapping;
+        print_seq s';
         print_newline ();
 
         let n = read_int () in
@@ -524,8 +532,8 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Axiom 5))))))));;
 
 (* let a = proof_4;;
-print_proof a; print_newline();print_newline();
-print_rep (encode a); print_newline();print_newline();
+print_proof a; print_newline();print_newline();; *)
+(* print_rep (encode a); print_newline();print_newline();
 print_proof (decode (encode a)); print_newline(); print_newline();;
 print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
 
@@ -561,4 +569,5 @@ print_mapping approx_4;;  *)
 
 (* let _ = prove_sequent [NA(1); T(A(1), A(2)); NA(2)];;
  *)
- let _ = prove_sequent (get_seq proof_4);;
+
+ let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
