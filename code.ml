@@ -95,6 +95,14 @@ let print_int_list = print_list print_int
 
 let print_seq = print_list print_formula
 
+let rec print_seq_low s s' =
+  match s, s' with
+  | [], [] -> ()
+  | [x], [y] -> (if y then print_string "#" else ()); print_formula x
+  | x::xs, y::ys -> (if y then print_string "#" else ()); print_formula x; print_string ", "; print_seq_low xs ys
+  | _ -> failwith "Bad construction print_seq_low"
+
+
 let print_permutation sigma =
   for i = 0 to Array.length sigma - 1 do
     Printf.printf "%d " sigma.(i)
@@ -330,114 +338,6 @@ let rec decode (t, s) =
 
 
 (*Approximations*)
-(*Given a mapping function from N to A, update it in case of a par*)
-let mapping_update_par mapping n = 
-  let m = Array.length mapping in
-  let new_mapping = Array.make (m+1) (-1, []) in
-
-  for i = 0 to n-2 do
-    new_mapping.(i) <- mapping.(i)
-  done;
-
-  let (n', w') = mapping.(n-1) in
-  new_mapping.(n-1) <- (n', Left::w');
-  new_mapping.(n) <- (n', Right::w');
-
-  for i = n+1 to m do
-    new_mapping.(i) <- mapping.(i-1)
-  done;
-
-  new_mapping
-
-(*Given a sequent with a tensor, keep only a side of the tensor in the sequent*)
-let rec aux_untensor_dir s n dir =
-    match s, n with
-    | T(g, d)::ys, 1 -> 
-      begin
-        match dir with
-          | Left -> g::ys
-          | Right -> d::ys
-      end
-    | x::xs, i when i > 1 -> x::(aux_untensor_dir xs (i-1) dir)
-    | _ -> failwith "Bad construction aux_untensor_dir"
-
-(*Given a set and indexes, remove the indexed elements in the set*)
-let set_remove set indexes =
-  let rec aux set_acc indexes_acc acc =
-    match set_acc, indexes_acc, acc with
-    | x::xs, i::is, j when i = j -> aux xs is (j+1)
-    | x::xs, i::is, j when i > j -> x::(aux xs (i::is) (j+1))
-    | x, [], i -> x
-    | _ -> failwith "Bad construction set_remove" in
-
-  aux set indexes 1
-
-(*Given a mapping function from N to A, update it in case of a tensor*)
-(* m is the number of formulas to be kept *)
-let mapping_update_tensor mapping n m dir sigma = 
-  let new_mapping = Array.make (m) (-1, []) in
-  let acc = ref 0 in
-  let (n_mapped, _) = mapping.(n-1) in
-  for i = 0 to (Array.length mapping) - 1 do
-    if sigma.(i) <> -1 then begin
-      incr acc;
-      match mapping.(i) with
-      | (j, w) when j = n_mapped -> new_mapping.(!acc - 1) <- (j, w@[dir])
-      | (j, w) when j <> n_mapped -> new_mapping.(!acc - 1) <- (j, w)
-      | _ -> failwith "Bad construction mapping_update_tensor1"
-    end
-  done;
-
-  if !acc <> m then failwith "Bad construction mapping_update_tensor2"
-  else new_mapping
-
-
-let high_approx (t, s) a =
-  (*a: address of context in t, with the convention that Left is used in case of an unary node*)
-  (*mapping: N -> A*)
-  let rec approx_aux t s a mapping =
-    match t, a with
-    | Unknown, [] -> mapping, s
-    | U((n,w), t), Left::xs -> 
-      approx_aux (map_psi (psi_1_merged n) t) 
-                 (aux_unpar s n) 
-                  xs
-                 (mapping_update_par mapping n)
-    | B((n,w), t_l, t_r), dir::xs -> 
-      let t_c, t = match dir with
-          | Left -> (t_l, t_r)
-          | Right -> (t_r, t_l)
-      in
-      let m = List.length s in
-      let indexes_t = list_of_roots t in
-      let s_untensored = aux_untensor_dir s n dir in
-      let s_new = set_remove s_untensored indexes_t in
-      
-      let sigma = Array.make m (-1) in
-      let rec aux to_remove i acc =
-        match to_remove with
-        | x::xs when x = i -> aux xs (i+1) acc
-        | x::xs when x > i -> sigma.(i-1) <- acc; aux (x::xs) (i+1) (acc+1)
-        | [] when i = m + 1 -> ()
-        | [] -> sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
-        | _ -> failwith "Bad construction high_approx2" in
-      aux indexes_t 1 1;
-      
-      let reindex n = function
-        | (i, dir::w) when i = n -> (sigma.(i-1), w)
-        | (i, w) when i <> n -> (sigma.(i-1), w)
-        | _ -> failwith "Bad construction high_approx3" in
-    
-      let t_c_new = map_psi (reindex n) t_c in
-      let m' = List.length s_new in
-      approx_aux t_c_new s_new xs (mapping_update_tensor mapping n m' dir sigma)
-    | _ -> failwith "Bad construction"
-
-    in let mapping_base = Array.init (List.length s) (fun i -> (i + 1, [])) in
-    approx_aux t s a mapping_base
-    
-
-(*Interactive proving*)
 (*Given a tree, find the address of its first Unknown node, meaning the closest to the root, left to right*)
 let rec unknown_list t =
   match t with
@@ -482,6 +382,160 @@ let rec replace_unknown_node t a node_type node_adresses =
       | _ -> failwith "replace_unknown_node: wrong node arguments"
     end
   | _ -> failwith "replace_unknown_node: wrong tree arguments"
+  
+(*Given a mapping function from N to A, update it in case of a par*)
+let mapping_update_par mapping n = 
+  let m = Array.length mapping in
+  let new_mapping = Array.make (m+1) (-1, []) in
+
+  for i = 0 to n-2 do
+    new_mapping.(i) <- mapping.(i)
+  done;
+
+  let (n', w') = mapping.(n-1) in
+  new_mapping.(n-1) <- (n', Left::w');
+  new_mapping.(n) <- (n', Right::w');
+
+  for i = n+1 to m do
+    new_mapping.(i) <- mapping.(i-1)
+  done;
+
+  new_mapping
+  
+(*Given a low approximation, update it in case of a tensor*)
+let low_approx_update_par s' n =
+  let m = Array.length s' in
+  let low_approx_new = Array.make (m+1) false in
+
+  for i = 0 to n-1 do
+    low_approx_new.(i) <- s'.(i)
+  done;
+
+  low_approx_new.(n) <- s'.(n-1);
+
+  for i = n+1 to m do
+    low_approx_new.(i) <- s'.(i-1)
+  done;
+
+  low_approx_new
+
+(*Given a sequent with a tensor, keep only a side of the tensor in the sequent*)
+let rec aux_untensor_dir s n dir =
+    match s, n with
+    | T(g, d)::ys, 1 -> 
+      begin
+        match dir with
+          | Left -> g::ys
+          | Right -> d::ys
+      end
+    | x::xs, i when i > 1 -> x::(aux_untensor_dir xs (i-1) dir)
+    | _ -> failwith "Bad construction aux_untensor_dir"
+
+(*Given a set and indexes, remove the indexed elements in the set*)
+let set_remove set indexes =
+  let rec aux set_acc indexes_acc acc =
+    match set_acc, indexes_acc, acc with
+    | x::xs, i::is, j when i = j -> aux xs is (j+1)
+    | x::xs, i::is, j when i > j -> x::(aux xs (i::is) (j+1))
+    | x, [], i -> x
+    | _ -> failwith "Bad construction set_remove" in
+
+  aux set indexes 1
+
+(*Given a mapping function from N to A, update it in case of a tensor*)
+(* m is the number of formulas to be kept *)
+let mapping_update_tensor mapping n m dir sigma = 
+  let new_mapping = Array.make (m) (-1, []) in
+  let acc = ref 0 in
+  let (n_mapped, _) = mapping.(n-1) in
+  for i = 0 to (Array.length mapping) - 1 do
+    if sigma.(i) <> -1 then begin
+      incr acc;
+      match mapping.(i) with
+      | (j, w) when j = n_mapped -> new_mapping.(!acc - 1) <- (j, w@[dir])
+      | (j, w) when j <> n_mapped -> new_mapping.(!acc - 1) <- (j, w)
+      | _ -> failwith "Bad construction mapping_update_tensor1"
+    end
+  done;
+
+  if !acc <> m then failwith "Bad construction mapping_update_tensor2"
+  else new_mapping
+
+let high_approx (t, s) a =
+  (*a: address of context in t, with the convention that Left is used in case of an unary node*)
+  (*mapping: N -> A*)
+  let rec approx_aux t s s' a mapping  =
+  (*s' is the low approximation of s: it's a tab of booleans indicating if a subformula is mandatory*)
+    match t, a with
+    | Unknown, [] -> mapping, s, s'
+    | U((n,w), t), Left::xs -> 
+      approx_aux (map_psi (psi_1_merged n) t) 
+                 (aux_unpar s n) 
+                 (low_approx_update_par s' n)
+                  xs
+                 (mapping_update_par mapping n)
+    | B((n,w), t_l, t_r), dir::xs -> 
+      let t_c, t = match dir with
+          | Left -> (t_l, t_r)
+          | Right -> (t_r, t_l)
+      in
+      let m = List.length s in
+      let indexes_t = list_of_roots t in
+      let s_untensored = aux_untensor_dir s n dir in
+      let s_new = set_remove s_untensored indexes_t in
+
+      let context_empty = ((unknown_list t) = []) in
+
+      let sigma = Array.make m (-1) in
+      let m' = m - (List.length indexes_t) in
+      let s'_new = Array.make m' false in
+
+      let rec aux to_remove i acc =
+        match to_remove with
+        | x::xs when x = i -> aux xs (i+1) acc
+        | x::xs when x > i -> 
+          begin
+            (if context_empty || (i = n) then s'_new.(acc-1) <- s'.(i-1)
+            else ());
+            sigma.(i-1) <- acc; aux (x::xs) (i+1) (acc+1)
+          end
+        | [] when i = m + 1 -> ()
+        | [] -> 
+          begin
+            (if context_empty || (i = n) then s'_new.(acc-1) <- s'.(i-1)
+            else ());
+            sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
+          end
+        | _ -> failwith "Bad construction high_approx2" in
+      aux indexes_t 1 1;
+      
+      let reindex n = function
+        | (i, dir::w) when i = n -> (sigma.(i-1), w)
+        | (i, w) when i <> n -> (sigma.(i-1), w)
+        | _ -> failwith "Bad construction high_approx3" in
+    
+      let t_c_new = map_psi (reindex n) t_c in
+      approx_aux t_c_new s_new s'_new xs (mapping_update_tensor mapping n m' dir sigma)
+    | _ -> failwith "Bad construction"
+
+    in let mapping_base = Array.init (List.length s) (fun i -> (i + 1, [])) in
+    approx_aux t s (Array.make (List.length s) true) a mapping_base 
+    
+
+(*Interactive proving*)
+let check_leaf s s' n n' =
+  let rec aux s_acc i a1 a2 =
+    match s_acc with
+    | [] -> a1, a2
+    | x::xs when i <> n && i <> n' && (not s'.(i-1)) -> aux xs (i+1) a1 a2
+    | x::xs when i = n -> aux xs (i+1) x a2
+    | x::xs when i = n' -> aux xs (i+1) a1 x
+    | _ -> failwith "check_leaf: not all mandatory formulas were used" in
+
+  match aux s 1 (A(-1)) (A(-1)) with
+  | A(i), NA(j) when i = j -> ()
+  | NA(i), A(j) when i = j -> ()
+  | _ -> failwith "check_leaf: two dual atoms were expected"
 
 let prove_sequent s =
   let rec aux t_curr =
@@ -496,8 +550,8 @@ let prove_sequent s =
           if List.length list_unknown = 1 then 1
           else read_int () in
         let a' = (Array.of_list list_unknown).(n_hole - 1) in
-        let mapping, s' = high_approx (t_curr, s) a' in
-        print_seq s';
+        let mapping, s', s'_low = high_approx (t_curr, s) a' in
+        print_seq_low s' (Array.to_list s'_low);
         print_newline ();
 
         let n = read_int () in
@@ -507,7 +561,7 @@ let prove_sequent s =
         | Leaf -> begin
           let n' = read_int () in
           match get_node_type_of_add s' (n', []) with
-          | Leaf -> print_newline (); aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
+          | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
           | _ -> failwith "prove_sequent: two atoms were expected"
           end
       end in
