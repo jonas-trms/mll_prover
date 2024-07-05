@@ -86,6 +86,12 @@ let rec print_formula = function
   | P (f1, f2) -> print_string "("; print_formula f1; print_string ") | ("; print_formula f2; print_string ")"
   | T (f1, f2) -> print_string "("; print_formula f1; print_string ") * ("; print_formula f2; print_string ")"
 
+let rec print_formula_latex = function
+  | A i -> Printf.printf "X_%d" i
+  | NA i -> Printf.printf "{X_%d}\\orth" i
+  | P (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\parr ("; print_formula_latex f2; print_string ")"
+  | T (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\tensor ("; print_formula_latex f2; print_string ")"
+
 let rec print_list p = function
   | [] -> ()
   | [x] -> p x
@@ -94,6 +100,8 @@ let rec print_list p = function
 let print_int_list = print_list print_int
 
 let print_seq = print_list print_formula
+
+let print_seq_latex = print_list print_formula_latex
 
 let rec print_seq_low s s' =
   match s, s' with
@@ -122,8 +130,24 @@ let print_proof p =
     | Par (i, p1) -> Printf.printf "%sPar %d \n" (repeat_string space depth) i; aux p1 depth
     | Tensor (p1, p2) -> aux p2 (depth + 1); Printf.printf "%sTensor \n" (repeat_string space depth); aux p1 (depth + 1);
     | Permutation (sigma, p1) -> Printf.printf "%sPermutation : " (repeat_string space depth);
-                                print_permutation sigma; print_newline (); aux p1 depth in
+                                 print_permutation sigma; print_newline (); aux p1 depth in
   aux p 0
+
+let print_proof_latex p =
+  let rec aux p_curr =
+    let s_curr = get_seq p_curr in 
+    match p_curr with
+    | Axiom _ -> Printf.printf "\\axv{"; print_seq_latex s_curr; print_string "}"
+    | Par(_, p1) -> aux p_curr; print_newline(); 
+                    Printf.printf "\\parrv{"; print_seq_latex s_curr; print_string "}"
+    | Tensor(p1, p2) -> aux p1; print_newline ();
+                        aux p2; print_newline ();
+                        Printf.printf "\\tensorv{"; print_seq_latex s_curr; print_string "}"
+    | Permutation(sigma, p1) -> aux p1; print_newline ();
+                                Printf.printf"\\permv{\\someperm}{\\permapp{\\someperm}{"; print_seq_latex s_curr; print_string "}}" in
+  Printf.printf "\\begin{prooftree}\n";                           
+  aux p;
+  Printf.printf "\n\\end{prooftree}\n"
 
 (*Print an address*)
 let print_add ((n, w) : address) = 
@@ -585,8 +609,8 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Tensor(Permutation ([|2; 1|], Axiom 4),
                                                                                     Axiom 5))))))));;
 
-(* let a = proof_4;;
-print_proof a; print_newline();print_newline();; *)
+let a = proof_4;;
+print_proof_latex a;;
 (* print_rep (encode a); print_newline();print_newline();
 print_proof (decode (encode a)); print_newline(); print_newline();;
 print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
@@ -624,4 +648,5 @@ print_mapping approx_4;;  *)
 (* let _ = prove_sequent [NA(1); T(A(1), A(2)); NA(2)];;
  *)
 
- let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+(*  let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+ *)
