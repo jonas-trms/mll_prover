@@ -29,6 +29,10 @@ type tree =
   
 type representation = tree * sequent
 
+(*Exceptions*)
+exception NotDual
+exception MandatoryNotUsed
+
 (*Manipulating sequents*)
 (*Merge formulas i and i+1 into a par*)
 let rec aux_par seq i =
@@ -107,8 +111,8 @@ let print_seq_low s s' =
   let rec aux s s' =
     match s, s' with
     | [], [] -> ()
-    | [x], [y] -> (if y then print_string "#" else ()); print_formula x
-    | x::xs, y::ys -> (if y then print_string "#" else ()); print_formula x; print_string ", "; aux xs ys
+    | [x], [y] -> (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ())
+    | x::xs, y::ys -> (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ()); print_string ", "; aux xs ys
     | _ -> failwith "Bad construction print_seq_low"
   in aux s (Array.to_list s')
 
@@ -580,12 +584,12 @@ let check_leaf s s' n n' =
     | x::xs when i <> n && i <> n' && (not s'.(i-1)) -> aux xs (i+1) a1 a2
     | x::xs when i = n -> aux xs (i+1) x a2
     | x::xs when i = n' -> aux xs (i+1) a1 x
-    | _ -> failwith "check_leaf: not all mandatory formulas were used" in
+    | _ -> raise MandatoryNotUsed in
 
   match aux s 1 (A(-1)) (A(-1)) with
   | A(i), NA(j) when i = j -> ()
   | NA(i), A(j) when i = j -> ()
-  | _ -> failwith "check_leaf: two dual atoms were expected"
+  | _ -> raise NotDual
 
 let print_rep_latex (t, s) print_function =
   let rec aux t_curr path depth =
@@ -608,29 +612,37 @@ let prove_sequent s =
   let rec aux t_curr =
     let list_unknown = unknown_list t_curr in
     match list_unknown with 
-    | [] -> print_string "Proven!\n\n"; print_proof (decode (t_curr, s))
+    | [] -> print_string "Proven!\n\n"; print_proof_latex (decode (t_curr, s))
     | _ -> 
       begin
         print_rep_latex (t_curr, s) print_seq_low;
         print_newline ();
         let n_hole =
           if List.length list_unknown = 1 then 1
-          else read_int () in
+          else (print_string "Please choose the hole to work on:\n"; read_int ()) in
         let a' = (Array.of_list list_unknown).(n_hole - 1) in
         let mapping, s', s'_low = high_approx (t_curr, s) a' in
         print_seq_low s' s'_low;
         print_newline ();
-
+        print_string "Please choose the rule to apply:\n";
         let n = read_int () in
-        match get_node_type_of_add s' (n, []) with
-        | Unary -> print_newline (); aux (replace_unknown_node t_curr a' Unary [mapping.(n-1)])
-        | Binary -> print_newline (); aux (replace_unknown_node t_curr a' Binary [mapping.(n-1)])
-        | Leaf -> begin
-          let n' = read_int () in
-          match get_node_type_of_add s' (n', []) with
-          | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
-          | _ -> failwith "prove_sequent: two atoms were expected"
-          end
+        try begin
+          match get_node_type_of_add s' (n, []) with
+          | Unary -> print_newline (); aux (replace_unknown_node t_curr a' Unary [mapping.(n-1)])
+          | Binary -> print_newline (); aux (replace_unknown_node t_curr a' Binary [mapping.(n-1)])
+          | Leaf -> begin
+            print_string "Please choose the dual atom to use:\n";
+            let n' = read_int () in
+            match get_node_type_of_add s' (n', []) with
+            | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
+            | _ -> failwith "prove_sequent: two atoms were expected"
+            end
+        end with
+        | MandatoryNotUsed -> print_string "Error: you must use all highlighted formulas\n\n"; aux t_curr
+        | NotDual -> print_string "Error: you must provide two dual atoms\n\n"; aux t_curr
+        | Invalid_argument "index out of bounds" -> print_string "Error: you must give an index corresponding to a formula\n\n"; aux t_curr
+        | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
+        | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
       end in
   aux Unknown
     
