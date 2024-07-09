@@ -103,12 +103,23 @@ let print_seq = print_list print_formula
 
 let print_seq_latex = print_list print_formula_latex
 
-let rec print_seq_low s s' =
-  match s, s' with
-  | [], [] -> ()
-  | [x], [y] -> (if y then print_string "#" else ()); print_formula x
-  | x::xs, y::ys -> (if y then print_string "#" else ()); print_formula x; print_string ", "; print_seq_low xs ys
-  | _ -> failwith "Bad construction print_seq_low"
+let print_seq_low s s' =
+  let rec aux s s' =
+    match s, s' with
+    | [], [] -> ()
+    | [x], [y] -> (if y then print_string "#" else ()); print_formula x
+    | x::xs, y::ys -> (if y then print_string "#" else ()); print_formula x; print_string ", "; aux xs ys
+    | _ -> failwith "Bad construction print_seq_low"
+  in aux s (Array.to_list s')
+
+let print_seq_low_latex s s' =
+  let rec aux s s' =
+    match s, s' with
+    | [], [] -> ()
+    | [x], [y] -> (if y then print_string "\\boldsymbol{" else ()); print_formula_latex x; (if y then print_string "}" else ())
+    | x::xs, y::ys -> (if y then print_string "\\boldsymbol{" else ()); print_formula_latex x; (if y then print_string "}" else ()); print_string ", "; aux xs ys
+    | _ -> failwith "Bad construction print_seq_low"
+  in aux s (Array.to_list s')
 
 
 let print_permutation sigma =
@@ -134,19 +145,19 @@ let print_proof p =
   aux p 0
 
 let print_proof_latex p =
-  let rec aux p_curr =
+  let rec aux p_curr depth =
     let s_curr = get_seq p_curr in 
     match p_curr with
-    | Axiom _ -> Printf.printf "\\axv{"; print_seq_latex s_curr; print_string "}"
-    | Par(_, p1) -> aux p_curr; print_newline(); 
-                    Printf.printf "\\parrv{"; print_seq_latex s_curr; print_string "}"
-    | Tensor(p1, p2) -> aux p1; print_newline ();
-                        aux p2; print_newline ();
-                        Printf.printf "\\tensorv{"; print_seq_latex s_curr; print_string "}"
-    | Permutation(sigma, p1) -> aux p1; print_newline ();
-                                Printf.printf"\\permv{\\someperm}{\\permapp{\\someperm}{"; print_seq_latex s_curr; print_string "}}" in
+    | Axiom _ -> Printf.printf "%s\\axv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
+    | Par(_, p1) -> aux p_curr (depth + 1); print_newline(); 
+                    Printf.printf "%s\\parrv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
+    | Tensor(p1, p2) -> aux p1 (depth + 1); print_newline (); print_newline ();
+                        aux p2 (depth + 1); print_newline ();
+                        Printf.printf "%s\\tensorv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
+    | Permutation(sigma, p1) -> aux p1 depth; print_newline ();
+                                Printf.printf"%s\\permv{\\someperm}{\\permapp{\\someperm}{" (repeat_string space depth); print_seq_latex s_curr; print_string "}}" in
   Printf.printf "\\begin{prooftree}\n";                           
-  aux p;
+  aux p 0;
   Printf.printf "\n\\end{prooftree}\n"
 
 (*Print an address*)
@@ -391,6 +402,18 @@ let get_node_type_of_add s a =
     | _ -> failwith "Bad construction get_node_type_of_add" in
   aux (Array.of_list s).(n-1) w
 
+let get_subformula_of_add s a =
+  let n, w = a in
+  let rec aux f w_curr = 
+    match f, w_curr with
+    | _, [] -> f
+    | P(f1, _), Left::xs -> aux f1 xs
+    | P(_, f2), Right::xs -> aux f2 xs
+    | T(f1, _), Left::xs -> aux f1 xs
+    | T(_, f2), Right::xs -> aux f2 xs
+    | _ -> failwith "Bad construction get_node_type_of_add" in
+  aux (Array.of_list s).(n-1) w
+
 (*Replace an Unknown node in a tree*)
 let rec replace_unknown_node t a node_type node_adresses =
   match t, a with
@@ -491,13 +514,16 @@ let high_approx (t, s) a =
   let rec approx_aux t s s' a mapping  =
   (*s' is the low approximation of s: it's a tab of booleans indicating if a subformula is mandatory*)
     match t, a with
-    | Unknown, [] -> mapping, s, s'
+    | F(a1, a2), [] -> [|a1; a2|], 
+                       [get_subformula_of_add s a1; get_subformula_of_add s a2],
+                       [|true; true|]
+    | _, [] -> mapping, s, s'
     | U((n,w), t), Left::xs -> 
-      approx_aux (map_psi (psi_1_merged n) t) 
-                 (aux_unpar s n) 
-                 (low_approx_update_par s' n)
+      approx_aux (map_psi (psi_1_merged n) t)
+                  (aux_unpar s n) 
+                  (low_approx_update_par s' n)
                   xs
-                 (mapping_update_par mapping n)
+                  (mapping_update_par mapping n)
     | B((n,w), t_l, t_r), dir::xs -> 
       let t_c, t = match dir with
           | Left -> (t_l, t_r)
@@ -561,6 +587,23 @@ let check_leaf s s' n n' =
   | NA(i), A(j) when i = j -> ()
   | _ -> failwith "check_leaf: two dual atoms were expected"
 
+let print_rep_latex (t, s) print_function =
+  let rec aux t_curr path depth =
+    match t_curr with
+    | Unknown -> Printf.printf "%s\\hypv{" (repeat_string space depth); 
+                 let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+    | F(a1, a2) -> Printf.printf "%s\\axv{" (repeat_string space depth);
+                   print_function [get_subformula_of_add s a1; get_subformula_of_add s a2] [|true; true|]; print_string "}\n"
+    | U(a1, t1) -> aux t1 (path@[Left]) (depth + 1);
+                   Printf.printf "%s\\parrv{" (repeat_string space depth);
+                   let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+    | B(a1, t1, t2) -> aux t1 (path@[Left]) (depth + 1); print_newline ();
+                       aux t2 (path@[Right]) (depth + 1);
+                       Printf.printf "%s\\tensorv{" (repeat_string space depth);
+                       let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+  in aux t [] 0
+
+
 let prove_sequent s =
   let rec aux t_curr =
     let list_unknown = unknown_list t_curr in
@@ -568,14 +611,14 @@ let prove_sequent s =
     | [] -> print_string "Proven!\n\n"; print_proof (decode (t_curr, s))
     | _ -> 
       begin
-        print_rep (t_curr, s);
+        print_rep_latex (t_curr, s) print_seq_low;
         print_newline ();
         let n_hole =
           if List.length list_unknown = 1 then 1
           else read_int () in
         let a' = (Array.of_list list_unknown).(n_hole - 1) in
         let mapping, s', s'_low = high_approx (t_curr, s) a' in
-        print_seq_low s' (Array.to_list s'_low);
+        print_seq_low s' s'_low;
         print_newline ();
 
         let n = read_int () in
@@ -609,8 +652,8 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Tensor(Permutation ([|2; 1|], Axiom 4),
                                                                                     Axiom 5))))))));;
 
-let a = proof_4;;
-print_proof_latex a;;
+(* let a = proof_4;;
+print_proof_latex a;; *)
 (* print_rep (encode a); print_newline();print_newline();
 print_proof (decode (encode a)); print_newline(); print_newline();;
 print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
@@ -648,5 +691,4 @@ print_mapping approx_4;;  *)
 (* let _ = prove_sequent [NA(1); T(A(1), A(2)); NA(2)];;
  *)
 
-(*  let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
- *)
+let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
