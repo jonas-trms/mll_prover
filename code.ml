@@ -458,11 +458,12 @@ let low_approx_update_par s' n =
   let m = Array.length s' in
   let low_approx_new = Array.make (m+1) false in
 
-  for i = 0 to n-1 do
+  for i = 0 to n-2 do
     low_approx_new.(i) <- s'.(i)
   done;
 
-  low_approx_new.(n) <- s'.(n-1);
+  low_approx_new.(n-1) <- true;
+  low_approx_new.(n) <- true;
 
   for i = n+1 to m do
     low_approx_new.(i) <- s'.(i-1)
@@ -512,16 +513,31 @@ let mapping_update_tensor mapping n m dir sigma =
   if !acc <> m then failwith "Bad construction mapping_update_tensor2"
   else new_mapping
 
-let high_approx (t, s) a =
+let approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
-  (*mapping: N -> A*)
   let rec approx_aux t s s' a mapping  =
-  (*s' is the low approximation of s: it's a tab of booleans indicating if a subformula is mandatory*)
+  (*mapping: N -> A*)
+  (*s is the high approximation: it contains all the formulas that can be applied at address a*)
+  (*s' is the low approximation: it's a tab of booleans indicating if a formula in s is mandatory*)
     match t, a with
+    | Unknown, [] -> mapping, s, s'
     | F(a1, a2), [] -> [|a1; a2|], 
                        [get_subformula_of_add s a1; get_subformula_of_add s a2],
                        [|true; true|]
-    | _, [] -> mapping, s, s'
+    | U(_, t), [] -> 
+      let children = list_of_roots t in
+      List.iter (fun i -> s'.(i-1) <- true) children;
+
+      mapping, s, s'
+    
+    | B(_, t1, t2), [] ->
+      let children1 = list_of_roots t1 in
+      let children2 = list_of_roots t2 in
+      List.iter (fun i -> s'.(i-1) <- true) children1;
+      List.iter (fun i -> s'.(i-1) <- true) children2;
+
+      mapping, s, s'
+
     | U((n,w), t), Left::xs -> 
       approx_aux (map_psi (psi_1_merged n) t)
                   (aux_unpar s n) 
@@ -560,13 +576,13 @@ let high_approx (t, s) a =
             else ());
             sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
           end
-        | _ -> failwith "Bad construction high_approx2" in
+        | _ -> failwith "Bad construction approx2" in
       aux indexes_t 1 1;
       
       let reindex n = function
         | (i, dir::w) when i = n -> (sigma.(i-1), w)
         | (i, w) when i <> n -> (sigma.(i-1), w)
-        | _ -> failwith "Bad construction high_approx3" in
+        | _ -> failwith "Bad construction approx3" in
     
       let t_c_new = map_psi (reindex n) t_c in
       approx_aux t_c_new s_new s'_new xs (mapping_update_tensor mapping n m' dir sigma)
@@ -595,16 +611,16 @@ let print_rep_latex (t, s) print_function =
   let rec aux t_curr path depth =
     match t_curr with
     | Unknown -> Printf.printf "%s\\hypv{" (repeat_string space depth); 
-                 let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+                 let _, s_new, s'_new = approx (t, s) path in print_function s_new s'_new; print_string "}\n"
     | F(a1, a2) -> Printf.printf "%s\\axv{" (repeat_string space depth);
                    print_function [get_subformula_of_add s a1; get_subformula_of_add s a2] [|true; true|]; print_string "}\n"
     | U(a1, t1) -> aux t1 (path@[Left]) (depth + 1);
                    Printf.printf "%s\\parrv{" (repeat_string space depth);
-                   let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+                   let _, s_new, s'_new = approx (t, s) path in print_function s_new s'_new; print_string "}\n"
     | B(a1, t1, t2) -> aux t1 (path@[Left]) (depth + 1); print_newline ();
                        aux t2 (path@[Right]) (depth + 1);
                        Printf.printf "%s\\tensorv{" (repeat_string space depth);
-                       let _, s_new, s'_new = high_approx (t, s) path in print_function s_new s'_new; print_string "}\n"
+                       let _, s_new, s'_new = approx (t, s) path in print_function s_new s'_new; print_string "}\n"
   in aux t [] 0
 
 
@@ -621,7 +637,7 @@ let prove_sequent s =
           if List.length list_unknown = 1 then 1
           else (print_string "Please choose the hole to work on:\n"; read_int ()) in
         let a' = (Array.of_list list_unknown).(n_hole - 1) in
-        let mapping, s', s'_low = high_approx (t_curr, s) a' in
+        let mapping, s', s'_low = approx (t_curr, s) a' in
         print_seq_low s' s'_low;
         print_newline ();
         print_string "Please choose the rule to apply:\n";
@@ -640,7 +656,7 @@ let prove_sequent s =
         end with
         | MandatoryNotUsed -> print_string "Error: you must use all highlighted formulas\n\n"; aux t_curr
         | NotDual -> print_string "Error: you must provide two dual atoms\n\n"; aux t_curr
-        | Invalid_argument "index out of bounds" -> print_string "Error: you must give an index corresponding to a formula\n\n"; aux t_curr
+        | Invalid_argument _ -> print_string "Error: you must give an index corresponding to a formula\n\n"; aux t_curr
         | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
       end in
@@ -673,7 +689,7 @@ print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
 (* let tree_context_1 = B((2, []), Unknown, Unknown);;
 let seq_context_1 = [NA(1); T(A(1), A(2)); NA(2)];;
 
-let approx_1, seq_modif_1 = high_approx (tree_context_1, seq_context_1) [Right];;
+let approx_1, seq_modif_1 = approx (tree_context_1, seq_context_1) [Right];;
 print_seq seq_modif_1;; print_newline ();;
 print_mapping approx_1;; 
 
@@ -682,21 +698,21 @@ print_newline()
 let tree_context_2 = B((1, []), Unknown, Unknown);;
 let seq_context_2 = [T(A(1), A(2)); NA(1); NA(2)];;
 
-let approx_2, seq_modif_2 = high_approx (tree_context_2, seq_context_2) [Right];;
+let approx_2, seq_modif_2 = approx (tree_context_2, seq_context_2) [Right];;
 print_seq seq_modif_2;; print_newline ();;
 print_mapping approx_2;; 
 
 let tree_context_3 = B((1, []), F((1, [Left]), (2, [])), Unknown);;
 let seq_context_3 = [T(A(1), A(2)); NA(1); NA(2)];; print_newline ();;
 
-let approx_3, seq_modif_3 = high_approx (tree_context_3, seq_context_3) [Right];;
+let approx_3, seq_modif_3 = approx (tree_context_3, seq_context_3) [Right];;
 print_seq seq_modif_3;; print_newline ();;
 print_mapping approx_3;; 
 
 let tree_context_4 = B((2, []), Unknown, F((1, []), (2, [Left])));;
 let seq_context_4 = [NA(1); T(A(2), A(1)); NA(2)];; print_newline ();;
 
-let approx_4, seq_modif_4 = high_approx (tree_context_4, seq_context_4) [Left];;
+let approx_4, seq_modif_4 = approx (tree_context_4, seq_context_4) [Left];;
 print_seq seq_modif_4;; print_newline ();;
 print_mapping approx_4;;  *)
 
@@ -704,3 +720,5 @@ print_mapping approx_4;;  *)
  *)
 
 let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+
+(* let _ = prove_sequent [T(A(1), A(2)); P(A(3), A(4))] *)
