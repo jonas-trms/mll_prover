@@ -524,17 +524,15 @@ let approx (t, s) a =
     | F(a1, a2), [] -> [|a1; a2|], 
                        [get_subformula_of_add s a1; get_subformula_of_add s a2],
                        [|true; true|]
-    | U(_, t), [] -> 
+    | U(_, _), [] -> 
       let children = list_of_roots t in
       List.iter (fun i -> s'.(i-1) <- true) children;
 
       mapping, s, s'
     
     | B(_, t1, t2), [] ->
-      let children1 = list_of_roots t1 in
-      let children2 = list_of_roots t2 in
-      List.iter (fun i -> s'.(i-1) <- true) children1;
-      List.iter (fun i -> s'.(i-1) <- true) children2;
+      let children = list_of_roots t in
+      List.iter (fun i -> s'.(i-1) <- true) children;
 
       mapping, s, s'
 
