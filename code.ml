@@ -420,7 +420,7 @@ let get_subformula_of_add s a =
     | P(_, f2), Right::xs -> aux f2 xs
     | T(f1, _), Left::xs -> aux f1 xs
     | T(_, f2), Right::xs -> aux f2 xs
-    | _ -> failwith "Bad construction get_node_type_of_add" in
+    | _ -> failwith "Bad construction get_subformula_of_add" in
   aux (Array.of_list s).(n-1) w
 
 (*Replace an Unknown node in a tree*)
@@ -504,14 +504,14 @@ let set_remove set indexes =
 let mapping_update_tensor mapping n m dir sigma = 
   let new_mapping = Array.make (m) (-1, []) in
   let acc = ref 0 in
-  let (n_mapped, _) = mapping.(n-1) in
+  let (n_mapped, w_mapped) = mapping.(n-1) in
   for i = 0 to (Array.length mapping) - 1 do
     if sigma.(i) <> -1 then begin
       incr acc;
       match mapping.(i) with
-      | (j, w) when j = n_mapped -> new_mapping.(!acc - 1) <- (j, w@[dir])
-      | (j, w) when j <> n_mapped -> new_mapping.(!acc - 1) <- (j, w)
-      | _ -> failwith "Bad construction mapping_update_tensor1"
+      (*BUG HERE*)
+      | (j, w) when j = n_mapped && w = w_mapped-> new_mapping.(!acc - 1) <- (j, w@[dir])
+      | (j, w) -> new_mapping.(!acc - 1) <- (j, w)
     end
   done;
 
@@ -725,7 +725,7 @@ let prove_sequent s =
   aux Unknown
     
 
-(*Examples*)
+(*Proof examples*)
 let proof_1 = Par (2, Permutation([|2; 1; 3; 4|], Tensor (Permutation ([|2; 1|], Axiom 1), Permutation ([|3; 1; 2|], Tensor (Axiom 2, Axiom 3)))));;
 
 let proof_2 = Tensor (Permutation ([|2; 1|], Axiom 1), Permutation ([|3; 1; 2|], Tensor (Axiom 2, Axiom 3)));;
@@ -742,43 +742,18 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Tensor(Permutation ([|2; 1|], Axiom 4),
                                                                                     Axiom 5))))))));;
 
-(* let a = proof_4;;
-print_proof_latex a;; *)
-(* print_rep (encode a); print_newline();print_newline();
-print_proof (decode (encode a)); print_newline(); print_newline();;
-print_rep (encode (decode (encode a))); print_newline();print_newline();; *)
+                                                                                
+(*Examples from Click & Collect*)
+let example1 = [P(NA 1, A 1)];;
+let example2 = [P(NA 1, NA 2); T(A 2, A 1)];;
+let example3 = [T(A 1, NA 2); T(A 2, NA 3); P(NA 1, A 3)];;
+let example4 = [P(NA 1, T(A 1, NA 2)); A 2];;
+let example5 = [P(P(NA 1, NA 2), NA 3); T(A 1, T(A 2, A 3))];;
+let example6 = [P(NA 1, T(A 2, NA 3)); P(NA 2, T(A 1, A 3))];;
+let example7 = [P(P(NA 1, NA 2), NA 3); T(A 1, T(A 2, A 3))];;
+let example8 = [P(NA 1, P(NA 2, NA 3)); T(T(A 1, A 2), A 3)];;
+let example9 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
-(* let tree_context_1 = B((2, []), Unknown, Unknown);;
-let seq_context_1 = [NA(1); T(A(1), A(2)); NA(2)];;
-
-let approx_1, seq_modif_1 = approx (tree_context_1, seq_context_1) [Right];;
-print_seq seq_modif_1;; print_newline ();;
-print_mapping approx_1;; 
-
-print_newline()
-
-let tree_context_2 = B((1, []), Unknown, Unknown);;
-let seq_context_2 = [T(A(1), A(2)); NA(1); NA(2)];;
-
-let approx_2, seq_modif_2 = approx (tree_context_2, seq_context_2) [Right];;
-print_seq seq_modif_2;; print_newline ();;
-print_mapping approx_2;; 
-
-let tree_context_3 = B((1, []), F((1, [Left]), (2, [])), Unknown);;
-let seq_context_3 = [T(A(1), A(2)); NA(1); NA(2)];; print_newline ();;
-
-let approx_3, seq_modif_3 = approx (tree_context_3, seq_context_3) [Right];;
-print_seq seq_modif_3;; print_newline ();;
-print_mapping approx_3;; 
-
-let tree_context_4 = B((2, []), Unknown, F((1, []), (2, [Left])));;
-let seq_context_4 = [NA(1); T(A(2), A(1)); NA(2)];; print_newline ();;
-
-let approx_4, seq_modif_4 = approx (tree_context_4, seq_context_4) [Left];;
-print_seq seq_modif_4;; print_newline ();;
-print_mapping approx_4;;  *)
-
-(* let _ = prove_sequent [NA(1); T(A(1), A(2)); NA(2)];;
- *)
-
-let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+let example10 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+                       
+let _ = prove_sequent example4;;
