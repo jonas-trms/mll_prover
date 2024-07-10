@@ -509,7 +509,6 @@ let mapping_update_tensor mapping n m dir sigma =
     if sigma.(i) <> -1 then begin
       incr acc;
       match mapping.(i) with
-      (*BUG HERE*)
       | (j, w) when j = n_mapped && w = w_mapped-> new_mapping.(!acc - 1) <- (j, w@[dir])
       | (j, w) -> new_mapping.(!acc - 1) <- (j, w)
     end
