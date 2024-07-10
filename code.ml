@@ -109,20 +109,24 @@ let print_seq = print_list print_formula
 let print_seq_latex = print_list print_formula_latex
 
 let print_seq_low s s' =
+  let print_pair x y =
+    (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ()) in
   let rec aux s s' =
     match s, s' with
     | [], [] -> ()
-    | [x], [y] -> (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ())
-    | x::xs, y::ys -> (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ()); print_string ", "; aux xs ys
+    | [x], [y] -> print_pair x y
+    | x::xs, y::ys -> print_pair x y; print_string ", "; aux xs ys
     | _ -> failwith "Bad construction print_seq_low"
   in aux s (Array.to_list s')
 
 let print_seq_low_latex s s' =
+  let print_pair x y =
+    (if y then print_string "\\boldsymbol{" else ()); print_formula_latex x; (if y then print_string "}" else ()) in
   let rec aux s s' =
     match s, s' with
     | [], [] -> ()
-    | [x], [y] -> (if y then print_string "\\boldsymbol{" else ()); print_formula_latex x; (if y then print_string "}" else ())
-    | x::xs, y::ys -> (if y then print_string "\\boldsymbol{" else ()); print_formula_latex x; (if y then print_string "}" else ()); print_string ", "; aux xs ys
+    | [x], [y] -> print_pair x y
+    | x::xs, y::ys -> print_pair x y; print_string ", "; aux xs ys
     | _ -> failwith "Bad construction print_seq_low"
   in aux s (Array.to_list s')
 
