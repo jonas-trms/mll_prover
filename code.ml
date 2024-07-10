@@ -32,6 +32,7 @@ type representation = tree * sequent
 (*Exceptions*)
 exception NotDual
 exception MandatoryNotUsed
+exception ToName
 
 (*Manipulating sequents*)
 (*Merge formulas i and i+1 into a par*)
@@ -153,7 +154,7 @@ let print_proof_latex p =
     let s_curr = get_seq p_curr in 
     match p_curr with
     | Axiom _ -> Printf.printf "%s\\axv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
-    | Par(_, p1) -> aux p_curr (depth + 1); print_newline(); 
+    | Par(_, p1) -> aux p1 (depth + 1); print_newline(); 
                     Printf.printf "%s\\parrv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
     | Tensor(p1, p2) -> aux p1 (depth + 1); print_newline (); print_newline ();
                         aux p2 (depth + 1); print_newline ();
@@ -591,6 +592,7 @@ let approx (t, s) a =
     
 
 (*Interactive proving*)
+(*Check if a leaf application is correct*)
 let check_leaf s s' n n' =
   let rec aux s_acc i a1 a2 =
     match s_acc with
@@ -621,6 +623,63 @@ let print_rep_latex (t, s) print_function =
                        let _, s_new, s'_new = approx (t, s) path in print_function s_new s'_new; print_string "}\n"
   in aux t [] 0
 
+(*Check if a sequent is atomic*)
+let rec is_atomic = function
+  | [] -> true
+  | (A _)::xs -> is_atomic xs
+  | (NA _)::xs -> is_atomic xs
+  | _ -> false
+
+(*Given a representation and an address, try to auto complete the unknown node addressed by a*)
+let atom_auto_complete t s a =
+  let mapping, s', s'_low = approx (t, s) a in
+  if is_atomic s' then 
+    begin
+      let rec mandatory_build s'_curr acc =
+        match s'_curr with
+        | [] -> []
+        | x::xs when s'_low.(acc-1) = true -> (acc, x)::(mandatory_build xs (acc+1))
+        | _::xs -> mandatory_build xs (acc+1) in
+      match mandatory_build s' 1 with
+        | [] -> if List.length s' = 2 then 
+                  begin
+                  (check_leaf s' s'_low 1 2);
+                  (replace_unknown_node t a Leaf [mapping.(0); mapping.(1)]), true
+                  end
+                else t, false
+        | [(n1, x)] -> begin
+                      let rec complementary_build s'_curr acc =
+                        match s'_curr, x with
+                        | [], _ -> []
+                        | (NA i)::xs, A j when i = j -> acc::(complementary_build xs (acc+1))
+                        | (A i)::xs, NA j when i = j -> acc::(complementary_build xs (acc+1))
+                        | _::xs, _ -> complementary_build xs (acc+1) in
+                      match complementary_build s' 1 with
+                        | [] -> raise ToName
+                        | [n2] -> (check_leaf s' s'_low n1 n2);
+                                  (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
+                        | _ -> t, false
+                      end
+        | [(n1, _); (n2, _)] -> (check_leaf s' s'_low n1 n2);
+                                (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
+        | _ -> raise ToName
+
+    end
+  else t, false
+
+(*Given a representation, iteratively autocomplete its holes, until a fixpoint is reached*)
+let rec autocomplete t s =
+  let list_unknown = unknown_list t in
+  let t_new, modified = List.fold_left 
+                        (fun (t', m') a -> 
+                          let t'_new, m'_new = atom_auto_complete t' s a
+                          in t'_new, (m'||m'_new))
+                        (t, false) 
+                        list_unknown 
+  in 
+  if modified then autocomplete t_new s
+  else t_new
+
 
 let prove_sequent s =
   let rec aux t_curr =
@@ -642,8 +701,8 @@ let prove_sequent s =
         let n = read_int () in
         try begin
           match get_node_type_of_add s' (n, []) with
-          | Unary -> print_newline (); aux (replace_unknown_node t_curr a' Unary [mapping.(n-1)])
-          | Binary -> print_newline (); aux (replace_unknown_node t_curr a' Binary [mapping.(n-1)])
+          | Unary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Unary [mapping.(n-1)]) s)
+          | Binary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Binary [mapping.(n-1)]) s)
           | Leaf -> begin
             print_string "Please choose the dual atom to use:\n";
             let n' = read_int () in
@@ -653,8 +712,9 @@ let prove_sequent s =
             end
         end with
         | MandatoryNotUsed -> print_string "Error: you must use all highlighted formulas\n\n"; aux t_curr
-        | NotDual -> print_string "Error: you must provide two dual atoms\n\n"; aux t_curr
-        | Invalid_argument _ -> print_string "Error: you must give an index corresponding to a formula\n\n"; aux t_curr
+        | NotDual -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
+        | ToName -> print_string "Error: to name\n\n"; aux t_curr
+        | Invalid_argument _ -> print_string "Error: index out of bounds\n\n"; aux t_curr
         | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
       end in
@@ -718,5 +778,3 @@ print_mapping approx_4;;  *)
  *)
 
 let _ = prove_sequent [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
-
-(* let _ = prove_sequent [T(A(1), A(2)); P(A(3), A(4))] *)
