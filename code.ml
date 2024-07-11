@@ -449,8 +449,8 @@ let mapping_update_par mapping n =
   done;
 
   let (n', w') = mapping.(n-1) in
-  new_mapping.(n-1) <- (n', Left::w');
-  new_mapping.(n) <- (n', Right::w');
+  new_mapping.(n-1) <- (n', w'@[Left]);
+  new_mapping.(n) <- (n', w'@[Right]);
 
   for i = n+1 to m do
     new_mapping.(i) <- mapping.(i-1)
@@ -636,6 +636,10 @@ let rec is_atomic = function
 (*Given a representation and an address, try to auto complete the unknown node addressed by a*)
 let atom_auto_complete t s a =
   let mapping, s', s'_low = approx (t, s) a in
+(*   print_string "appel à atom_auto_complete\n";
+  print_seq_low s' s'_low; print_newline();
+  print_mapping mapping; print_newline();
+  print_rep_latex (t, s) print_seq_low; print_newline(); *)
   if is_atomic s' then 
     begin
       let rec mandatory_build s'_curr acc =
@@ -665,7 +669,7 @@ let atom_auto_complete t s a =
                       end
         | [(n1, _); (n2, _)] -> (check_leaf s' s'_low n1 n2);
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
-        | _ -> raise ToName
+        | _ -> print_string "on est ici\n"; raise ToName
 
     end
   else t, false
@@ -755,4 +759,4 @@ let example9 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
 let example10 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
                        
-let _ = prove_sequent example4;;
+let _ = prove_sequent example5;;
