@@ -132,9 +132,11 @@ let print_seq_low_latex s s' =
 
 
 let print_permutation sigma =
-  for i = 0 to Array.length sigma - 1 do
-    Printf.printf "%d " sigma.(i)
-  done
+  for i = 0 to Array.length sigma - 2 do
+    Printf.printf "%d \\;" sigma.(i)
+  done;
+  print_int sigma.(Array.length sigma - 1)
+
 
 let rec repeat_string s n =
   if n = 0 then "" else s ^ repeat_string s (n - 1)
@@ -164,7 +166,7 @@ let print_proof_latex p =
                         aux p2 (depth + 1); print_newline ();
                         Printf.printf "%s\\tensorv{" (repeat_string space depth); print_seq_latex s_curr; print_string "}"
     | Permutation(sigma, p1) -> aux p1 depth; print_newline ();
-                                Printf.printf"%s\\permv{\\someperm}{\\permapp{\\someperm}{" (repeat_string space depth); print_seq_latex s_curr; print_string "}}" in
+                                Printf.printf"%s\\permv{" (repeat_string space depth); print_permutation sigma; print_string "}{"; print_seq_latex s_curr; print_string "}" in
   Printf.printf "\\begin{prooftree}\n";                           
   aux p 0;
   Printf.printf "\n\\end{prooftree}\n"
@@ -753,10 +755,9 @@ let example3 = [T(A 1, NA 2); T(A 2, NA 3); P(NA 1, A 3)];;
 let example4 = [P(NA 1, T(A 1, NA 2)); A 2];;
 let example5 = [P(P(NA 1, NA 2), NA 3); T(A 1, T(A 2, A 3))];;
 let example6 = [P(NA 1, T(A 2, NA 3)); P(NA 2, T(A 1, A 3))];;
-let example7 = [P(P(NA 1, NA 2), NA 3); T(A 1, T(A 2, A 3))];;
-let example8 = [P(NA 1, P(NA 2, NA 3)); T(T(A 1, A 2), A 3)];;
-let example9 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
+let example7 = [P(NA 1, P(NA 2, NA 3)); T(T(A 1, A 2), A 3)];;
+let example8 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
-let example10 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
                        
 let _ = prove_sequent example5;;
