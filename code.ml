@@ -1,3 +1,13 @@
+(*Utilitaries*)
+(*Given a list, extract its ith element*)
+let get_ith_of_list l i =
+  let rec aux l_curr acc =
+    match l_curr with
+    | [] -> failwith "The list given doesn't contain enough elements\n"
+    | x::xs when acc = i -> x
+    | _::xs -> aux xs (acc+1) in
+  aux l 1
+
 (*Types*)
 type formula = A of int | NA of int | P of formula * formula | T of formula * formula
 
@@ -519,6 +529,24 @@ let mapping_update_tensor mapping n m dir sigma =
   if !acc <> m then failwith "Bad construction mapping_update_tensor2"
   else new_mapping
 
+(*Given a sequent, extract its mandatory formulas*)
+let mandatory_build s s'_low =
+  let rec aux s'_curr acc =
+    match s'_curr with
+    | [] -> []
+    | x::xs when s'_low.(acc-1) = true -> (acc, x)::(aux xs (acc+1))
+    | _::xs -> aux xs (acc+1) in
+  aux s 1
+
+let rec complementary_build s x =
+  let rec aux s'_curr acc =
+    match s'_curr, x with
+    | [], _ -> []
+    | (NA i)::xs, A j when i = j -> acc::(aux xs (acc+1))
+    | (A i)::xs, NA j when i = j -> acc::(aux xs (acc+1))
+    | _::xs, _ -> aux xs (acc+1) in
+  aux s 1
+
 let approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   let rec approx_aux t s s' a mapping  =
@@ -644,12 +672,7 @@ let atom_auto_complete t s a =
   print_rep_latex (t, s) print_seq_low; print_newline(); *)
   if is_atomic s' then 
     begin
-      let rec mandatory_build s'_curr acc =
-        match s'_curr with
-        | [] -> []
-        | x::xs when s'_low.(acc-1) = true -> (acc, x)::(mandatory_build xs (acc+1))
-        | _::xs -> mandatory_build xs (acc+1) in
-      match mandatory_build s' 1 with
+      match mandatory_build s' s'_low with
         | [] -> if List.length s' = 2 then 
                   begin
                   (check_leaf s' s'_low 1 2);
@@ -657,13 +680,7 @@ let atom_auto_complete t s a =
                   end
                 else t, false
         | [(n1, x)] -> begin
-                      let rec complementary_build s'_curr acc =
-                        match s'_curr, x with
-                        | [], _ -> []
-                        | (NA i)::xs, A j when i = j -> acc::(complementary_build xs (acc+1))
-                        | (A i)::xs, NA j when i = j -> acc::(complementary_build xs (acc+1))
-                        | _::xs, _ -> complementary_build xs (acc+1) in
-                      match complementary_build s' 1 with
+                      match complementary_build s' x with
                         | [] -> raise ToName
                         | [n2] -> (check_leaf s' s'_low n1 n2);
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
@@ -713,8 +730,10 @@ let prove_sequent s =
           | Unary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Unary [mapping.(n-1)]) s)
           | Binary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Binary [mapping.(n-1)]) s)
           | Leaf -> begin
-            print_string "Please choose the dual atom to use:\n";
-            let n' = read_int () in
+            let n' = match complementary_build s' (get_ith_of_list s' n) with
+                      | [m] -> m
+                      | _ -> print_string "Please choose the dual atom to use:\n"; read_int ()
+            in
             match get_node_type_of_add s' (n', []) with
             | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
             | _ -> failwith "prove_sequent: two atoms were expected"
@@ -760,4 +779,4 @@ let example8 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
 let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
                        
-let _ = prove_sequent example5;;
+let _ = prove_sequent example9;;
