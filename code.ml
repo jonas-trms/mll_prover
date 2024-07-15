@@ -30,9 +30,11 @@ type tree =
 type representation = tree * sequent
 
 (*Exceptions*)
-exception NotDual
-exception MandatoryNotUsed
-exception ToName
+exception Atoms_given_not_dual
+exception Closing_without_using_mandatory
+exception No_dual_pair_in_atomic
+exception Unique_mandatory_atom_without_complementary
+exception Too_many_mandatory_atoms
 
 (*Utilitaries*)
 (*Given a sorted list, insert an element, keeping the sorting*)
@@ -41,7 +43,7 @@ let rec list_insert l x =
   | [] -> [x]
   | y::xs when x < y -> x::l
   | y::xs when x = y -> l
-  | y::xs -> x::(list_insert xs x)
+  | y::xs -> y::(list_insert xs x)
 
 (*Given a list, extract its ith element*)
 let get_ith_of_list l i =
@@ -649,12 +651,12 @@ let check_leaf s s' n n' =
     | x::xs when i <> n && i <> n' && (not s'.(i-1)) -> aux xs (i+1) a1 a2
     | x::xs when i = n -> aux xs (i+1) x a2
     | x::xs when i = n' -> aux xs (i+1) a1 x
-    | _ -> raise MandatoryNotUsed in
+    | _ -> raise Closing_without_using_mandatory in
 
   match aux s 1 (A(-1)) (A(-1)) with
   | A(i), NA(j) when i = j -> ()
   | NA(i), A(j) when i = j -> ()
-  | _ -> raise NotDual
+  | _ -> raise Atoms_given_not_dual
 
 (*Given a partial representation, print its latex display*)
 (*print_function serves as an option to display the representation using either a readable pseudo-latex code, 
@@ -707,12 +709,12 @@ let rec complementary_build s x =
 let rec dual_build s = 
   let rec aux s_curr dual_curr acc = 
     match s_curr with 
-    | [] -> []
+    | [] -> dual_curr
     | x::xs -> aux 
                xs
-               (List.fold_left (fun l i -> list_insert l ((min acc i),(max acc i)))
+               (List.fold_left (fun l i -> list_insert l ((min acc (i+acc-1)),(max acc (i+acc-1))))
                dual_curr 
-               (complementary_build s_curr x))
+               (complementary_build xs x))
                (acc + 1) in
   aux s [] 1
 
@@ -729,27 +731,39 @@ let atom_auto_complete t s a =
       match mandatory_build s' s'_low with
         | [] -> begin
                   match dual_build s' with
-                  | [] -> raise ToName
-                  | [(n1, n2)] -> (check_leaf s' s'_low n1 n2);
+                  | [] -> raise No_dual_pair_in_atomic
+                  | [(n1, n2)] -> print_rep_latex (t, s) print_seq_low;
+                                  print_newline ();
+                                  print_string "Atomic sequent containing a single dual pair: applying it\n\n";
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-2)]), true
                   | _ -> t, false
                   end
         | [(n1, x)] -> begin
                       match complementary_build s' x with
-                        | [] -> raise ToName
-                        | [n2] -> (check_leaf s' s'_low n1 n2);
+                        | [] -> raise Unique_mandatory_atom_without_complementary
+                        | [n2] -> print_rep_latex (t, s) print_seq_low;
+                                  print_newline ();
+                                  print_string "Atomic sequent with a unique mandatory atom having a unique complementary: applying it\n\n";
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
                         | _ -> t, false
                       end
-        | [(n1, _); (n2, _)] -> (check_leaf s' s'_low n1 n2);
+        | [(n1, _); (n2, _)] -> print_rep_latex (t, s) print_seq_low;
+                                print_newline ();
+                                print_string "Atomic sequent having only two mandatory and dual atom: applying them\n\n";
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
-        | _ -> raise ToName
+        | _ -> raise Too_many_mandatory_atoms
     end
   | [n] when s'_low.(n-1) = true -> 
     begin
       match get_node_type_of_add s' (n, []) with
-          | Unary -> replace_unknown_node t a Unary [mapping.(n-1)], true
-          | Binary -> replace_unknown_node t a Binary [mapping.(n-1)], true
+          | Unary -> print_rep_latex (t, s) print_seq_low;
+                     print_newline ();
+                     print_string "Quasi-atomic sequent with a unique mandatory par operator: applying it\n\n";
+                     replace_unknown_node t a Unary [mapping.(n-1)], true
+          | Binary -> print_rep_latex (t, s) print_seq_low;
+                      print_newline ();
+                      print_string "Quasi-atomic sequent with a unique mandatory tensor operator: applying it\n\n";
+                      replace_unknown_node t a Binary [mapping.(n-1)], true
           | _ -> failwith "Unexpected case\n"
     end
 
@@ -801,9 +815,11 @@ let prove_sequent s =
             | _ -> failwith "prove_sequent: two atoms were expected"
             end
         end with
-        | MandatoryNotUsed -> print_string "Error: you must use all highlighted formulas\n\n"; aux t_curr
-        | NotDual -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
-        | ToName -> print_string "Error: to name\n\n"; aux t_curr
+        | Atoms_given_not_dual -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
+        | Closing_without_using_mandatory -> print_string "Error: tried to close without using all mandatory formulas\n\n"; aux t_curr
+        | No_dual_pair_in_atomic -> print_string "Error: an atomic sequent didn't contain any dual pair\n\n"; aux t_curr
+        | Unique_mandatory_atom_without_complementary -> print_string "Error: a mandatory atom in an atomic sequent didn't have any complementary\n\n"; aux t_curr
+        | Too_many_mandatory_atoms -> print_string "Error: an atomic sequent had too many mandatory atoms\n\n"; aux t_curr
         | Invalid_argument _ -> print_string "Error: index out of bounds\n\n"; aux t_curr
         | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
@@ -842,4 +858,6 @@ let example8 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
 let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
 
-let _ = prove_sequent example9;;
+let example10 = [P (T (P (NA(1), A(3)), NA(3)), T(P (NA(2), A(3)), NA(3))); P (T (T (A(1), A(2)), NA(3)), A(3))];;
+
+let _ = prove_sequent example10;;
