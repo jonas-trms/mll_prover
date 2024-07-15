@@ -101,6 +101,23 @@ let rec get_seq = function
   | Tensor (p1, p2) -> aux_tensor (get_seq p1) (get_seq p2)
   | Permutation (sigma, p) -> aux_perm (get_seq p) sigma
 
+(*Clean a proof*)
+let is_identity sigma =
+  let n = Array.length sigma in
+  let rec aux acc =
+    if acc = n + 1 then true
+    else if sigma.(acc-1) = acc then aux (acc+1)
+    else false in
+  aux 1
+
+
+let rec clean_proof p =
+  match p with
+  | Axiom i -> p 
+  | Par (i, p') -> Par (i, (clean_proof p'))
+  | Tensor (p1, p2) -> Tensor ((clean_proof p1), (clean_proof p2))
+  | Permutation (sigma, p') -> if is_identity sigma then clean_proof p'
+                            else Permutation (sigma, (clean_proof p'))
 
 (*Printing*)
 let rec print_list p = function
@@ -756,7 +773,7 @@ let prove_sequent s =
   let rec aux t_curr =
     let list_unknown = unknown_list t_curr in
     match list_unknown with 
-    | [] -> print_string "Proven!\n\n"; print_proof_latex (decode (t_curr, s))
+    | [] -> print_string "Proven!\n\n"; print_proof_latex (clean_proof (decode (t_curr, s)))
     | _ -> 
       begin
         print_rep_latex (t_curr, s) print_seq_low;
@@ -824,5 +841,5 @@ let example7 = [P(NA 1, P(NA 2, NA 3)); T(T(A 1, A 2), A 3)];;
 let example8 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
 let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
-                       
+
 let _ = prove_sequent example9;;
