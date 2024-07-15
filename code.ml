@@ -1,4 +1,12 @@
 (*Utilitaries*)
+(*Given a sorted list, insert an element, keeping the sorting*)
+let rec list_insert l x =
+  match l with
+  | [] -> [x]
+  | y::xs when x < y -> x::l
+  | y::xs when x = y -> l
+  | y::xs -> x::(list_insert xs x)
+
 (*Given a list, extract its ith element*)
 let get_ith_of_list l i =
   let rec aux l_curr acc =
@@ -529,24 +537,6 @@ let mapping_update_tensor mapping n m dir sigma =
   if !acc <> m then failwith "Bad construction mapping_update_tensor2"
   else new_mapping
 
-(*Given a sequent, extract its mandatory formulas*)
-let mandatory_build s s'_low =
-  let rec aux s'_curr acc =
-    match s'_curr with
-    | [] -> []
-    | x::xs when s'_low.(acc-1) = true -> (acc, x)::(aux xs (acc+1))
-    | _::xs -> aux xs (acc+1) in
-  aux s 1
-
-let rec complementary_build s x =
-  let rec aux s'_curr acc =
-    match s'_curr, x with
-    | [], _ -> []
-    | (NA i)::xs, A j when i = j -> acc::(aux xs (acc+1))
-    | (A i)::xs, NA j when i = j -> acc::(aux xs (acc+1))
-    | _::xs, _ -> aux xs (acc+1) in
-  aux s 1
-
 let approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   let rec approx_aux t s s' a mapping  =
@@ -656,12 +646,46 @@ let print_rep_latex (t, s) print_function =
                        let _, s_new, s'_new = approx (t, s) path in print_function s_new s'_new; print_string "}\n"
   in aux t [] 0
 
-(*Check if a sequent is atomic*)
-let rec is_atomic = function
-  | [] -> true
-  | (A _)::xs -> is_atomic xs
-  | (NA _)::xs -> is_atomic xs
-  | _ -> false
+(*Given a sequent, extract the indexes of its not atomic formulas*)
+let indexes_not_atomic s =
+  let rec aux s_curr acc =
+    match s_curr with
+    | [] -> []
+    | (A _)::xs | (NA _)::xs -> aux xs (acc + 1)
+    | _::xs -> acc::(aux xs (acc + 1)) in
+  aux s 1
+
+(*Given a sequent, extract its mandatory formulas*)
+let mandatory_build s s'_low =
+  let rec aux s'_curr acc =
+    match s'_curr with
+    | [] -> []
+    | x::xs when s'_low.(acc-1) = true -> (acc, x)::(aux xs (acc+1))
+    | _::xs -> aux xs (acc+1) in
+  aux s 1
+
+(*Given a sequent and an atom, extract its complementary atoms*)
+let rec complementary_build s x =
+  let rec aux s'_curr acc =
+    match s'_curr, x with
+    | [], _ -> []
+    | (NA i)::xs, A j when i = j -> acc::(aux xs (acc+1))
+    | (A i)::xs, NA j when i = j -> acc::(aux xs (acc+1))
+    | _::xs, _ -> aux xs (acc+1) in
+  aux s 1
+
+(*Given a sequent, extract its dual pairs*)
+let rec dual_build s = 
+  let rec aux s_curr dual_curr acc = 
+    match s_curr with 
+    | [] -> []
+    | x::xs -> aux 
+               xs
+               (List.fold_left (fun l i -> list_insert l ((min acc i),(max acc i)))
+               dual_curr 
+               (complementary_build s_curr x))
+               (acc + 1) in
+  aux s [] 1
 
 (*Given a representation and an address, try to auto complete the unknown node addressed by a*)
 let atom_auto_complete t s a =
@@ -670,15 +694,17 @@ let atom_auto_complete t s a =
   print_seq_low s' s'_low; print_newline();
   print_mapping mapping; print_newline();
   print_rep_latex (t, s) print_seq_low; print_newline(); *)
-  if is_atomic s' then 
+  match indexes_not_atomic s' with
+  | [] ->
     begin
       match mandatory_build s' s'_low with
-        | [] -> if List.length s' = 2 then 
-                  begin
-                  (check_leaf s' s'_low 1 2);
-                  (replace_unknown_node t a Leaf [mapping.(0); mapping.(1)]), true
+        | [] -> begin
+                  match dual_build s' with
+                  | [] -> raise ToName
+                  | [(n1, n2)] -> (check_leaf s' s'_low n1 n2);
+                                  (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-2)]), true
+                  | _ -> t, false
                   end
-                else t, false
         | [(n1, x)] -> begin
                       match complementary_build s' x with
                         | [] -> raise ToName
@@ -688,10 +714,17 @@ let atom_auto_complete t s a =
                       end
         | [(n1, _); (n2, _)] -> (check_leaf s' s'_low n1 n2);
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
-        | _ -> print_string "on est ici\n"; raise ToName
-
+        | _ -> raise ToName
     end
-  else t, false
+  | [n] when s'_low.(n-1) = true -> 
+    begin
+      match get_node_type_of_add s' (n, []) with
+          | Unary -> replace_unknown_node t a Unary [mapping.(n-1)], true
+          | Binary -> replace_unknown_node t a Binary [mapping.(n-1)], true
+          | _ -> failwith "Unexpected case\n"
+    end
+
+  | _ -> t, false
 
 (*Given a representation, iteratively autocomplete its holes, until a fixpoint is reached*)
 let rec autocomplete t s =
