@@ -754,7 +754,8 @@ let atom_auto_complete t s a =
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
         | _ -> raise (Too_many_mandatory_atoms (s', s'_low))
     end
-  | [n] when s'_low.(n-1) = true -> 
+
+  | [n] when s'_low.(n-1) = true || dual_build s' = [] -> 
     begin
       match get_node_type_of_add s' (n, []) with
           | Unary -> print_rep_latex (t, s) print_seq_low;
@@ -818,7 +819,7 @@ let prove_sequent s =
         end with
         | Atoms_given_not_dual(s, s') -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
         | Closing_without_using_mandatory(s, s') -> print_string "Error: tried to close "; print_seq_low s s'; print_string " without using all mandatory formulas\n\n"; aux t_curr
-        | No_dual_pair_in_atomic(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string "didn't contain any dual pair\n\n"; aux t_curr
+        | No_dual_pair_in_atomic(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " didn't contain any dual pair\n\n"; aux t_curr
         | Unique_mandatory_atom_without_complementary(s, s') -> print_string "Error: a mandatory atom in atomic sequent "; print_seq_low s s'; print_string " didn't have any complementary\n\n"; aux t_curr
         | Too_many_mandatory_atoms(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " had too many mandatory atoms\n\n"; aux t_curr
         | Invalid_argument _ -> print_string "Error: index out of bounds\n\n"; aux t_curr

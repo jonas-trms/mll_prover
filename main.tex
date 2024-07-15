@@ -331,10 +331,20 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte. Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites, et un décalage est effectué sur les adresses de $\Delta$, étant donné que $A$ et $B$ ont été fusionnées. Toutes les adresses sont donc correctes.
+        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
+        
+        Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de un, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de un.
+        
+        Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         }
         
-        \item[(ii) :]
+        \item[(ii) :] D'une part, (ii) étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
+        
+        De plus, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquettée par au moins un noeud de $\encode ' \left( \pi_1 \right)$. Le ré-adressage $\psi_\parr$ étant correct (voir (i)), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est donc étiquettée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$. Ce noeud est de surcroît unique, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ étant distinctes.
+        
+        $A \parr B$, quant à lui, est étiquetté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \epsilon$.
+
+        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît bien une unique fois dans l'arbre, d'où la linéarité est préservée.
         \item[(iii) :]
     \end{itemize}
 
