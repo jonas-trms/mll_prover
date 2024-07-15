@@ -429,7 +429,7 @@ let get_node_type_of_add s a =
     | T(f1, _), Left::xs -> aux f1 xs
     | T(_, f2), Right::xs -> aux f2 xs
     | _ -> failwith "Bad construction get_node_type_of_add" in
-  aux (Array.of_list s).(n-1) w
+  aux (get_ith_of_list s n) w
 
 let get_subformula_of_add s a =
   let n, w = a in
@@ -441,7 +441,7 @@ let get_subformula_of_add s a =
     | T(f1, _), Left::xs -> aux f1 xs
     | T(_, f2), Right::xs -> aux f2 xs
     | _ -> failwith "Bad construction get_subformula_of_add" in
-  aux (Array.of_list s).(n-1) w
+  aux (get_ith_of_list s n) w
 
 (*Replace an Unknown node in a tree*)
 let rec replace_unknown_node t a node_type node_adresses =
@@ -752,7 +752,7 @@ let prove_sequent s =
         let n_hole =
           if List.length list_unknown = 1 then 1
           else (print_string "Please choose the hole to work on:\n"; read_int ()) in
-        let a' = (Array.of_list list_unknown).(n_hole - 1) in
+        let a' = get_ith_of_list list_unknown n_hole in
         let mapping, s', s'_low = approx (t_curr, s) a' in
         print_seq_low s' s'_low;
         print_newline ();
