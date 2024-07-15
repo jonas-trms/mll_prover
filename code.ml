@@ -768,7 +768,7 @@ let prove_sequent s =
                       | _ -> print_string "Please choose the dual atom to use:\n"; read_int ()
             in
             match get_node_type_of_add s' (n', []) with
-            | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)])
+            | Leaf -> print_newline (); check_leaf s' s'_low n n'; aux (autocomplete (replace_unknown_node t_curr a' Leaf [mapping.(n-1); mapping.(n'-1)]) s)
             | _ -> failwith "prove_sequent: two atoms were expected"
             end
         end with
@@ -779,7 +779,7 @@ let prove_sequent s =
         | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
       end in
-  aux Unknown
+  aux (autocomplete Unknown s)
     
 
 (*Proof examples*)
