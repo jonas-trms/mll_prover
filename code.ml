@@ -1,21 +1,3 @@
-(*Utilitaries*)
-(*Given a sorted list, insert an element, keeping the sorting*)
-let rec list_insert l x =
-  match l with
-  | [] -> [x]
-  | y::xs when x < y -> x::l
-  | y::xs when x = y -> l
-  | y::xs -> x::(list_insert xs x)
-
-(*Given a list, extract its ith element*)
-let get_ith_of_list l i =
-  let rec aux l_curr acc =
-    match l_curr with
-    | [] -> failwith "The list given doesn't contain enough elements\n"
-    | x::xs when acc = i -> x
-    | _::xs -> aux xs (acc+1) in
-  aux l 1
-
 (*Types*)
 type formula = A of int | NA of int | P of formula * formula | T of formula * formula
 
@@ -51,6 +33,24 @@ type representation = tree * sequent
 exception NotDual
 exception MandatoryNotUsed
 exception ToName
+
+(*Utilitaries*)
+(*Given a sorted list, insert an element, keeping the sorting*)
+let rec list_insert l x =
+  match l with
+  | [] -> [x]
+  | y::xs when x < y -> x::l
+  | y::xs when x = y -> l
+  | y::xs -> x::(list_insert xs x)
+
+(*Given a list, extract its ith element*)
+let get_ith_of_list l i =
+  let rec aux l_curr acc =
+    match l_curr with
+    | [] -> failwith "The list given doesn't contain enough elements\n"
+    | x::xs when acc = i -> x
+    | _::xs -> aux xs (acc+1) in
+  aux l 1
 
 (*Manipulating sequents*)
 (*Merge formulas i and i+1 into a par*)
@@ -103,18 +103,6 @@ let rec get_seq = function
 
 
 (*Printing*)
-let rec print_formula = function
-  | A i -> Printf.printf "%d" i
-  | NA i -> Printf.printf "%d^" i
-  | P (f1, f2) -> print_string "("; print_formula f1; print_string ") | ("; print_formula f2; print_string ")"
-  | T (f1, f2) -> print_string "("; print_formula f1; print_string ") * ("; print_formula f2; print_string ")"
-
-let rec print_formula_latex = function
-  | A i -> Printf.printf "X_%d" i
-  | NA i -> Printf.printf "{X_%d}\\orth" i
-  | P (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\parr ("; print_formula_latex f2; print_string ")"
-  | T (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\tensor ("; print_formula_latex f2; print_string ")"
-
 let rec print_list p = function
   | [] -> ()
   | [x] -> p x
@@ -122,10 +110,26 @@ let rec print_list p = function
 
 let print_int_list = print_list print_int
 
+(*Print a formula using a readable display*)
+let rec print_formula = function
+  | A i -> Printf.printf "%d" i
+  | NA i -> Printf.printf "%d^" i
+  | P (f1, f2) -> print_string "("; print_formula f1; print_string ") | ("; print_formula f2; print_string ")"
+  | T (f1, f2) -> print_string "("; print_formula f1; print_string ") * ("; print_formula f2; print_string ")"
+
+(*Print a formula in latex*)
+let rec print_formula_latex = function
+  | A i -> Printf.printf "X_%d" i
+  | NA i -> Printf.printf "{X_%d}\\orth" i
+  | P (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\parr ("; print_formula_latex f2; print_string ")"
+  | T (f1, f2) -> print_string "("; print_formula_latex f1; print_string ") \\tensor ("; print_formula_latex f2; print_string ")"
+
+(*Print a sequent, again either readable, either in latex*)
 let print_seq = print_list print_formula
 
 let print_seq_latex = print_list print_formula_latex
-
+ 
+(*Print a sequent highlighting its mandatory formulas, again with two options*)
 let print_seq_low s s' =
   let print_pair x y =
     (if y then print_string "<" else ()); print_formula x; (if y then print_string ">" else ()) in
@@ -148,19 +152,19 @@ let print_seq_low_latex s s' =
     | _ -> failwith "Bad construction print_seq_low"
   in aux s (Array.to_list s')
 
-
+(*Print a permutation*)
 let print_permutation sigma =
   for i = 0 to Array.length sigma - 2 do
     Printf.printf "%d \\;" sigma.(i)
   done;
   print_int sigma.(Array.length sigma - 1)
 
-
 let rec repeat_string s n =
   if n = 0 then "" else s ^ repeat_string s (n - 1)
 
 let space = "   "
 
+(*Print a proof in a readable way*)
 let print_proof p =
   let rec aux p_curr depth =
     Printf.printf "%s" (repeat_string space depth); print_seq (get_seq p_curr);
@@ -173,6 +177,7 @@ let print_proof p =
                                  print_permutation sigma; print_newline (); aux p1 depth in
   aux p 0
 
+(*Print a proof in latex*)
 let print_proof_latex p =
   let rec aux p_curr depth =
     let s_curr = get_seq p_curr in 
@@ -377,6 +382,7 @@ let alpha_2 merged m1 n = function
   | (i, w) when i <> n -> (merged.(i-1) - m1 + 1, w)
   | _ -> failwith "Bad construction"
 
+(*Convert a correction representation into a proof*)
 let rec decode (t, s) =
   match t with
   | Unknown -> failwith "Bad construction: incomplete tree"
@@ -431,6 +437,7 @@ let get_node_type_of_add s a =
     | _ -> failwith "Bad construction get_node_type_of_add" in
   aux (get_ith_of_list s n) w
 
+(*Given a sequent and an address a, get the subformula addressed by a*)
 let get_subformula_of_add s a =
   let n, w = a in
   let rec aux f w_curr = 
@@ -537,6 +544,7 @@ let mapping_update_tensor mapping n m dir sigma =
   if !acc <> m then failwith "Bad construction mapping_update_tensor2"
   else new_mapping
 
+(*Given a representation and an address, compute the approximated sequent at address a in the tree*)
 let approx (t, s) a =
   (*a: address of context in t, with the convention that Left is used in case of an unary node*)
   let rec approx_aux t s s' a mapping  =
@@ -566,6 +574,7 @@ let approx (t, s) a =
                   (low_approx_update_par s' n)
                   xs
                   (mapping_update_par mapping n)
+
     | B((n,w), t_l, t_r), dir::xs -> 
       let t_c, t = match dir with
           | Left -> (t_l, t_r)
@@ -630,6 +639,9 @@ let check_leaf s s' n n' =
   | NA(i), A(j) when i = j -> ()
   | _ -> raise NotDual
 
+(*Given a partial representation, print its latex display*)
+(*print_function serves as an option to display the representation using either a readable pseudo-latex code, 
+   or in latex*)
 let print_rep_latex (t, s) print_function =
   let rec aux t_curr path depth =
     match t_curr with
@@ -739,7 +751,7 @@ let rec autocomplete t s =
   if modified then autocomplete t_new s
   else t_new
 
-
+(*Interactively build a tree proving the sequent s*)
 let prove_sequent s =
   let rec aux t_curr =
     let list_unknown = unknown_list t_curr in
@@ -780,9 +792,10 @@ let prove_sequent s =
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
       end in
   aux (autocomplete Unknown s)
-    
 
-(*Proof examples*)
+
+(*Testing*)
+(*Proof examples, to display*)
 let proof_1 = Par (2, Permutation([|2; 1; 3; 4|], Tensor (Permutation ([|2; 1|], Axiom 1), Permutation ([|3; 1; 2|], Tensor (Axiom 2, Axiom 3)))));;
 
 let proof_2 = Tensor (Permutation ([|2; 1|], Axiom 1), Permutation ([|3; 1; 2|], Tensor (Axiom 2, Axiom 3)));;
@@ -800,7 +813,7 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Axiom 5))))))));;
 
                                                                                 
-(*Examples from Click & Collect*)
+(*Examples from Click & Collect, to prove*)
 let example1 = [P(NA 1, A 1)];;
 let example2 = [P(NA 1, NA 2); T(A 2, A 1)];;
 let example3 = [T(A 1, NA 2); T(A 2, NA 3); P(NA 1, A 3)];;
