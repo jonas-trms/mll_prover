@@ -2,6 +2,7 @@
 type formula = A of int | NA of int | P of formula * formula | T of formula * formula
 
 type sequent = formula list
+type sequent_low = bool array
 
 type permutation = int array
 
@@ -30,11 +31,11 @@ type tree =
 type representation = tree * sequent
 
 (*Exceptions*)
-exception Atoms_given_not_dual
-exception Closing_without_using_mandatory
-exception No_dual_pair_in_atomic
-exception Unique_mandatory_atom_without_complementary
-exception Too_many_mandatory_atoms
+exception Atoms_given_not_dual of sequent * sequent_low
+exception Closing_without_using_mandatory of sequent * sequent_low
+exception No_dual_pair_in_atomic of sequent * sequent_low
+exception Unique_mandatory_atom_without_complementary of sequent * sequent_low
+exception Too_many_mandatory_atoms of sequent * sequent_low
 
 (*Utilitaries*)
 (*Given a sorted list, insert an element, keeping the sorting*)
@@ -651,12 +652,12 @@ let check_leaf s s' n n' =
     | x::xs when i <> n && i <> n' && (not s'.(i-1)) -> aux xs (i+1) a1 a2
     | x::xs when i = n -> aux xs (i+1) x a2
     | x::xs when i = n' -> aux xs (i+1) a1 x
-    | _ -> raise Closing_without_using_mandatory in
+    | _ -> raise (Closing_without_using_mandatory (s, s') ) in
 
   match aux s 1 (A(-1)) (A(-1)) with
   | A(i), NA(j) when i = j -> ()
   | NA(i), A(j) when i = j -> ()
-  | _ -> raise Atoms_given_not_dual
+  | _ -> raise (Atoms_given_not_dual (s, s'))
 
 (*Given a partial representation, print its latex display*)
 (*print_function serves as an option to display the representation using either a readable pseudo-latex code, 
@@ -712,9 +713,9 @@ let rec dual_build s =
     | [] -> dual_curr
     | x::xs -> aux 
                xs
-               (List.fold_left (fun l i -> list_insert l ((min acc (i+acc-1)),(max acc (i+acc-1))))
+               (List.fold_left (fun l i -> list_insert l ((min acc i),(max acc i)))
                dual_curr 
-               (complementary_build xs x))
+               (complementary_build s x))
                (acc + 1) in
   aux s [] 1
 
@@ -731,38 +732,38 @@ let atom_auto_complete t s a =
       match mandatory_build s' s'_low with
         | [] -> begin
                   match dual_build s' with
-                  | [] -> raise No_dual_pair_in_atomic
+                  | [] -> raise (No_dual_pair_in_atomic (s', s'_low))
                   | [(n1, n2)] -> print_rep_latex (t, s) print_seq_low;
                                   print_newline ();
-                                  print_string "Atomic sequent containing a single dual pair: applying it\n\n";
+                                  print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " containing a single dual pair: applying it\n\n";
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-2)]), true
                   | _ -> t, false
                   end
         | [(n1, x)] -> begin
                       match complementary_build s' x with
-                        | [] -> raise Unique_mandatory_atom_without_complementary
+                        | [] -> raise (Unique_mandatory_atom_without_complementary (s', s'_low))
                         | [n2] -> print_rep_latex (t, s) print_seq_low;
                                   print_newline ();
-                                  print_string "Atomic sequent with a unique mandatory atom having a unique complementary: applying it\n\n";
+                                  print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory atom having a unique complementary: applying it\n\n";
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
                         | _ -> t, false
                       end
         | [(n1, _); (n2, _)] -> print_rep_latex (t, s) print_seq_low;
                                 print_newline ();
-                                print_string "Atomic sequent having only two mandatory and dual atom: applying them\n\n";
+                                print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " having only two mandatory and dual atoms: applying them\n\n";
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
-        | _ -> raise Too_many_mandatory_atoms
+        | _ -> raise (Too_many_mandatory_atoms (s', s'_low))
     end
   | [n] when s'_low.(n-1) = true -> 
     begin
       match get_node_type_of_add s' (n, []) with
           | Unary -> print_rep_latex (t, s) print_seq_low;
                      print_newline ();
-                     print_string "Quasi-atomic sequent with a unique mandatory par operator: applying it\n\n";
+                     print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory par operator: applying it\n\n";
                      replace_unknown_node t a Unary [mapping.(n-1)], true
           | Binary -> print_rep_latex (t, s) print_seq_low;
                       print_newline ();
-                      print_string "Quasi-atomic sequent with a unique mandatory tensor operator: applying it\n\n";
+                      print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory tensor operator: applying it\n\n";
                       replace_unknown_node t a Binary [mapping.(n-1)], true
           | _ -> failwith "Unexpected case\n"
     end
@@ -807,7 +808,7 @@ let prove_sequent s =
           | Binary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Binary [mapping.(n-1)]) s)
           | Leaf -> begin
             let n' = match complementary_build s' (get_ith_of_list s' n) with
-                      | [m] -> m
+                      | [m] -> print_string "This atom has a single complementary, which was automatically applied\n"; m
                       | _ -> print_string "Please choose the dual atom to use:\n"; read_int ()
             in
             match get_node_type_of_add s' (n', []) with
@@ -815,11 +816,11 @@ let prove_sequent s =
             | _ -> failwith "prove_sequent: two atoms were expected"
             end
         end with
-        | Atoms_given_not_dual -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
-        | Closing_without_using_mandatory -> print_string "Error: tried to close without using all mandatory formulas\n\n"; aux t_curr
-        | No_dual_pair_in_atomic -> print_string "Error: an atomic sequent didn't contain any dual pair\n\n"; aux t_curr
-        | Unique_mandatory_atom_without_complementary -> print_string "Error: a mandatory atom in an atomic sequent didn't have any complementary\n\n"; aux t_curr
-        | Too_many_mandatory_atoms -> print_string "Error: an atomic sequent had too many mandatory atoms\n\n"; aux t_curr
+        | Atoms_given_not_dual(s, s') -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
+        | Closing_without_using_mandatory(s, s') -> print_string "Error: tried to close "; print_seq_low s s'; print_string " without using all mandatory formulas\n\n"; aux t_curr
+        | No_dual_pair_in_atomic(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string "didn't contain any dual pair\n\n"; aux t_curr
+        | Unique_mandatory_atom_without_complementary(s, s') -> print_string "Error: a mandatory atom in atomic sequent "; print_seq_low s s'; print_string " didn't have any complementary\n\n"; aux t_curr
+        | Too_many_mandatory_atoms(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " had too many mandatory atoms\n\n"; aux t_curr
         | Invalid_argument _ -> print_string "Error: index out of bounds\n\n"; aux t_curr
         | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
         | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
