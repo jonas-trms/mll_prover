@@ -713,9 +713,9 @@ let rec dual_build s =
     | [] -> dual_curr
     | x::xs -> aux 
                xs
-               (List.fold_left (fun l i -> list_insert l ((min acc i),(max acc i)))
-               dual_curr 
-               (complementary_build s x))
+               (List.fold_left (fun l i -> list_insert l (min acc i, max acc i))
+                 dual_curr 
+                 (complementary_build s x))
                (acc + 1) in
   aux s [] 1
 
@@ -736,7 +736,7 @@ let atom_auto_complete t s a =
                   | [(n1, n2)] -> print_rep_latex (t, s) print_seq_low;
                                   print_newline ();
                                   print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " containing a single dual pair: applying it\n\n";
-                                  (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-2)]), true
+                                  (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
                   | _ -> t, false
                   end
         | [(n1, x)] -> begin
