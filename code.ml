@@ -760,11 +760,11 @@ let atom_auto_complete t s a =
       match get_node_type_of_add s' (n, []) with
           | Unary -> print_rep_latex (t, s) print_seq_low;
                      print_newline ();
-                     print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory par operator: applying it\n\n";
+                     print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory (or possible) par operator: applying it\n\n";
                      replace_unknown_node t a Unary [mapping.(n-1)], true
           | Binary -> print_rep_latex (t, s) print_seq_low;
                       print_newline ();
-                      print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory tensor operator: applying it\n\n";
+                      print_string "Quasi-atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory (or possible) tensor operator: applying it\n\n";
                       replace_unknown_node t a Binary [mapping.(n-1)], true
           | _ -> failwith "Unexpected case\n"
     end
