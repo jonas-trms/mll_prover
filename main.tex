@@ -17,7 +17,7 @@
 \theoremstyle{remark}
 \newtheorem{example}{Exemple}
 
-\renewcommand{\labelenumi}{(\roman{enumi})}
+\renewcommand{\labelenumi}{(\alph{enumi})}
 \renewcommand{\theenumi}{\labelenumi}
 
 % dessins arbres : tikz
@@ -138,9 +138,9 @@ $(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Le
 \begin{definition}[Arbres]
 L'ensemble \trees{} des arbres est défini inductivement, par trois constructeurs:
 \begin{itemize}
-  \item{un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$}
-  \item{un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$}
-  \item{un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$}
+  \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
+  \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
+  \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
 \end{itemize}
 \end{definition}
 
@@ -152,7 +152,7 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
 \begin{prooftree}
     \axv{{X_1}\orth, X_1}
     \axv{{X_2}\orth, X_2}
-    \permv{(1,2)}{X_2, {X_2}\orth}
+    \permv{(2, 1)}{X_2, {X_2}\orth}
     \tensorv{{X_1}\orth, X_1 \tensor X_2, {X_2}\orth}
     \parrv{{X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth}
 \end{prooftree}
@@ -266,6 +266,8 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \end{cases*}$
   \end{description}
 
+\todo{expliquer que l'ordre lexicographique sur les feuilles vient du fait qu'on veut représenter des paires d'adresses distinctes pas des couples, on implémente les paires comme des couples ordonnés}
+
 
     On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representationslarge$:
     \begin{equation*}
@@ -297,15 +299,15 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 \begin{proof}
     Par induction sur $\someproof \in \proofs$:
     \begin{description}
-    \item[Axiome:] {$\someproof =
+    \item[Axiome:] $\someproof =
     \begin{prooftree}
         \axv{X\orth, X}
     \end{prooftree}$,
-    et donc $\encode \left( \someproof \right) = F(1 \epsilon, \; 2 \epsilon) \vdash X\orth, X$
+    et donc $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X\orth, X$
 
     On vérifie aisément les conditions \ref{cadd}, \ref{clin} et \ref{cdes} de la définition \ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.
 
-    \item[Échange:] {$\someproof =
+    \item[Échange:] $\someproof =
     \begin{prooftree}
         \namedproofv{\pi_1}{\Gamma}
         \permv{\someperm}{\permapp{\someperm}{\Gamma}}
@@ -350,7 +352,7 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
         
         $A \parr B$ est quant à lui étiqueté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiqueté par $n \epsilon$.
 
-        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.}
+        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
         
         \item La condition \ref{cdes} est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre.
         
@@ -410,37 +412,38 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 
 \begin{theorem}[Inversion des représentations correctes]
 \begin{equation*}
-\forall (t,s) \in \representations, \; \exists p \in \proofs, \; \encode \left( p \right) = (t, s)
+\forall (t,s) \in \representations, \; \exists \someproof \in \proofs, \; \encode \left( \someproof \right) = (t, s)
 \end{equation*}
-Autrement dit, une représentation correcte représente bien une preuve.
+Autrement dit, toute représentation correcte est bien l'encodage d'une preuve.
 \end{theorem}
 
 \begin{proof}
-Par récurrence sur la hauteur $\height$ de $t \in \trees$.
-
-\begin{itemize}
-    \item[(i) Initialisation :]{
-    Soit $(t, s) = F((n, \rho), (n', \rho')), \; \Gamma \in \representations$.
+Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe ud présent à la racine:
+\begin{description}
+    \item[$F$:]
+    Si $(t, s) = F(n\rho, n'\rho') \vdash \Gamma \in \representations$.
 
     D'après la condition (c) de descendance, on a nécessairement $\rho = \rho' = \epsilon$.
 
-    D'après la condition (b) de linéarité, $n \neq n'$, et $| \Gamma | \leq 2$.
+    D'après la condition (b) de linéarité, $n \neq n'$, $\size{\Gamma} = 2$ et $\{n, n'\} = \{1, 2\}$.
 
-    D'après la condition (a) de bon adressage, $| \Gamma | \geq 2 $. On en déduit, toujours d'après (a), que $n = 1$, $n' = 2$, et $ \Gamma = \{ X, \orth{X} \}$, avec $X$ un atome.
+    D'après la condition (a) de bon adressage, $n = 1$, $n' = 2$, et $\Gamma = X\orth, X$ ou $\Gamma = X, X\orth$, avec $X$ un atome.
 
-    $p = \begin{prooftree}
+    Dans le premier cas,
+    $\someproof = \begin{prooftree}
             \axv{X\orth, X}
-        \end{prooftree}$ convient donc, puisque $\encode \left( p \right) = F(1 \epsilon, \; 2 \epsilon), \; \{ X, \; \orth{X} \} = (t,s)$.
-    }
+        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X\orth, X = (t,s)$.
 
-    \item[(ii) Hérédité :]{
-    Soit $(t, s) \in \representations$, tel que $\height \left( t \right) \geq 1$. On a deux cas possibles.
+    Dans le second cas,
+    $\someproof = \begin{prooftree}
+            \axv{X\orth, X}
+            \permv{(2, 1)}{X, X\orth}
+        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X, X\orth = (t,s)$.
 
-    \begin{itemize}
-        \item[(i') Racine unaire :]
-    \end{itemize}
-    }
-\end{itemize}
+    \item[$U$:]
+
+    \item[$B$:]
+  \end{description}
 \end{proof}
 
 \end{document}
