@@ -63,7 +63,8 @@
 \newcommand*{\representationslarge}{\ensuremath{\trees \times \sequents}}
 \newcommand*{\representations}{\ensuremath{\mathcal{R}}}
 \newcommand*{\encode}{\ensuremath{\varphi}}
-
+\newcommand*{\decode}{\ensuremath{\gamma}}
+\newcommand*{\height}{\ensuremath{h}}
 
 \newcommand*{\todo}{{\normalfont \textbf{TODO}} }
 
@@ -86,7 +87,7 @@ F := X \mid X\orth \mid F \parr F \mid F \tensor F
 \end{definition}
 
 \subsection{Preuves}
-Les séquents sont des listes de formules. On définit alors l'ensemble \proofs{} des preuves en logique linéaire.
+Les séquents sont des listes de formules. On note $\sequents$ l'ensemble des séquents. On définit alors l'ensemble \proofs{} des preuves en logique linéaire.
 \begin{definition}[Preuves]
 \proofs{} est défini par les règles d'induction suivantes :
 \begin{equation*}
@@ -134,9 +135,9 @@ $(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Le
 \begin{definition}[Arbres]
 L'ensemble \trees{} des arbres est défini inductivement, par trois constructeurs :
 \begin{itemize}
-  \item un constructeur 0-aire étiquetté par deux adresses : $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
-  \item un constructeur unaire étiquetté par une adresse : $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
-  \item un constructeur binaire étiquetté par une adresse : $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
+  \item{un constructeur 0-aire étiquetté par deux adresses : $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$}
+  \item{un constructeur unaire étiquetté par une adresse : $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$}
+  \item{un constructeur binaire étiquetté par une adresse : $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$}
 \end{itemize}
 \end{definition}
 
@@ -177,11 +178,11 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationslarge$ vérifiant les trois conditions suivantes :
     
     \begin{itemize}
-    \item[(i) Bon adressage :]{ Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.}
+    \item[(a) Bon adressage :]{Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.}
     
-    \item[(ii) Linéarité :]{ Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.}
+    \item[(b) Linéarité :]{Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.}
 
-    \item[(iii) Descendance :]{ Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.}
+    \item[(c) Descendance :]{Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.}
     \end{itemize}
 \end{definition}
 
@@ -293,31 +294,31 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     Par induction sur $\someproof \in \proofs$ :
 
     \begin{itemize}
-    \item[(i) Axiome :]$\someproof =
+    \item[(i) Axiome :]{$\someproof =
     \begin{prooftree}
         \axv{X\orth, X}
     \end{prooftree}$,
     et donc $\encode \left( \someproof \right) = F(1 \epsilon, \; 2 \epsilon) \vdash X\orth, X$
 
-    On vérifie aisément les conditions (i), (ii) et (iii) de la définition \ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.
+    On vérifie aisément les conditions (a), (b) et (c) de la définition \ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.}
 
-    \item[(ii) Échange :]$\someproof =
+    \item[(ii) Échange :]{$\someproof =
     \begin{prooftree}
         \namedproofv{\pi_1}{\Gamma}
         \permv{\someperm}{\permapp{\someperm}{\Gamma}}
     \end{prooftree}$.
     
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie (i), (ii) et (iii). Les conditions (ii) et (iii) sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition (i) est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie (a), (b) et (c). Les conditions (b) et (c) sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition (a) est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
 
-    On en déduit que $\encode \left( \someproof' \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
+    On en déduit que $\encode \left( \someproof' \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie (a), (b) et (c), d'où $\encode \left( \someproof \right) \in \representations$.}
 
-    \item[(iii) Par :]$\someproof =
+    \item[(iii) Par :]{$\someproof =
     \begin{prooftree}
       \namedproofv{\pi_1}{\Gamma, A, B, \Delta}
       \parrv{\Gamma, A \parr B, \Delta}
     \end{prooftree}$
 
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$ vérifie (i), (ii) et (iii).
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$ vérifie (a), (b) et (c).
     
     On a, de plus :
 
@@ -333,34 +334,33 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
+        \item[(a) :]{L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
         
-        Par ailleurs, (i) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de un, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de un.
+        Par ailleurs, (a) est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de un, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de un.
         
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         }
         
-        \item[(ii) :] D'une part, (ii) étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
+        \item[(b) :]{D'une part, (b) étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
         
-        D'autre part, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquettée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après (ii). Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de (i)), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquettée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        D'autre part, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquettée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après (b). Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de (a)), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquettée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
         
         Chaque sous-formule de $\Gamma, A, B, \Delta$ est donc étiquettée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
         
         $A \parr B$ est quant à lui étiquetté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \epsilon$.
 
-        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
+        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.}
         
-        \item[(iii) :]
-        (iii) est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre. 
+        \item[(c) :]{(c) est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre. 
         
         La racine est étiquettée par $n \epsilon$, ce qui convient. 
 
-        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par construction la descendance, d'où (iii) est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par construction la descendance, d'où (c) est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
 
-        Ainsi, (iii) est vérifiée pour le nouvel arbre.
+        Ainsi, (c) est vérifiée pour le nouvel arbre.}
     \end{itemize}
 
-    On a bien (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
+    On a bien (a), (b) et (c), d'où $\encode \left( \someproof \right) \in \representations$.}
 
      \item[(iv) Tenseur :]$\someproof =
     \begin{prooftree}
@@ -369,7 +369,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
       \tensorv{\Gamma, A \tensor B, \Delta}
     \end{prooftree}$
 
-    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient (i), (ii) et (iii).
+    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient (a), (b) et (c).
     
     De plus :
 
@@ -386,17 +386,17 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Vérifions les trois conditions :
     \begin{itemize}
-        \item[(i) :] L'argument est similaire au cas du par : les adresses de $A$ et $B$ deviennent des sous-adresses gauches et droites de $A \tensor B$, et un décalage est effectué sur les adresses de $\Delta$, à cause de la fusion des séquents.
+        \item[(a) :]{L'argument est similaire au cas du par : les adresses de $A$ et $B$ deviennent des sous-adresses gauches et droites de $A \tensor B$, et un décalage est effectué sur les adresses de $\Delta$, à cause de la fusion des séquents.}
 
-        \item[(ii) :] À nouveau, l'argument pour $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ est similaire au cas du par : le ré-adressage est correct, et on se sert des hypothèses d'induction. 
+        \item[(b) :]{À nouveau, l'argument pour $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ est similaire au cas du par : le ré-adressage est correct, et on se sert des hypothèses d'induction. }
         
         Le cas de la racine se traite également comme pour le par.
 
-        \item[(iii) :] De la même manière que pour le par, en utilisant les hypothèses d'induction et par construction des fonctions de ré-adressage, la descendance est préservée au sein de $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$.
+        \item[(c) :]{De la même manière que pour le par, en utilisant les hypothèses d'induction et par construction des fonctions de ré-adressage, la descendance est préservée au sein de $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$.
 
         Par ailleurs, la racine est étiquettée par $n \epsilon$, ce qui convient. Il s'agit de plus d'un noeud de la forme $B(n \epsilon)$, et, par construction de $\psi_{\tensor\Left}$, aucun noeud de $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \Right$. Idem pour $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ qui ne peut contenir $n \Left$.
 
-        La racine vérifie ainsi toutes les conditions, la descendance est donc préservée.
+        La racine vérifie ainsi toutes les conditions, la descendance est donc préservée.}
     \end{itemize}
 
     On en déduit $\encode \left( \someproof \right) \in \representations$.
@@ -407,6 +407,41 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     
 \end{proof}
 
+\subsubsection{Décodage}
 
+\begin{theorem}[Inversion des représentations correctes]
+\begin{equation*}
+\forall (t,s) \in \representations, \; \exists p \in \proofs, \; \encode \left( p \right) = (t, s)
+\end{equation*}
+Autrement dit, une représentation correcte représente bien une preuve.
+\end{theorem}
+
+\begin{proof}
+Par récurrence sur la hauteur $\height$ de $t \in \trees$.
+
+\begin{itemize}
+    \item[(i) Initialisation :]{
+    Soit $(t, s) = F((n, \rho), (n', \rho')), \; \Gamma \in \representations$.
+
+    D'après la condition (c) de descendance, on a nécessairement $\rho = \rho' = \epsilon$.
+
+    D'après la condition (b) de linéarité, $n \neq n'$, et $| \Gamma | \leq 2$.
+
+    D'après la condition (a) de bon adressage, $| \Gamma | \geq 2 $. On en déduit, toujours d'après (a), que $n = 1$, $n' = 2$, et $ \Gamma = \{ X, \orth{X} \}$, avec $X$ un atome.
+
+    $p = \begin{prooftree}
+            \axv{X\orth, X}
+        \end{prooftree}$ convient donc, puisque $\encode \left( p \right) = F(1 \epsilon, \; 2 \epsilon), \; \{ X, \; \orth{X} \} = (t,s)$.
+    }
+
+    \item[(ii) Hérédité :]{
+    Soit $(t, s) \in \representations$, tel que $\height \left( t \right) \geq 1$. On a deux cas possibles.
+
+    \begin{itemize}
+        \item[(i') Racine unaire :]
+    \end{itemize}
+    }
+\end{itemize}
+\end{proof}
 
 \end{document}
