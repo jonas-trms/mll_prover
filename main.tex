@@ -338,19 +338,73 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         }
         
-        \item[(ii) :] D'une part, (ii) étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
+        \item[(ii) :] D'une part, (ii) étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
         
-        De plus, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquettée par au moins un noeud de $\encode ' \left( \pi_1 \right)$. Le ré-adressage $\psi_\parr$ étant correct (voir (i)), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est donc étiquettée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$. Ce noeud est de surcroît unique, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ étant distinctes.
+        D'autre part, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquettée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après (ii). Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de (i)), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquettée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
         
-        $A \parr B$, quant à lui, est étiquetté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \epsilon$.
+        Chaque sous-formule de $\Gamma, A, B, \Delta$ est donc étiquettée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
+        
+        $A \parr B$ est quant à lui étiquetté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \epsilon$.
 
-        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît bien une unique fois dans l'arbre, d'où la linéarité est préservée.
+        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
+        
         \item[(iii) :]
+        (iii) est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre. 
+        
+        La racine est étiquettée par $n \epsilon$, ce qui convient. 
+
+        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par construction la descendance, d'où (iii) est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+
+        Ainsi, (iii) est vérifiée pour le nouvel arbre.
     \end{itemize}
+
+    On a bien (i), (ii) et (iii), d'où $\encode \left( \someproof \right) \in \representations$.
+
+     \item[(iv) Tenseur :]$\someproof =
+    \begin{prooftree}
+      \namedproofv{\pi_1}{\Gamma, A}
+      \namedproofv{\pi_2}{B, \Delta}
+      \tensorv{\Gamma, A \tensor B, \Delta}
+    \end{prooftree}$
+
+    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient (i), (ii) et (iii).
+    
+    De plus :
+
+    \begin{equation*}
+    \encode ( \someproof ) = \begin{tikzpicture}%
+    [level distance=1.5cm,
+    level 1/.style={sibling distance=3.5cm}]
+    \node {$B_{n \epsilon}$}
+        child {node {$\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$}}
+        child {node {$\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$}
+    };
+    \end{tikzpicture} \vdash \Gamma, A \tensor B, \Delta
+    \end{equation*}
+
+    Vérifions les trois conditions :
+    \begin{itemize}
+        \item[(i) :] L'argument est similaire au cas du par : les adresses de $A$ et $B$ deviennent des sous-adresses gauches et droites de $A \tensor B$, et un décalage est effectué sur les adresses de $\Delta$, à cause de la fusion des séquents.
+
+        \item[(ii) :] À nouveau, l'argument pour $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ est similaire au cas du par : le ré-adressage est correct, et on se sert des hypothèses d'induction. 
+        
+        Le cas de la racine se traite également comme pour le par.
+
+        \item[(iii) :] De la même manière que pour le par, en utilisant les hypothèses d'induction et par construction des fonctions de ré-adressage, la descendance est préservée au sein de $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$.
+
+        Par ailleurs, la racine est étiquettée par $n \epsilon$, ce qui convient. Il s'agit de plus d'un noeud de la forme $B(n \epsilon)$, et, par construction de $\psi_{\tensor\Left}$, aucun noeud de $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiquetté par $n \Right$. Idem pour $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ qui ne peut contenir $n \Left$.
+
+        La racine vérifie ainsi toutes les conditions, la descendance est donc préservée.
+    \end{itemize}
+
+    On en déduit $\encode \left( \someproof \right) \in \representations$.
 
     \end{itemize}
 
+    Ainsi, $\forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations$.
     
 \end{demonstration}
+
+
 
 \end{document}
