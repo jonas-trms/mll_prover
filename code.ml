@@ -34,7 +34,7 @@ type representation = tree * sequent
 exception Atoms_given_not_dual of sequent * sequent_low
 exception Closing_without_using_mandatory of sequent * sequent_low
 exception No_dual_pair_in_atomic of sequent * sequent_low
-exception Unique_mandatory_atom_without_complementary of sequent * sequent_low
+exception Unique_mandatory_atom_without_complement of sequent * sequent_low
 exception Too_many_mandatory_atoms of sequent * sequent_low
 
 (*Utilitaries*)
@@ -684,7 +684,7 @@ let mandatory_build s s'_low =
   aux s 1
 
 (*Given a sequent and an atom, extract its complementary atoms*)
-let rec complementary_build s x =
+let rec complement_build s x =
   let rec aux s'_curr acc =
     match s'_curr, x with
     | [], _ -> []
@@ -702,7 +702,7 @@ let rec dual_build s =
                xs
                (List.fold_left (fun l i -> list_insert l (min acc i, max acc i))
                  dual_curr 
-                 (complementary_build s x))
+                 (complement_build s x))
                (acc + 1) in
   aux s [] 1
 
@@ -727,11 +727,11 @@ let atom_auto_complete t s a =
                   | _ -> t, false
                   end
         | [(n1, x)] -> begin
-                      match complementary_build s' x with
-                        | [] -> raise (Unique_mandatory_atom_without_complementary (s', s'_low))
+                      match complement_build s' x with
+                        | [] -> raise (Unique_mandatory_atom_without_complement (s', s'_low))
                         | [n2] -> print_rep_latex (t, s) print_seq_low;
                                   print_newline ();
-                                  print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory atom having a unique complementary: applying it\n\n";
+                                  print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " with a unique mandatory atom having a unique complement: applying it\n\n";
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
                         | _ -> t, false
                       end
@@ -783,11 +783,12 @@ let prove_sequent s =
         print_rep_latex (t_curr, s) print_seq_low;
         print_newline ();
         let n_hole =
-          if List.length list_unknown = 1 then 1
+          if List.length list_unknown = 1 then (print_string "Unique hole 1 automatically selected\n"; 1)
           else (print_string "Please choose the hole to work on:\n"; read_int ()) in
         let a' = get_ith_of_list list_unknown n_hole in
         (*insert a try with here*)
         let mapping, s', s'_low = approx (t_curr, s) a' in
+        print_string "Selected hole:\n  ";
         print_seq_low s' s'_low;
         print_newline ();
         print_string "Please choose the rule to apply:\n";
@@ -797,8 +798,8 @@ let prove_sequent s =
           | Unary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Unary [mapping.(n-1)]) s)
           | Binary -> print_newline (); aux (autocomplete (replace_unknown_node t_curr a' Binary [mapping.(n-1)]) s)
           | Leaf -> begin
-            let n' = match complementary_build s' (get_ith_of_list s' n) with
-                      | [m] -> print_string "This atom has a single complementary, which was automatically applied\n"; m
+            let n' = match complement_build s' (get_ith_of_list s' n) with
+                      | [m] -> Printf.printf "This atom has a single complement at position %i, which was automatically applied\n" m; m
                       | _ -> print_string "Please choose the dual atom to use:\n"; read_int ()
             in
             match get_node_type_of_add s' (n', []) with
@@ -806,14 +807,14 @@ let prove_sequent s =
             | _ -> failwith "prove_sequent: two atoms were expected"
             end
         end with
-        | Atoms_given_not_dual(s, s') -> print_string "Error: two dual atoms were expected in "; print_seq_low s s'; print_string "\n\n"; aux t_curr
-        | Closing_without_using_mandatory(s, s') -> print_string "Error: tried to close "; print_seq_low s s'; print_string " without using all mandatory formulas\n\n"; aux t_curr
-        | No_dual_pair_in_atomic(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " didn't contain any dual pair\n\n"; aux t_curr
-        | Unique_mandatory_atom_without_complementary(s, s') -> print_string "Error: a mandatory atom in atomic sequent "; print_seq_low s s'; print_string " didn't have any complementary\n\n"; aux t_curr
-        | Too_many_mandatory_atoms(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " had too many mandatory atoms\n\n"; aux t_curr
-        | Invalid_argument _ -> print_string "Error: index out of bounds\n\n"; aux t_curr
-        | Failure error -> Printf.printf "Error: %s\n\n" error; aux t_curr
-        | _ -> print_string "Error: please retry with a correct input\n\n"; aux t_curr
+        | Atoms_given_not_dual(s, s') -> print_string "ERROR: two dual atoms were expected in "; print_seq_low s s'; print_string "\n\n"; aux t_curr
+        | Closing_without_using_mandatory(s, s') -> print_string "ERROR: tried to close "; print_seq_low s s'; print_string " without using all mandatory formulas\n\n"; aux t_curr
+        | No_dual_pair_in_atomic(s, s') -> print_string "ERROR: atomic sequent "; print_seq_low s s'; print_string " didn't contain any dual pair\n\n"; aux t_curr
+        | Unique_mandatory_atom_without_complement(s, s') -> print_string "ERROR: a mandatory atom in atomic sequent "; print_seq_low s s'; print_string " didn't have any complement\n\n"; aux t_curr
+        | Too_many_mandatory_atoms(s, s') -> print_string "ERROR: atomic sequent "; print_seq_low s s'; print_string " has too many mandatory atoms\n\n"; aux t_curr
+        | Invalid_argument _ -> print_string "ERROR: index out of bounds\n\n"; aux t_curr
+        | Failure error -> Printf.printf "ERROR: %s\n\n" error; aux t_curr
+        | _ -> print_string "ERROR: please retry with a correct input\n\n"; aux t_curr
       end in
   aux (autocomplete Unknown s)
 
