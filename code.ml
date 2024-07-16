@@ -616,14 +616,16 @@ let approx (t, s) a =
         | x::xs when x = i -> aux xs (i+1) acc
         | x::xs when x > i -> 
           begin
-            (if context_empty || (i = n) then s'_new.(acc-1) <- s'.(i-1)
+            (if (i = n) || (i = n + 1) then s'_new.(acc-1) <- true
+            else if context_empty then s'_new.(acc-1) <- s'.(i-1)
             else ());
             sigma.(i-1) <- acc; aux (x::xs) (i+1) (acc+1)
           end
         | [] when i = m + 1 -> ()
         | [] -> 
           begin
-            (if context_empty || (i = n) then s'_new.(acc-1) <- s'.(i-1)
+            (if (i = n) || (i = n + 1) then s'_new.(acc-1) <- true
+            else if context_empty then s'_new.(acc-1) <- s'.(i-1)
             else ());
             sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
           end
