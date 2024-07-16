@@ -572,17 +572,10 @@ let approx (t, s) a =
   (*s is the high approximation: it contains all the formulas that can be applied at address a*)
   (*s' is the low approximation: it's a tab of booleans indicating if a formula in s is mandatory*)
     match t, a with
-    | Unknown, [] -> mapping, s, s'
     | F(a1, a2), [] -> [|a1; a2|], 
                        [get_subformula_of_add s a1; get_subformula_of_add s a2],
                        [|true; true|]
-    | U(_, _), [] -> 
-      let children = list_of_roots t in
-      List.iter (fun i -> s'.(i-1) <- true) children;
-
-      mapping, s, s'
-    
-    | B(_, t1, t2), [] ->
+    | _, [] -> 
       let children = list_of_roots t in
       List.iter (fun i -> s'.(i-1) <- true) children;
 
@@ -614,22 +607,14 @@ let approx (t, s) a =
       let rec aux to_remove i acc =
         match to_remove with
         | x::xs when x = i -> aux xs (i+1) acc
-        | x::xs when x > i -> 
-          begin
-            (if (i = n) || (i = n + 1) then s'_new.(acc-1) <- true
-            else if context_empty then s'_new.(acc-1) <- s'.(i-1)
-            else ());
-            sigma.(i-1) <- acc; aux (x::xs) (i+1) (acc+1)
-          end
         | [] when i = m + 1 -> ()
-        | [] -> 
+        | _ -> 
           begin
-            (if (i = n) || (i = n + 1) then s'_new.(acc-1) <- true
+            (if (i = n) then s'_new.(acc-1) <- true
             else if context_empty then s'_new.(acc-1) <- s'.(i-1)
             else ());
-            sigma.(i-1) <- acc; aux [] (i+1) (acc+1)
-          end
-        | _ -> failwith "Bad construction approx2" in
+            sigma.(i-1) <- acc; aux to_remove (i+1) (acc+1)
+          end in
       aux indexes_t 1 1;
       
       let reindex n = function
@@ -750,7 +735,8 @@ let atom_auto_complete t s a =
                                   (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
                         | _ -> t, false
                       end
-        | [(n1, _); (n2, _)] -> print_rep_latex (t, s) print_seq_low;
+        | [(n1, _); (n2, _)] -> check_leaf s' s'_low n1 n2;
+                                print_rep_latex (t, s) print_seq_low;
                                 print_newline ();
                                 print_string "Atomic sequent "; print_seq_low s' s'_low; print_string " having only two mandatory and dual atoms: applying them\n\n";
                                 (replace_unknown_node t a Leaf [mapping.(n1-1); mapping.(n2-1)]), true
@@ -819,7 +805,7 @@ let prove_sequent s =
             | _ -> failwith "prove_sequent: two atoms were expected"
             end
         end with
-        | Atoms_given_not_dual(s, s') -> print_string "Error: two dual atoms were expected\n\n"; aux t_curr
+        | Atoms_given_not_dual(s, s') -> print_string "Error: two dual atoms were expected in "; print_seq_low s s'; print_string "\n\n"; aux t_curr
         | Closing_without_using_mandatory(s, s') -> print_string "Error: tried to close "; print_seq_low s s'; print_string " without using all mandatory formulas\n\n"; aux t_curr
         | No_dual_pair_in_atomic(s, s') -> print_string "Error: atomic sequent "; print_seq_low s s'; print_string " didn't contain any dual pair\n\n"; aux t_curr
         | Unique_mandatory_atom_without_complementary(s, s') -> print_string "Error: a mandatory atom in atomic sequent "; print_seq_low s s'; print_string " didn't have any complementary\n\n"; aux t_curr
@@ -864,4 +850,4 @@ let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1);
 
 let example10 = [P (T (P (NA(1), A(3)), NA(3)), T(P (NA(2), A(3)), NA(3))); P (T (T (A(1), A(2)), NA(3)), A(3))];;
 
-let _ = prove_sequent example10;;
+let _ = prove_sequent example9;;
