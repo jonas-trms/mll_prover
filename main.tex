@@ -147,7 +147,7 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 Chaque n\oe ud de l'arbre représente ainsi une règle de la preuve, par le biais de l'adresse qui l'étiquette, et qui renvoie à la sous-formule de $s$ sur laquelle la règle est appliquée. Le cas de l'axiome est particulier: un axiome est représenté par une feuille qui a deux adresses, renvoyant aux deux atomes duaux utilisés.
 
 \begin{example}
-Une preuve et sa représentation (la racine de la preuve est positionnée en bas, celles de l'arbre de la représentation est positionnée en haut):
+Une preuve et sa représentation (la racine de la preuve est positionnée en bas, celle de l'arbre de la représentation est positionnée en haut):
 \begin{equation*}
 \begin{prooftree}
     \axv{{X_1}\orth, X_1}
@@ -174,22 +174,11 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
 Notre objectif est de définir une fonction d'encodage des preuves vers les représentations, puis de l'inverser.
 
 \subsubsection{Encodage}
-On cherche d'abord à restreindre l'ensemble des représentations, pour ne conserver que celles qui représentent effectivement une preuve.
 
-\begin{definition}[Représentations correctes]
-    \label{def_rep}
-    On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationslarge$ vérifiant les trois conditions suivantes:
-    
-    \begin{enumerate}
-    \item\label{cadd} \textbf{Bon adressage:} Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.
-    \item\label{clin} \textbf{Linéarité:} Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.
-    \item\label{cdes} \textbf{Descendance:} Une adresse de $t$ est de la forme $(n, \epsilon)$, ou est de la forme $(n, \sigma \cdot \alpha)$ et descend d'un n\oe ud adressant $(n, \sigma)$ (possiblement indirectement). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.
-    \end{enumerate}
-\end{definition}
+On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de $\trees$ dans $\trees$, qui remplace chaque adresse de l'arbre par son image.
 
 \begin{definition}[Fonction d'encodage]
-    On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de $\trees$ dans $\trees$, qui remplace chaque adresse de l'arbre par son image. On définit d'abord une fonction $\encode' : \proofs \rightarrow \trees$, par induction sur $\proofs$:
-
+  On définit d'abord une fonction $\encode' : \proofs \rightarrow \trees$, par induction sur $\proofs$:
     \begin{description}
     \item[Axiome:]
     $\encode' \left(
@@ -284,6 +273,19 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     \end{equation*}
 \end{definition}
 
+On cherche ensuite à restreindre l'ensemble des représentations, pour ne conserver que celles qui sont effectivement l'encodage d'une preuve.
+
+\begin{definition}[Représentations correctes]
+    \label{def_rep}
+    On définit l'ensemble \representations{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationslarge$ vérifiant les trois conditions suivantes:
+    
+    \begin{enumerate}
+    \item\label{cadd} \textbf{Bon adressage:} Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.
+    \item\label{clin} \textbf{Linéarité:} Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.
+    \item\label{cdes} \textbf{Descendance:} Une adresse de $t$ de la forme $(n, \sigma \cdot \alpha)$ descend nécessairement d'un n\oe ud adressant $(n, \sigma)$ (possiblement à distance plus grande que $1$). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.
+    \end{enumerate}
+\end{definition}
+
 \begin{theorem}[Image de l'encodage]
     \begin{equation*}
     \forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations
@@ -294,7 +296,6 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
 \begin{proof}
     Par induction sur $\someproof \in \proofs$:
-
     \begin{description}
     \item[Axiome:] {$\someproof =
     \begin{prooftree}
@@ -312,7 +313,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     
     Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}. Les conditions \ref{clin} et \ref{cdes} sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition \ref{cadd} est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
 
-    On en déduit que $\encode \left( \someproof' \right) = \someperm \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}, d'où $\encode \left( \someproof \right) \in \representations$.
+    On en déduit que $\encode \left( \someproof \right) = \someperm' \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}, d'où $\encode \left( \someproof \right) \in \representations$.
 
     \item[Par:] $\someproof =
     \begin{prooftree}
@@ -323,7 +324,6 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     On a, de plus:
-
     \begin{equation*}
     \encode ( \someproof ) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -338,7 +338,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     \begin{enumerate}
         \item\label{pcadd} L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
         
-        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de un, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de un.
+        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
         
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         
@@ -356,7 +356,8 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
         
         La racine est étiquetée par $n \epsilon$, ce qui convient.
 
-        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par construction la descendance, d'où \ref{cdes} est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par le fait d'être une sous-adresse, d'où \ref{cdes} est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+\todo{détailler le cas de $A$ et de $B$}
 
         Ainsi, \ref{cdes} est vérifiée pour le nouvel arbre.
     \end{enumerate}
@@ -373,7 +374,6 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     De plus:
-
     \begin{equation*}
     \encode ( \someproof ) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -401,11 +401,9 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     \end{enumerate}
 
     On en déduit $\encode \left( \someproof \right) \in \representations$.
-
     \end{description}
 
     Ainsi, $\forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations$.
-    
 \end{proof}
 
 \subsubsection{Décodage}
