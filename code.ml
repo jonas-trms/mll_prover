@@ -786,6 +786,7 @@ let prove_sequent s =
           if List.length list_unknown = 1 then 1
           else (print_string "Please choose the hole to work on:\n"; read_int ()) in
         let a' = get_ith_of_list list_unknown n_hole in
+        (*insert a try with here*)
         let mapping, s', s'_low = approx (t_curr, s) a' in
         print_seq_low s' s'_low;
         print_newline ();
