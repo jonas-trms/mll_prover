@@ -10,10 +10,12 @@
 \usepackage{tikz}
 \usetikzlibrary{trees}
 
-\newtheorem{example}{Exemple}
-\newtheorem{definition}{Définition}
+\theoremstyle{plain}
 \newtheorem{theorem}{Théorème}
-\newtheorem{demonstration}{Démonstration}
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}
+\theoremstyle{remark}
+\newtheorem{example}{Exemple}
 
 % dessins arbres : tikz
 \tikzset{baseline=(current bounding box.center)}
@@ -287,7 +289,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
     Autrement dit, l'encodage d'une preuve est une représentation correcte.
 \end{theorem}
 
-\begin{demonstration}
+\begin{proof}
     Par induction sur $\someproof \in \proofs$ :
 
     \begin{itemize}
@@ -403,7 +405,7 @@ On cherche d'abord à restreindre l'ensemble des représentations, pour ne conse
 
     Ainsi, $\forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations$.
     
-\end{demonstration}
+\end{proof}
 
 
 
