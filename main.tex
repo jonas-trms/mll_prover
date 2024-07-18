@@ -9,11 +9,7 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{trees}
-\usepackage[ruled]{algorithm2e}
-
-\renewcommand*{\algorithmcfname}{Algorithme}
-\SetKwInput{KwData}{Entrées}
-\SetKwInput{KwResult}{Sorties}
+\usepackage[ruled, french, frenchkw, onelanguage]{algorithm2e}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Théorème}
@@ -57,8 +53,10 @@
 \newcommand*{\defv}[1]{\infer[dashed]{1}[\ensuremath{\mathit{def}}]{\vdash #1}}
 \newcommand*{\permapp}[2]{#2 #1}
 \newcommand*{\someperm}{\varsigma}
+\newcommand*{\someadd}{\sigma}
 \newcommand*{\someproof}{\pi}
 \newcommand*{\sequent}{\Gamma}
+\newcommand*{\sequentbis}{\Delta}
 \newcommand*{\size}[1]{\mathopen{|}#1\mathclose{|}}
 
 
@@ -76,9 +74,9 @@
 \newcommand*{\encode}{\ensuremath{\varphi}}
 \newcommand*{\decode}{\ensuremath{\gamma}}
 \newcommand*{\height}{\ensuremath{h}}
-\newcommand*{\relapprox}{\ensuremath{\triangleright}}
+\newcommand*{\relapprox}{\ensuremath{\triangleleft}}
 \newcommand*{\relapproxlarge}{\ensuremath{\relapprox^*}}
-\newcommand*{\unknown}{\ensuremath{?}}
+\newcommand*{\unknown}{\mathcal{H}}
 
 \newcommand*{\lowapprox}{\ensuremath{\Sigma_0}}
 \newcommand*{\highapprox}{\ensuremath{\Sigma_1}}
@@ -127,14 +125,14 @@ Les séquents sont des listes de formules. On note $\sequents$ l'ensemble des s�
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
-  \hypv{\sequent, A, B, \Delta}
-  \parrv{\sequent, A \parr B, \Delta}
+  \hypv{\sequent, A, B, \sequentbis}
+  \parrv{\sequent, A \parr B, \sequentbis}
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
   \hypv{\sequent, A}
-  \hypv{B, \Delta}
-  \tensorv{\sequent, A \tensor B, \Delta}
+  \hypv{B, \sequentbis}
+  \tensorv{\sequent, A \tensor B, \sequentbis}
 \end{prooftree}
 \end{equation*}
 \end{definition}
@@ -229,8 +227,8 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \item[Par:]
     $\encode' \left(
     \begin{prooftree}
-      \namedproofv{\pi}{\sequent, A, B, \Delta}
-      \parrv{\sequent, A \parr B, \Delta}
+      \namedproofv{\pi}{\sequent, A, B, \sequentbis}
+      \parrv{\sequent, A \parr B, \sequentbis}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -238,7 +236,7 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left(
            \begin{prooftree}
-             \namedproofv{\pi}{\sequent, A, B, \Delta}
+             \namedproofv{\pi}{\sequent, A, B, \sequentbis}
            \end{prooftree} \right) \right)$}
     };
     \end{tikzpicture}$
@@ -247,18 +245,18 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     
     $\psi_\parr : \addresses \rightarrow \addresses =
     \begin{cases*}
-        (i, \sigma) \mapsto (i, \sigma) & si $i < n$ \\
-        (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
-        (n+1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
-        (i, \sigma) \mapsto (i-1, \sigma) & si $i \geq n+2$
+        (i, \someadd) \mapsto (i, \someadd) & si $i < n$ \\
+        (n, \someadd) \mapsto (n, \Left \cdot \someadd)\\
+        (n+1, \someadd) \mapsto (n, \Right \cdot \someadd)\\
+        (i, \someadd) \mapsto (i-1, \someadd) & si $i \geq n+2$
     \end{cases*}$
 
     \item[Tenseur:]
     $\encode' \left(
     \begin{prooftree}
       \namedproofv{\pi_1}{\sequent, A}
-      \namedproofv{\pi_2}{B, \Delta}
-      \tensorv{\sequent, A \tensor B, \Delta}
+      \namedproofv{\pi_2}{B, \sequentbis}
+      \tensorv{\sequent, A \tensor B, \sequentbis}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -271,7 +269,7 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
               \right) \right)$}}
         child {node {$\psi_{\tensor\Right} \left( \encode' \left(
                 \begin{prooftree}
-                  \namedproofv{\pi_2}{B, \Delta}
+                  \namedproofv{\pi_2}{B, \sequentbis}
                 \end{prooftree}
               \right) \right)$}
     };
@@ -281,14 +279,14 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     
     $\psi_{\tensor\Left} : \addresses \rightarrow \addresses =
     \begin{cases*}
-        (n, \sigma) \mapsto (n, \Left \cdot \sigma)\\
-        (i, \sigma) \mapsto (i, \sigma) & si $i \neq n$
+        (n, \someadd) \mapsto (n, \Left \cdot \someadd)\\
+        (i, \someadd) \mapsto (i, \someadd) & si $i \neq n$
     \end{cases*}$
     
     $\psi_{\tensor\Right} : \addresses \rightarrow \addresses =
     \begin{cases*}
-        (1, \sigma) \mapsto (n, \Right \cdot \sigma)\\
-        (i, \sigma) \mapsto (i + n - 1, \sigma) & si $i \geq 2$
+        (1, \someadd) \mapsto (n, \Right \cdot \someadd)\\
+        (i, \someadd) \mapsto (i + n - 1, \someadd) & si $i \geq 2$
     \end{cases*}$
   \end{description}
 
@@ -309,7 +307,7 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
     \begin{enumerate}
     \item\label{cadd} \textbf{Bon adressage:} Chaque adresse apparaissant dans une feuille ou un n\oe ud de $t$ est celle d'un atome ou d'un opérateur de $\sequent$. De plus, l'arité d'un n\oe ud est égale à celle de la règle de l'opérateur qu'il adresse, et chaque feuille adresse deux atomes duaux. Enfin, les deux adresses d'une feuille sont triées (par ordre lexicographique, en considérant que $\Left < \Right)$.
     \item\label{clin} \textbf{Linéarité:} Chaque sous-formule de $\sequent$ apparaît exactement une fois dans les adresses de $t$.
-    \item\label{cdes} \textbf{Descendance:} Une adresse de $t$ de la forme $(n, \sigma \cdot \alpha)$ descend nécessairement d'un n\oe ud adressant $(n, \sigma)$ (possiblement à distance plus grande que $1$). De plus, pour tout n\oe ud de la forme $B((n, \sigma), \; g, \; d)$, $(n, \sigma \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \sigma \cdot \Left)$ ne peut apparaître dans $d$.
+    \item\label{cdes} \textbf{Descendance:} Une adresse de $t$ de la forme $(n, \someadd \cdot \alpha)$ descend nécessairement d'un n\oe ud adressant $(n, \someadd)$ (possiblement à distance plus grande que $1$). De plus, pour tout n\oe ud de la forme $B((n, \someadd), \; g, \; d)$, $(n, \someadd \cdot \Right)$ ne peut apparaître dans $g$, et $(n, \someadd \cdot \Left)$ ne peut apparaître dans $d$.
     \end{enumerate}
 \end{definition}
 
@@ -344,11 +342,11 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 
     \item[Par:] $\someproof =
     \begin{prooftree}
-      \namedproofv{\pi_1}{\sequent, A, B, \Delta}
-      \parrv{\sequent, A \parr B, \Delta}
+      \namedproofv{\pi_1}{\sequent, A, B, \sequentbis}
+      \parrv{\sequent, A \parr B, \sequentbis}
     \end{prooftree}$
 
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \sequentbis$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     On a, de plus:
     \begin{equation*}
@@ -358,26 +356,26 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$}
     };
-    \end{tikzpicture} \vdash \sequent, A \parr B, \Delta
+    \end{tikzpicture} \vdash \sequent, A \parr B, \sequentbis
     \end{equation*}
 
     Vérifions les trois conditions:
     \begin{enumerate}
         \item\label{pcadd} L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
         
-        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
+        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \sequentbis$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\sequentbis$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
         
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         
-        \item D'une part, \ref{clin} étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
+        \item D'une part, \ref{clin} étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \sequentbis$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
         
-        D'autre part, chaque sous-formule de $\sequent, A, B, \Delta$ est étiquetée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après \ref{clin}. Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de \ref{pcadd}), chaque sous-formule de $\sequent, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquetée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        D'autre part, chaque sous-formule de $\sequent, A, B, \sequentbis$ est étiquetée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après \ref{clin}. Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de \ref{pcadd}), chaque sous-formule de $\sequent, A \parr B, \sequentbis$, à l'exception de $A \parr B$, est étiquetée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
         
-        Chaque sous-formule de $\sequent, A, B, \Delta$ est donc étiquetée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
+        Chaque sous-formule de $\sequent, A, B, \sequentbis$ est donc étiquetée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
         
         $A \parr B$ est quant à lui étiqueté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiqueté par $n \epsilon$.
 
-        Finalement, chaque sous-adresse de $\sequent, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
+        Finalement, chaque sous-adresse de $\sequent, A \parr B, \sequentbis$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
         
         \item La condition \ref{cdes} est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre.
         
@@ -394,11 +392,11 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
      \item[Tenseur:] $\someproof =
     \begin{prooftree}
       \namedproofv{\pi_1}{\sequent, A}
-      \namedproofv{\pi_2}{B, \Delta}
-      \tensorv{\sequent, A \tensor B, \Delta}
+      \namedproofv{\pi_2}{B, \sequentbis}
+      \tensorv{\sequent, A \tensor B, \sequentbis}
     \end{prooftree}$
 
-    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient \ref{cadd}, \ref{clin} et \ref{cdes}.
+    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \sequentbis$ vérifient \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     De plus:
     \begin{equation*}
@@ -409,12 +407,12 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
         child {node {$\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$}}
         child {node {$\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$}
     };
-    \end{tikzpicture} \vdash \sequent, A \tensor B, \Delta
+    \end{tikzpicture} \vdash \sequent, A \tensor B, \sequentbis
     \end{equation*}
 
     Vérifions les trois conditions:
     \begin{enumerate}
-        \item L'argument est similaire au cas du par: les adresses de $A$ et $B$ deviennent des sous-adresses gauches et droites de $A \tensor B$, et un décalage est effectué sur les adresses de $\Delta$, à cause de la fusion des séquents.
+        \item L'argument est similaire au cas du par: les adresses de $A$ et $B$ deviennent des sous-adresses gauches et droites de $A \tensor B$, et un décalage est effectué sur les adresses de $\sequentbis$, à cause de la fusion des séquents.
 
         \item À nouveau, l'argument pour $\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$ et $\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$ est similaire au cas du par: le ré-adressage est correct, et on se sert des hypothèses d'induction.
         
@@ -506,7 +504,7 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser uniquement �
     On définit l'ensemble \representationspartial{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationspartiallarge$ vérifiant les trois conditions suivantes:
     
     \begin{enumerate}
-    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les feuilles \unknown{} ne portent aucune adresse.
+    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les feuilles $\unknown$ ne portent aucune adresse.
     \item\label{clinpartial} \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît au plus une fois dans les adresses de $t$.
     \item\label{cdespartial} \textbf{Descendance:} Même condition que \ref{cdes} de la définition \ref{def_rep}.
     \end{enumerate}
@@ -539,7 +537,7 @@ L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette d
 On définit pour cela deux ensembles approximant ces adresses.
 
 \begin{definition}[Approximations basse et haute d'adresses]
-    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles \unknown{}. Soit $1 \leq i \leq n$, et considérons le $i$\ieme{} trou \unknown{} en partant de la gauche.
+    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles $\unknown$. Soit $1 \leq i \leq n$, et considérons le $i$\ieme{} trou $\unknown$ en partant de la gauche.
 
     On définit alors :
     \begin{align*}
@@ -558,15 +556,46 @@ On définit pour cela deux ensembles approximant ces adresses.
 
 On donne un algorithme calculant ces deux ensembles, pour une représentation partielle correcte et un trou donnés.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Calcul des approximations basse et haute d'adresses}\label{algo_approx}
 \KwData{$(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $0 \leq i \leq n$, où $n$ est le nombre de trous de $t'$.}
 \KwResult{$\lowapprox \left( (t', s), \; i \right)$ et $\highapprox \left( (t', s), \; i \right)$.}
-$\lowapprox \gets \emptyset$\;
-$\highapprox \gets \emptyset$\;
+$\highapprox \gets \{ (j, \epsilon), \; 0 \leq j \leq |s| \}$\;
+$\lowapprox \gets \highapprox$\;
+$t'_{curr} \gets t'$\;
+
+\While{$t'_{curr} \neq \unknown$}{
+    \Switch{la forme de $t'_{curr}$}{
+        \Case{$t'_{curr} = U((m, \someadd), t_1)$}{
+            $\highapprox \gets {\highapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$\;
+            $\lowapprox \gets {\lowapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$\;
+            $t'_{curr} \gets t_1$\;
+        }
+
+        \Case{$t'_{curr} = B((m, \someadd), t_1, t_2)$ et le $i\ieme$ trou est dans $t_1$}{
+            $\mathcal{M} \gets \left\{\text{$a$, où $a$ est une adresse minimale apparaissant dans $t_2$}\right\}$\;
+            $\highapprox \gets {\highapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$\;
+            \eIf{$t_2 \in \trees$}{
+                $\lowapprox \gets \highapprox \cap \left( \lowapprox \cup \left\{ (m, \someadd \cdot \Left) \right\} \right)$
+            }{
+                $\lowapprox \gets \left\{ (m, \someadd \cdot \Left) \right\}$
+            }
+            $t'_{curr} \gets t_1$\;
+        }
+
+        \Case{$t'_{curr} = B((m, \someadd), t_1, t_2)$ et le $i\ieme$ trou est dans $t_2$}{
+            Symétrique du cas précédent.
+        }
+    }
+}
+\KwRet{$\lowapprox, \highapprox$}\;
 \end{algorithm}
 
-\todo{Décrire les algos les calculant et faire le lien avec le code}
+\begin{theorem}
+    L'algorithme \ref{algo_approx} termine et est correct.
+\end{theorem}
+
+\todo{Faire le lien avec le code}
 
 \todo{Montrer que la spécification est une approximation des ensembles idéaux}
 
