@@ -435,7 +435,7 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 
 \begin{theorem}[Inversion des représentations correctes]
 \begin{equation*}
-\forall (t,s) \in \representations, \; \exists \someproof \in \proofs, \; \encode \left( \someproof \right) = (t, s)
+\forall (t, \sequent) \in \representations, \; \exists \someproof \in \proofs, \; \encode \left( \someproof \right) = (t, \sequent)
 \end{equation*}
 Autrement dit, toute représentation correcte est bien l'encodage d'une preuve.
 \end{theorem}
@@ -455,13 +455,13 @@ Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe u
     Dans le premier cas,
     $\someproof = \begin{prooftree}
             \axv{X\orth, X}
-        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X\orth, X = (t,s)$.
+        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X\orth, X = (t, \sequent)$.
 
     Dans le second cas,
     $\someproof = \begin{prooftree}
             \axv{X\orth, X}
             \permv{(2, 1)}{X, X\orth}
-        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X, X\orth = (t,s)$.
+        \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X, X\orth = (t, \sequent)$.
 
      \todo{compléter la preuve}
      
@@ -511,15 +511,15 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser uniquement �
 \end{definition}
 
 \begin{theorem}
-    Soit $(t, s) \in \representationslarge$ tel que $(t, s) \in \representations$, et soit $t' \in \treespartial$ tel que $t' \relapproxlarge t$. Alors $(t', s) \in \representationspartial$.
+    Soit $(t, \sequent) \in \representationslarge$ tel que $(t, \sequent) \in \representations$, et soit $t' \in \treespartial$ tel que $t' \relapproxlarge t$. Alors $(t', \sequent) \in \representationspartial$.
     
     Autrement dit, une approximation d'une représentation correcte est une représentation partielle correcte.
 \end{theorem}
 
 \begin{proof}
-    Les trois conditions de la définition \ref{def_rep} sont vérifiées pour $(t, s)$, et en particulier les conditions de la définition \ref{def_rep_partial}, qui en sont une version plus faible. 
+    Les trois conditions de la définition \ref{def_rep} sont vérifiées pour $(t, \sequent)$, et en particulier les conditions de la définition \ref{def_rep_partial}, qui en sont une version plus faible. 
     
-    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des feuilles $?$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
+    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des feuilles $\unknown$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
 
     \begin{enumerate}
         \item On a seulement retiré des adresses, les adresses qui restent dans $t'$ sont donc correctes car elles l'étaient déjà dans $t$.
@@ -530,23 +530,25 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser uniquement �
     \end{enumerate}
 \end{proof}
 
-La construction d'une preuve se fera de la manière suivante : étant donné un séquent $\sequent$, l'utilisateur partira de la représentation partielle correcte minimale $(?, \; \sequent)$, et construira, étape par étape, une suite d'approximations immédiates, aboutissant, si le séquent est prouvable, à une représentation totale correcte.
+En particulier, pour tout séquent $\sequent$, $(\unknown, \; \sequent) \in \representationspartial$.
+
+La construction d'une preuve se donc fera de la manière suivante : étant donné un séquent $\sequent$, l'utilisateur partira de la représentation partielle correcte minimale $(?, \; \sequent)$, et construira, étape par étape, une suite d'approximations immédiates, aboutissant, si le séquent est prouvable, à une représentation totale correcte.
 
 L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette démarche, en lui indiquant de la manière la plus fine possible les adresses qu'il peut choisir, à chaque étape, pour construire la suite d'approximations, tout en préservant la correction.
 
 On définit pour cela deux ensembles approximant ces adresses.
 
 \begin{definition}[Approximations basse et haute d'adresses]
-    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles $\unknown$. Soit $1 \leq i \leq n$, et considérons le $i$\ieme{} trou $\unknown$ en partant de la gauche.
+    Soit $(t', \sequent) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles $\unknown$. Soit $1 \leq i \leq n$, et considérons le $i$\ieme{} trou $\unknown$ en partant de la gauche.
 
     On définit alors :
     \begin{align*}
         & \begin{multlined}
-            \highapprox \left( (t', s), \; i \right) = \{ a \in \addresses, \; \exists t \in \treespartial, \; t' \relapprox t \; \text{en ayant remplacé le $i$\ieme{} trou}, \; (t, s) \in \representationspartial, \; \\
+            \highapprox \left( (t', \sequent), \; i \right) = \{ a \in \addresses, \; \exists t \in \treespartial, \; t' \relapprox t \; \text{en ayant remplacé le $i$\ieme{} trou}, \; (t, \sequent) \in \representationspartial, \; \\
             \text{$a$ étiquette le nouveau noeud de $t'$} \}
         \end{multlined}\\
         & \begin{multlined}
-            \lowapprox \left( (t', s), \; i \right) = \{ a \in \highapprox \left( (t', s), \; i \right), \; \forall t \in \trees, t' \relapproxlarge t, \; (t, s) \in \representations, \; \\
+            \lowapprox \left( (t', \sequent), \; i \right) = \{ a \in \highapprox \left( (t', \sequent), \; i \right), \; \forall t \in \trees, t' \relapproxlarge t, \; (t, \sequent) \in \representations, \; \\
             \text{$a$ apparaît dans la branche de $t$ remplaçant le $i$\ieme{} trou de $t'$}
             \}
         \end{multlined}
@@ -561,13 +563,13 @@ On donne un algorithme calculant ces deux ensembles, pour une représentation pa
 
 \begin{algorithm}[H]
 \caption{Calcul des approximations basse et haute d'adresses}\label{algo_approx}
-\KwData{$(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $0 \leq i \leq n$, où $n$ est le nombre de trous de $t'$.}
-\KwResult{$\lowapprox \left( (t', s), \; i \right)$ et $\highapprox \left( (t', s), \; i \right)$.}
-$\highapprox \gets \{ (j, \epsilon), \; 0 \leq j \leq |s| \}$\;
+\KwData{$(t', \sequent) \in \representationspartial$, tel que $t' \notin \trees$. $0 \leq i \leq n$, où $n$ est le nombre de trous de $t'$.}
+\KwResult{$\lowapprox \left( (t', \sequent), \; i \right)$ et $\highapprox \left( (t', \sequent), \; i \right)$.}
+$\highapprox \gets \{ (j, \epsilon), \; 0 \leq j \leq |\sequent| \}$\;
 $\lowapprox \gets \highapprox$\;
 $t'_{curr} \gets t'$\;
 
-\While{$t'_{curr} \neq \unknown$ (modifier cette condition)}{
+\While{$t'_{curr} \neq \unknown$ (modifier cette condition en tant que l'adresse du trou n'est pas $\epsilon$)}{
     \Switch{la forme de $t'_{curr}$}{
         \Case{$t'_{curr} = U((m, \someadd), t_1)$}{
             $\highapprox \gets {\highapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$\;
@@ -605,15 +607,29 @@ $t'_{curr} \gets t'$\;
 
         \item[Correction:] Prouvons l'invariant de boucle suivant : \og à chaque étape, $\lowapprox$ et $\highapprox$ correspondent aux ensembles pour l'arbre ayant un trou à l'endroit où on en est, et l'adresse qui reste est celle du trou dans la sous-branche où on se trouve \fg
 
-        \todo{mieux le formuler et le prouver}
+        Pour $\highapprox$, ok, arguments simples et clairs. Pour $\lowapprox$ ? Que calcule-t-on en réalité ?
+
+        \todo{Le formuler et le prouver, régler le problème lié à $\lowapprox$}
     \end{description}
 \end{proof}
 
 \todo{Faire le lien avec le code}
 
-\todo{Montrer que la spécification est une approximation des ensembles idéaux}
+\todo{Montrer que la spécification est une approximation des ensembles idéaux. Ok, visiblement pas trop dur}
 
-\todo{Prouver la correction et la complétude à partir d'une suite exacte d'approx partielles}
+\begin{theorem}[Correction de l'assistant de preuve]
+    Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox ... \relapprox t_n$ une suite d'approximations immédiates, telles que $t_0 = \unknown$ et $t_n \in \trees$.
+    
+    On suppose que, pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne étiquetté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox((t_i, \sequent), \; j)$, où $j$ est l'indice de trou de $t_i$ qu'on a remplacé. De même, pour tout $0 \leq i \leq n-1$, on suppose que, si l'on a ajouté à $t_i$ une feuille $F$ étiquettée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox((t_i, \sequent), \; j) = \{a_1, \; a_2\}$, où $j$ est l'indice du trou qu'on a remplacé.
+
+    On a alors $(t_n, \sequent) \in \representations$.
+\end{theorem}
+
+\begin{proof}
+    \todo{Comment prouver la sur-linéarité ? Quelle est la spécification de $\lowapprox$ ?}
+\end{proof}
+
+\todo{Prouver la complétude à partir d'une suite exacte d'approx partielles}
 
 \section{Complétion automatique}
 
