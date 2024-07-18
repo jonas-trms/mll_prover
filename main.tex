@@ -620,7 +620,7 @@ $t'_{curr} \gets t'$\;
 \begin{theorem}[Correction de l'assistant de preuve]
     Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox ... \relapprox t_n$ une suite d'approximations immédiates, telles que $t_0 = \unknown$ et $t_n \in \trees$.
     
-    On suppose que, pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne étiquetté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox((t_i, \sequent), \; j)$, où $j$ est l'indice de trou de $t_i$ qu'on a remplacé. De même, pour tout $0 \leq i \leq n-1$, on suppose que, si l'on a ajouté à $t_i$ une feuille $F$ étiquettée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox((t_i, \sequent), \; j) = \{a_1, \; a_2\}$, où $j$ est l'indice du trou qu'on a remplacé.
+    On suppose que, pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne étiquetté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox((t_i, \sequent), \; j)$, où $j$ est l'indice de trou de $t_i$ qu'on a remplacé. De même, pour tout $0 \leq i \leq n-1$, on suppose que, si l'on a ajouté à $t_i$ une feuille $F$ étiquettée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox((t_i, \sequent), \; j) \subseteq \{a_1, \; a_2\}$, où $j$ est l'indice du trou qu'on a remplacé.
 
     On a alors $(t_n, \sequent) \in \representations$.
 \end{theorem}
