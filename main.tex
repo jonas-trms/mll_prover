@@ -63,11 +63,18 @@
 \newcommand*{\sequents}{\ensuremath{\mathcal{S}}}
 \newcommand*{\addresses}{\ensuremath{\mathcal{A}}}
 \newcommand*{\trees}{\ensuremath{\mathcal{T}}}
+\newcommand*{\treespartial}{\ensuremath{\mathcal{T'}}}
 \newcommand*{\representationslarge}{\ensuremath{\trees \times \sequents}}
 \newcommand*{\representations}{\ensuremath{\mathcal{R}}}
+\newcommand*{\representationspartiallarge}{\ensuremath{\treespartial \times \sequents}}
+\newcommand*{\representationspartial}{\ensuremath{\mathcal{R'}}}
 \newcommand*{\encode}{\ensuremath{\varphi}}
 \newcommand*{\decode}{\ensuremath{\gamma}}
 \newcommand*{\height}{\ensuremath{h}}
+\newcommand*{\relapprox}{\ensuremath{\triangleright}}
+\newcommand*{\relapproxlarge}{\ensuremath{\relapprox^*}}
+\newcommand*{\unknown}{\ensuremath{?}}
+
 
 \newcommand*{\todo}{{\normalfont \textbf{TODO}} }
 
@@ -79,9 +86,18 @@
 
 \maketitle
 
-\section{Définitions}
+\section{Présentation du sujet et objectifs}
+\todo{à détailler et compléter.}
 
-\subsection{Formules}
+Répondre à la même question que click and collect, d'une manière plus sobre : click and collect a une visée pédagogique, nous n'avons pas la même : droit au but, pour utilisateur expert.
+
+On n'a fait que MLL. Expliquer la différence entre trouver une preuve, et construire une preuve particulière. Toutes les preuves ne se valent pas (éventuellement citer Curry-Howard).
+
+Comme certains séquents ont plusieurs preuves : on ne peut pas afficher l'ensemble de toutes les preuves, ce qui serait trop compliqué. MLL NP-complet (pas trivial), LL indécidable (borne). On choisit donc de construire une preuve étape par étape, en guidant l'utilisateur.
+
+\section{Représentation des preuves}
+\subsection{Définitions préliminaires}
+\subsubsection{Formules}
 \begin{definition}[Formules]
 On se donne un ensemble $\mathcal{X}$ infini d'atomes. Les formules en logique linéaire sont définies par la grammaire suivante:
 \begin{equation*}
@@ -89,7 +105,7 @@ F := X \mid X\orth \mid F \parr F \mid F \tensor F
 \end{equation*}
 \end{definition}
 
-\subsection{Preuves}
+\subsubsection{Preuves}
 Les séquents sont des listes de formules. On note $\sequents$ l'ensemble des séquents. On définit alors l'ensemble \proofs{} des preuves en logique linéaire.
 \begin{definition}[Preuves]
 \proofs{} est défini par les règles d'induction suivantes:
@@ -116,6 +132,8 @@ Les séquents sont des listes de formules. On note $\sequents$ l'ensemble des s�
 \end{equation*}
 \end{definition}
 
+\todo{Ajouter des exemples et comparer avec la logique classique, pour donner les intuitions et faire comprendre les objets.}
+
 \subsection{Représentations}
 On choisit de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $\sequent$ est le séquent prouvé.
 
@@ -136,6 +154,7 @@ $(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Le
 \end{example}
 
 \begin{definition}[Arbres]
+\label{def_trees}
 L'ensemble \trees{} des arbres est défini inductivement, par trois constructeurs:
 \begin{itemize}
   \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
@@ -266,8 +285,7 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \end{cases*}$
   \end{description}
 
-\todo{expliquer que l'ordre lexicographique sur les feuilles vient du fait qu'on veut représenter des paires d'adresses distinctes pas des couples, on implémente les paires comme des couples ordonnés}
-
+    On préserve l'ordre lexicographique sur les feuilles, car on souhaite moralement étiqueter celles-ci par des paires d'adresses, qu'on implémente en pratique par des couples ordonnés. En effet, la règle d'axiome étant unique, la donnée de la paire d'atomes utilisés suffit à retrouver la preuve.
 
     On définit ensuite la fonction d'encodage $\encode : \proofs \rightarrow \representationslarge$:
     \begin{equation*}
@@ -358,11 +376,11 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
         
         La racine est étiquetée par $n \epsilon$, ce qui convient.
 
-        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve par le fait d'être une sous-adresse, d'où \ref{cdes} est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        Par ailleurs, le ré-adressage par $\psi_\parr$ préserve le fait d'être une sous-adresse, d'où \ref{cdes} est vérifiée pour $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
 \todo{détailler le cas de $A$ et de $B$}
 
         Ainsi, \ref{cdes} est vérifiée pour le nouvel arbre.
-    \end{enumerate}
+    \end{enumerate} 
 
     On a bien \ref{cadd}, \ref{clin} et \ref{cdes}, d'où $\encode \left( \someproof \right) \in \representations$.
 
@@ -440,10 +458,78 @@ Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe u
             \permv{(2, 1)}{X, X\orth}
         \end{prooftree}$ convient donc, puisque $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X, X\orth = (t,s)$.
 
-    \item[$U$:]
+     \todo{compléter la preuve}
+     
+    \item[$U$:] 
 
-    \item[$B$:]
+    \item[$B$:] 
   \end{description}
 \end{proof}
+
+\todo{Parler du noyau de la fonction d'encodage, soit avec une propriété à exprimer, soit en donnant des exemples de formules "distinctes" mais identifiables ayant la même image, pour montrer que l'information qu'on perd n'est que celle liée aux permutations.}
+
+\section{Manipulation interactive des représentations}
+L'utilisateur ne travaillera pas directement sur des preuves partielles, mais sur des représentations partielles de preuves. On généralise donc la définition \ref{def_trees}.
+
+\begin{definition}[Arbres partiels]
+L'ensemble \treespartial{} des arbres partiels est défini inductivement, par quatre constructeurs:
+\begin{itemize}
+  \item un constructeur $0$-aire: $\unknown: \trees$
+  \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
+  \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
+  \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
+\end{itemize}
+\end{definition}
+
+Les arbres complets \trees{} sont en particulier des arbres partiels appartenant à \treespartial{}. On définit une relation d'approximation sur \treespartial{}, pour caractériser la proximité entre un arbre de \treespartial{} et \trees{}.
+
+\begin{definition}[Relation d'approximation]
+    Soient $t', t \in \treespartial$. $t'$ est une approximation immédiate de $t$, notée $t' \relapprox t$, si $t$ s'obtient en remplaçant un constructeur $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
+
+    On étend cette relation à sa clôture réflexive et transitive, notée $\relapproxlarge$.
+\end{definition}
+\todo{Ajouter des exemples}
+
+Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des approximations de représentations correctes, qu'on veut donc caractériser. On étend pour ce faire la définition \ref{def_rep}.
+
+\begin{definition}[Représentations partielles correctes]
+    \label{def_rep_partial}
+    On définit l'ensemble \representationspartial{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationspartiallarge$ vérifiant les trois conditions suivantes:
+    
+    \begin{enumerate}
+    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les noeuds \unknown{} ne portent aucune adresse.
+    \item\label{clinpartial} \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît au plus une fois dans les adresses de $t$.
+    \item\label{cdespartial} \textbf{Descendance:} Même condition que \ref{cdes} de la définition \ref{def_rep}.
+    \end{enumerate}
+\end{definition}
+
+\begin{theorem}
+Soit $(t, s) \in \representationslarge$ tel que $(t, s) \in \representations$, et soit $t' \in \treespartial$ tel que $t' \relapproxlarge t$. Alors $(t', s) \in \representationspartial$.
+
+Autrement dit, une approximation d'une représentation correcte est une représentation partielle correcte.
+\end{theorem}
+
+\begin{proof}
+    Les trois conditions de la définition \ref{def_rep} sont vérifiées pour $(t, s)$, et en particulier les conditions de la définition \ref{def_rep_partial}, qui en sont une version plus faible. 
+    
+    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des noeuds $?$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
+
+    \begin{enumerate}
+        \item On a seulement retiré des adresses, les adresses qui restent dans $t'$ sont donc correctes car elles l'étaient déjà dans $t$.
+
+        \item De même, on n'a fait que retirer des adresses, et on doit vérifier que les adresses qui restent dans $t'$ sont distinctes. C'est vrai, car les adresses de $t$ étaient déjà distinctes.
+
+        \item On retire les adresses en percolant vers le haut depuis les feuilles. On ne se trouve donc jamais dans le cas où l'on retire une adresse ayant des descendants, ce qui préserve la condition de descendance.
+    \end{enumerate}
+\end{proof}
+
+
+\todo{Donner la spécification de $\Gamma_0$ et $\Gamma_1$ par rapport aux conditions '. Décrire les algos les calculant}
+
+\todo{Montrer que la spécification est une approximation des ensembles idéaux}
+
+\todo{Prouver la correction et la complétude à partir d'une suite exacte d'approx partielles}
+
+\section{Complétion automatique}
 
 \end{document}
