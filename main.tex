@@ -486,7 +486,7 @@ L'utilisateur ne travaillera pas directement sur des preuves partielles, mais su
 Les arbres complets \trees{} sont en particulier des arbres partiels appartenant à \treespartial{}. On définit une relation d'approximation sur \treespartial{}, pour caractériser la proximité entre un arbre de \treespartial{} et \trees{}.
 
 \begin{definition}[Relation d'approximation]
-    Soient $t', t \in \treespartial$. $t'$ est une approximation immédiate de $t$, notée $t' \relapprox t$, si $t$ s'obtient en remplaçant un constructeur $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
+    Soient $t', t \in \treespartial$. $t'$ est une approximation immédiate de $t$, notée $t' \relapprox t$, si $t$ s'obtient en remplaçant une feuille $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
 
     On étend cette relation à sa clôture réflexive et transitive, notée $\relapproxlarge$.
 \end{definition}
@@ -499,7 +499,7 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des appro
     On définit l'ensemble \representationspartial{} des représentations correctes comme les éléments $(t, \sequent)$ de $\representationspartiallarge$ vérifiant les trois conditions suivantes:
     
     \begin{enumerate}
-    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les noeuds \unknown{} ne portent aucune adresse.
+    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les feuilles \unknown{} ne portent aucune adresse.
     \item\label{clinpartial} \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît au plus une fois dans les adresses de $t$.
     \item\label{cdespartial} \textbf{Descendance:} Même condition que \ref{cdes} de la définition \ref{def_rep}.
     \end{enumerate}
@@ -514,7 +514,7 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des appro
 \begin{proof}
     Les trois conditions de la définition \ref{def_rep} sont vérifiées pour $(t, s)$, et en particulier les conditions de la définition \ref{def_rep_partial}, qui en sont une version plus faible. 
     
-    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des noeuds $?$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
+    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des feuilles $?$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
 
     \begin{enumerate}
         \item On a seulement retiré des adresses, les adresses qui restent dans $t'$ sont donc correctes car elles l'étaient déjà dans $t$.
@@ -527,15 +527,29 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des appro
 
 La construction d'une preuve se fera de la manière suivante : étant donné un séquent $\sequent$, l'utilisateur partira de la représentation partielle correcte minimale $(?, \; \sequent)$, et construira, étape par étape, une suite d'approximations immédiates, aboutissant, si le séquent est prouvable, à une représentation totale correcte.
 
-L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette démarche, en lui indiquant de la manière la plus fine possible les adresses qu'il peut choisir, à chaque étape, pour construire la suite d'approximations en préservant la correction.
+L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette démarche, en lui indiquant de la manière la plus fine possible les adresses qu'il peut choisir, à chaque étape, pour construire la suite d'approximations, tout en préservant la correction.
 
 On définit pour cela deux ensembles approximant ces adresses.
 
 \begin{definition}[Approximations basse et haute d'adresses]
+    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles \unknown{}. Soit $1 \leq i \leq n$, et considérons la $i$\ieme{} feuille \unknown{} en partant de la gauche.
 
+    On définit alors :
+    \begin{align*}
+        & \begin{multlined}
+            \highapprox \left( (t', s), \; i \right) = \{ a \in \addresses, \; \exists t \in \treespartial, \; t' \relapprox t \; \text{en ayant remplacé le $i$\ieme{} trou}, \; (t, s) \in \representationspartial, \; \\
+            \text{$a$ étiquette le nouveau noeud de $t'$} \}
+        \end{multlined}\\
+        & \begin{multlined}
+            \lowapprox \left( (t', s), \; i \right) = \{ a \in \highapprox \left( (t', s), \; i \right), \; \forall t \in \trees, t' \relapproxlarge t, \; (t, s) \in \representations, \; \\
+            \text{$a$ apparaît dans la branche de $t$ remplaçant le $i$\ieme{} trou de $t'$}
+            \}
+        \end{multlined}
+    \end{align*} 
+    
 \end{definition}
 
-\todo{Donner la spécification de $\Gamma_0$ et $\Gamma_1$ par rapport aux conditions '. Décrire les algos les calculant}
+\todo{Décrire les algos les calculant}
 
 \todo{Montrer que la spécification est une approximation des ensembles idéaux}
 
