@@ -75,6 +75,8 @@
 \newcommand*{\relapproxlarge}{\ensuremath{\relapprox^*}}
 \newcommand*{\unknown}{\ensuremath{?}}
 
+\newcommand*{\lowapprox}{\ensuremath{\Sigma_0}}
+\newcommand*{\highapprox}{\ensuremath{\Sigma_1}}
 
 \newcommand*{\todo}{{\normalfont \textbf{TODO}} }
 
@@ -115,19 +117,19 @@ Les séquents sont des listes de formules. On note $\sequents$ l'ensemble des s�
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
-  \hypv{\Gamma}
-  \permv{\someperm}{\permapp{\someperm}{\Gamma}}
+  \hypv{\sequent}
+  \permv{\someperm}{\permapp{\someperm}{\sequent}}
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
-  \hypv{\Gamma, A, B, \Delta}
-  \parrv{\Gamma, A \parr B, \Delta}
+  \hypv{\sequent, A, B, \Delta}
+  \parrv{\sequent, A \parr B, \Delta}
 \end{prooftree}
 \qquad\qquad
 \begin{prooftree}
-  \hypv{\Gamma, A}
+  \hypv{\sequent, A}
   \hypv{B, \Delta}
-  \tensorv{\Gamma, A \tensor B, \Delta}
+  \tensorv{\sequent, A \tensor B, \Delta}
 \end{prooftree}
 \end{equation*}
 \end{definition}
@@ -209,12 +211,12 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \item[Échange:]
     $\encode' \left(
     \begin{prooftree}
-      \namedproofv{\pi}{\Gamma}
-      \permv{\someperm}{\permapp{\someperm}{\Gamma}}
+      \namedproofv{\pi}{\sequent}
+      \permv{\someperm}{\permapp{\someperm}{\sequent}}
     \end{prooftree}
     \right) = \someperm' \left( \encode ' \left(
            \begin{prooftree}
-             \namedproofv{\pi}{\Gamma}
+             \namedproofv{\pi}{\sequent}
            \end{prooftree} \right) \right)$
            
     où $\someperm'$ est la fonction qui applique $\someperm$ à l'arbre, puis trie les deux adresses de chaque feuille par ordre lexicographique.
@@ -222,8 +224,8 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \item[Par:]
     $\encode' \left(
     \begin{prooftree}
-      \namedproofv{\pi}{\Gamma, A, B, \Delta}
-      \parrv{\Gamma, A \parr B, \Delta}
+      \namedproofv{\pi}{\sequent, A, B, \Delta}
+      \parrv{\sequent, A \parr B, \Delta}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -231,12 +233,12 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left(
            \begin{prooftree}
-             \namedproofv{\pi}{\Gamma, A, B, \Delta}
+             \namedproofv{\pi}{\sequent, A, B, \Delta}
            \end{prooftree} \right) \right)$}
     };
     \end{tikzpicture}$
     
-    où $n = \size{\Gamma} + 1$
+    où $n = \size{\sequent} + 1$
     
     $\psi_\parr : \addresses \rightarrow \addresses =
     \begin{cases*}
@@ -249,9 +251,9 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \item[Tenseur:]
     $\encode' \left(
     \begin{prooftree}
-      \namedproofv{\pi_1}{\Gamma, A}
+      \namedproofv{\pi_1}{\sequent, A}
       \namedproofv{\pi_2}{B, \Delta}
-      \tensorv{\Gamma, A \tensor B, \Delta}
+      \tensorv{\sequent, A \tensor B, \Delta}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
     [level distance=1.5cm,
@@ -259,7 +261,7 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     \node {$B_{n \epsilon}$}
         child {node {$\psi_{\tensor\Left} \left( \encode' \left(
                 \begin{prooftree}
-                  \namedproofv{\pi_1}{\Gamma, A}
+                  \namedproofv{\pi_1}{\sequent, A}
                 \end{prooftree}
               \right) \right)$}}
         child {node {$\psi_{\tensor\Right} \left( \encode' \left(
@@ -270,7 +272,7 @@ On identifie une fonction de $\addresses$ dans $\addresses$ et son extension de 
     };
     \end{tikzpicture}$
     
-    où $n = \size{\Gamma} + 1$
+    où $n = \size{\sequent} + 1$
     
     $\psi_{\tensor\Left} : \addresses \rightarrow \addresses =
     \begin{cases*}
@@ -327,21 +329,21 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 
     \item[Échange:] $\someproof =
     \begin{prooftree}
-        \namedproofv{\pi_1}{\Gamma}
-        \permv{\someperm}{\permapp{\someperm}{\Gamma}}
+        \namedproofv{\pi_1}{\sequent}
+        \permv{\someperm}{\permapp{\someperm}{\sequent}}
     \end{prooftree}$.
     
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}. Les conditions \ref{clin} et \ref{cdes} sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition \ref{cadd} est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}. Les conditions \ref{clin} et \ref{cdes} sont stables par ré-adressage par $\someperm$, étant donné que les conditions portent sur les adresses de l'arbre et du séquent, et qu'on ré-adresse les deux identiquement. La condition \ref{cadd} est également préservée, car on s'assure de trier les adresses des feuilles après avoir ré-adressé par $\someperm$.
 
-    On en déduit que $\encode \left( \someproof \right) = \someperm' \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\Gamma}$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}, d'où $\encode \left( \someproof \right) \in \representations$.
+    On en déduit que $\encode \left( \someproof \right) = \someperm' \left( \encode ' \left( \pi_1 \right) \right) \vdash \permapp{\someperm}{\sequent}$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}, d'où $\encode \left( \someproof \right) \in \representations$.
 
     \item[Par:] $\someproof =
     \begin{prooftree}
-      \namedproofv{\pi_1}{\Gamma, A, B, \Delta}
-      \parrv{\Gamma, A \parr B, \Delta}
+      \namedproofv{\pi_1}{\sequent, A, B, \Delta}
+      \parrv{\sequent, A \parr B, \Delta}
     \end{prooftree}$
 
-    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}.
+    Par hypothèse d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$ vérifie \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     On a, de plus:
     \begin{equation*}
@@ -351,26 +353,26 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$}
     };
-    \end{tikzpicture} \vdash \Gamma, A \parr B, \Delta
+    \end{tikzpicture} \vdash \sequent, A \parr B, \Delta
     \end{equation*}
 
     Vérifions les trois conditions:
     \begin{enumerate}
         \item\label{pcadd} L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
         
-        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
+        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\Delta$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
         
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         
-        \item D'une part, \ref{clin} étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \Gamma, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
+        \item D'une part, \ref{clin} étant vérifiée pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \Delta$, et le ré-adressage par $\psi_\parr$ étant injectif, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont distinctes.
         
-        D'autre part, chaque sous-formule de $\Gamma, A, B, \Delta$ est étiquetée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après \ref{clin}. Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de \ref{pcadd}), chaque sous-formule de $\Gamma, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquetée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
+        D'autre part, chaque sous-formule de $\sequent, A, B, \Delta$ est étiquetée par au moins un noeud de $\encode ' \left( \pi_1 \right)$, d'après \ref{clin}. Le ré-adressage par $\psi_\parr$ étant correct (voir preuve de \ref{pcadd}), chaque sous-formule de $\sequent, A \parr B, \Delta$, à l'exception de $A \parr B$, est étiquetée par au moins un noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$.
         
-        Chaque sous-formule de $\Gamma, A, B, \Delta$ est donc étiquetée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
+        Chaque sous-formule de $\sequent, A, B, \Delta$ est donc étiquetée par un unique noeud de $\encode ' \left( \pi_1 \right)$.
         
         $A \parr B$ est quant à lui étiqueté par la racine, et c'est le seul endroit où son adresse apparaît, car, par construction de $\psi_\parr$, aucun noeud de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ ne peut être étiqueté par $n \epsilon$.
 
-        Finalement, chaque sous-adresse de $\Gamma, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
+        Finalement, chaque sous-adresse de $\sequent, A \parr B, \Delta$ apparaît une et une seule fois dans l'arbre, la linéarité en est donc préservée.
         
         \item La condition \ref{cdes} est vérifiée pour $\encode ' \left( \pi_1 \right)$. Intéressons-nous au nouvel arbre.
         
@@ -386,12 +388,12 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
 
      \item[Tenseur:] $\someproof =
     \begin{prooftree}
-      \namedproofv{\pi_1}{\Gamma, A}
+      \namedproofv{\pi_1}{\sequent, A}
       \namedproofv{\pi_2}{B, \Delta}
-      \tensorv{\Gamma, A \tensor B, \Delta}
+      \tensorv{\sequent, A \tensor B, \Delta}
     \end{prooftree}$
 
-    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \Gamma, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient \ref{cadd}, \ref{clin} et \ref{cdes}.
+    Par hypothèses d'induction, $\encode \left( \pi_1 \right) = \encode ' \left( \pi_1 \right) \vdash \sequent, A$ et $\encode \left( \pi_2 \right) = \encode ' \left( \pi_2 \right) \vdash B, \Delta$ vérifient \ref{cadd}, \ref{clin} et \ref{cdes}.
     
     De plus:
     \begin{equation*}
@@ -402,7 +404,7 @@ On cherche ensuite à restreindre l'ensemble des représentations, pour ne conse
         child {node {$\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$}}
         child {node {$\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$}
     };
-    \end{tikzpicture} \vdash \Gamma, A \tensor B, \Delta
+    \end{tikzpicture} \vdash \sequent, A \tensor B, \Delta
     \end{equation*}
 
     Vérifions les trois conditions:
@@ -439,13 +441,13 @@ Autrement dit, toute représentation correcte est bien l'encodage d'une preuve.
 Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe ud présent à la racine:
 \begin{description}
     \item[$F$:]
-    Si $(t, s) = F(n\rho, n'\rho') \vdash \Gamma \in \representations$.
+    Si $(t, s) = F(n\rho, n'\rho') \vdash \sequent \in \representations$.
 
     D'après la condition (c) de descendance, on a nécessairement $\rho = \rho' = \epsilon$.
 
-    D'après la condition (b) de linéarité, $n \neq n'$, $\size{\Gamma} = 2$ et $\{n, n'\} = \{1, 2\}$.
+    D'après la condition (b) de linéarité, $n \neq n'$, $\size{\sequent} = 2$ et $\{n, n'\} = \{1, 2\}$.
 
-    D'après la condition (a) de bon adressage, $n = 1$, $n' = 2$, et $\Gamma = X\orth, X$ ou $\Gamma = X, X\orth$, avec $X$ un atome.
+    D'après la condition (a) de bon adressage, $n = 1$, $n' = 2$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome.
 
     Dans le premier cas,
     $\someproof = \begin{prooftree}
@@ -472,13 +474,13 @@ Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe u
 L'utilisateur ne travaillera pas directement sur des preuves partielles, mais sur des représentations partielles de preuves. On généralise donc la définition \ref{def_trees}.
 
 \begin{definition}[Arbres partiels]
-L'ensemble \treespartial{} des arbres partiels est défini inductivement, par quatre constructeurs:
-\begin{itemize}
-  \item un constructeur $0$-aire: $\unknown: \trees$
-  \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
-  \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
-  \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
-\end{itemize}
+    L'ensemble \treespartial{} des arbres partiels est défini inductivement, par quatre constructeurs:
+    \begin{itemize}
+      \item un constructeur $0$-aire: $\unknown: \trees$
+      \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
+      \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
+      \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
+    \end{itemize}
 \end{definition}
 
 Les arbres complets \trees{} sont en particulier des arbres partiels appartenant à \treespartial{}. On définit une relation d'approximation sur \treespartial{}, pour caractériser la proximité entre un arbre de \treespartial{} et \trees{}.
@@ -504,9 +506,9 @@ Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des appro
 \end{definition}
 
 \begin{theorem}
-Soit $(t, s) \in \representationslarge$ tel que $(t, s) \in \representations$, et soit $t' \in \treespartial$ tel que $t' \relapproxlarge t$. Alors $(t', s) \in \representationspartial$.
-
-Autrement dit, une approximation d'une représentation correcte est une représentation partielle correcte.
+    Soit $(t, s) \in \representationslarge$ tel que $(t, s) \in \representations$, et soit $t' \in \treespartial$ tel que $t' \relapproxlarge t$. Alors $(t', s) \in \representationspartial$.
+    
+    Autrement dit, une approximation d'une représentation correcte est une représentation partielle correcte.
 \end{theorem}
 
 \begin{proof}
@@ -523,6 +525,15 @@ Autrement dit, une approximation d'une représentation correcte est une représe
     \end{enumerate}
 \end{proof}
 
+La construction d'une preuve se fera de la manière suivante : étant donné un séquent $\sequent$, l'utilisateur partira de la représentation partielle correcte minimale $(?, \; \sequent)$, et construira, étape par étape, une suite d'approximations immédiates, aboutissant, si le séquent est prouvable, à une représentation totale correcte.
+
+L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette démarche, en lui indiquant de la manière la plus fine possible les adresses qu'il peut choisir, à chaque étape, pour construire la suite d'approximations en préservant la correction.
+
+On définit pour cela deux ensembles approximant ces adresses.
+
+\begin{definition}[Approximations basse et haute d'adresses]
+
+\end{definition}
 
 \todo{Donner la spécification de $\Gamma_0$ et $\Gamma_1$ par rapport aux conditions '. Décrire les algos les calculant}
 
