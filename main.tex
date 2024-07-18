@@ -551,10 +551,13 @@ On définit pour cela deux ensembles approximant ces adresses.
             \}
         \end{multlined}
     \end{align*} 
-    
 \end{definition}
 
+\todo{$\lowapprox$ qu'on calcule est seulement inclus dans ce qu'on définit : le préciser dans la définition}
+
 On donne un algorithme calculant ces deux ensembles, pour une représentation partielle correcte et un trou donnés.
+
+\todo{Parler de la notion d'adresse du trou, et s'en servir pour la condition de boucle}
 
 \begin{algorithm}[H]
 \caption{Calcul des approximations basse et haute d'adresses}\label{algo_approx}
@@ -564,7 +567,7 @@ $\highapprox \gets \{ (j, \epsilon), \; 0 \leq j \leq |s| \}$\;
 $\lowapprox \gets \highapprox$\;
 $t'_{curr} \gets t'$\;
 
-\While{$t'_{curr} \neq \unknown$}{
+\While{$t'_{curr} \neq \unknown$ (modifier cette condition)}{
     \Switch{la forme de $t'_{curr}$}{
         \Case{$t'_{curr} = U((m, \someadd), t_1)$}{
             $\highapprox \gets {\highapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$\;
@@ -596,8 +599,14 @@ $t'_{curr} \gets t'$\;
 \end{theorem}
 
 \begin{proof}
-    Montrons que l'invariant de boucle suivant est vérifié, dont découleront la terminaison et la correction : \og \fg
+    Prouvons chaque point individuellement.
+    \begin{description}
+        \item[Terminaison:] La taille de l'adresse du trou est un variant de boucle strictement décroissant et minoré par 0.
 
+        \item[Correction:] Prouvons l'invariant de boucle suivant : \og à chaque étape, $\lowapprox$ et $\highapprox$ correspondent aux ensembles pour l'arbre ayant un trou à l'endroit où on en est, et l'adresse qui reste est celle du trou dans la sous-branche où on se trouve \fg
+
+        \todo{mieux le formuler et le prouver}
+    \end{description}
 \end{proof}
 
 \todo{Faire le lien avec le code}
