@@ -9,6 +9,11 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{trees}
+\usepackage[ruled]{algorithm2e}
+
+\renewcommand*{\algorithmcfname}{Algorithme}
+\SetKwInput{KwData}{Entrées}
+\SetKwInput{KwResult}{Sorties}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Théorème}
@@ -470,29 +475,31 @@ Par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe u
 
 \todo{Parler du noyau de la fonction d'encodage, soit avec une propriété à exprimer, soit en donnant des exemples de formules "distinctes" mais identifiables ayant la même image, pour montrer que l'information qu'on perd n'est que celle liée aux permutations.}
 
+\todo{Faire le lien avec le code}
+
 \section{Manipulation interactive des représentations}
 L'utilisateur ne travaillera pas directement sur des preuves partielles, mais sur des représentations partielles de preuves. On généralise donc la définition \ref{def_trees}.
 
 \begin{definition}[Arbres partiels]
     L'ensemble \treespartial{} des arbres partiels est défini inductivement, par quatre constructeurs:
     \begin{itemize}
-      \item un constructeur $0$-aire: $\unknown: \trees$
+      \item un constructeur $0$-aire, le "trou": $\unknown: \trees$
       \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \trees$
       \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \trees \rightarrow \trees$
       \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \trees \rightarrow \trees \rightarrow \trees$
     \end{itemize}
 \end{definition}
 
-Les arbres complets \trees{} sont en particulier des arbres partiels appartenant à \treespartial{}. On définit une relation d'approximation sur \treespartial{}, pour caractériser la proximité entre un arbre de \treespartial{} et \trees{}.
+Les arbres complets \trees{} sont en particulier des arbres partiels appartenant à \treespartial{}. On interprète un trou dans un arbre partiel comme étant une partie de cet arbre qu'on ne connaît pas encore. Au cours de l'interaction avec l'utilisateur, on éliminera peu à peu les trous, en gagnant de l'information au fur et à mesure. On définit une relation d'approximation sur \treespartial{}, pour formaliser cette notion.
 
 \begin{definition}[Relation d'approximation]
-    Soient $t', t \in \treespartial$. $t'$ est une approximation immédiate de $t$, notée $t' \relapprox t$, si $t$ s'obtient en remplaçant une feuille $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
+    Soient $t', t \in \treespartial$. $t'$ est une approximation immédiate de $t$, notée $t' \relapprox t$, si $t$ s'obtient en remplaçant un trou $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
 
     On étend cette relation à sa clôture réflexive et transitive, notée $\relapproxlarge$.
 \end{definition}
 \todo{Ajouter des exemples}
 
-Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser à des approximations de représentations correctes, qu'on veut donc caractériser. On étend pour ce faire la définition \ref{def_rep}.
+Lors de l'interaction avec l'utilisateur, on souhaite s'intéresser uniquement à des approximations de représentations correctes, qu'on veut donc caractériser. On étend pour ce faire la définition \ref{def_rep}.
 
 \begin{definition}[Représentations partielles correctes]
     \label{def_rep_partial}
@@ -532,7 +539,7 @@ L'objectif de notre assistant de preuve est de guider l'utilisateur dans cette d
 On définit pour cela deux ensembles approximant ces adresses.
 
 \begin{definition}[Approximations basse et haute d'adresses]
-    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles \unknown{}. Soit $1 \leq i \leq n$, et considérons la $i$\ieme{} feuille \unknown{} en partant de la gauche.
+    Soit $(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $t'$ a donc un nombre $n$ non nul de feuilles \unknown{}. Soit $1 \leq i \leq n$, et considérons le $i$\ieme{} trou \unknown{} en partant de la gauche.
 
     On définit alors :
     \begin{align*}
@@ -549,7 +556,17 @@ On définit pour cela deux ensembles approximant ces adresses.
     
 \end{definition}
 
-\todo{Décrire les algos les calculant}
+On donne un algorithme calculant ces deux ensembles, pour une représentation partielle correcte et un trou donnés.
+
+\begin{algorithm}
+\caption{Calcul des approximations basse et haute d'adresses}\label{algo_approx}
+\KwData{$(t', s) \in \representationspartial$, tel que $t' \notin \trees$. $0 \leq i \leq n$, où $n$ est le nombre de trous de $t'$.}
+\KwResult{$\lowapprox \left( (t', s), \; i \right)$ et $\highapprox \left( (t', s), \; i \right)$.}
+$\lowapprox \gets \emptyset$\;
+$\highapprox \gets \emptyset$\;
+\end{algorithm}
+
+\todo{Décrire les algos les calculant et faire le lien avec le code}
 
 \todo{Montrer que la spécification est une approximation des ensembles idéaux}
 
