@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{trees}
+\usepackage{bm}
 \usepackage[ruled, french, frenchkw, onelanguage]{algorithm2e}
 
 \theoremstyle{plain}
@@ -53,7 +54,7 @@
 \newcommand*{\defv}[1]{\infer[dashed]{1}[\ensuremath{\mathit{def}}]{\vdash #1}}
 \newcommand*{\permapp}[2]{#2 #1}
 \newcommand*{\someperm}{\varsigma}
-\newcommand*{\someadd}{\sigma}
+\newcommand*{\someadd}{\rho}
 \newcommand*{\someproof}{\pi}
 \newcommand*{\sequent}{\Gamma}
 \newcommand*{\sequentbis}{\Delta}
@@ -548,7 +549,7 @@ On définit pour cela deux ensembles approximant ces adresses.
             \text{$a$ étiquette le nouveau noeud de $t'$} \}
         \end{multlined}\\
         & \begin{multlined}
-            \lowapprox \left( (t', \sequent), \; i \right) = \{ a \in \highapprox \left( (t', \sequent), \; i \right), \; \forall t \in \trees, t' \relapproxlarge t, \; (t, \sequent) \in \representations, \; \\
+            \lowapprox \left( (t', \sequent), \; i \right) \subseteq \{ a \in \highapprox \left( (t', \sequent), \; i \right), \; \forall t \in \trees, t' \relapproxlarge t, \; (t, \sequent) \in \representations, \; \\
             \text{$a$ apparaît dans la branche de $t$ remplaçant le $i$\ieme{} trou de $t'$}
             \}
         \end{multlined}
@@ -607,9 +608,9 @@ $t'_{curr} \gets t'$\;
 
         \item[Correction:] Prouvons l'invariant de boucle suivant : \og à chaque étape, $\lowapprox$ et $\highapprox$ correspondent aux ensembles pour l'arbre ayant un trou à l'endroit où on en est, et l'adresse qui reste est celle du trou dans la sous-branche où on se trouve \fg
 
-        Pour $\highapprox$, ok, arguments simples et clairs. Pour $\lowapprox$ ? Que calcule-t-on en réalité ?
+        Ok, les arguments suivent le code.
 
-        \todo{Le formuler et le prouver, régler le problème lié à $\lowapprox$}
+        \todo{Le formuler et le prouver}
     \end{description}
 \end{proof}
 
@@ -626,7 +627,19 @@ $t'_{curr} \gets t'$\;
 \end{theorem}
 
 \begin{proof}
-    \todo{Comment prouver la sur-linéarité ? Quelle est la spécification de $\lowapprox$ ?}
+    D'après la première supposition faite sur les remplacements de trous et la définition de $\highapprox$, on a, par récurrence immédiate, $\forall 0 \leq i \leq n, \; (t_i, \sequent) \in \representationspartial$.
+
+    Supposons par l'absurde qu'on ait $(t_n, \sequent) \notin \representations$. Comme $(t_n, \sequent) \in \representationspartial$, il existe nécessairement des adresses de sous-formules de $\sequent$ n'apparaissant pas dans $t_n$. Choisissons une telle adresse $a \in \addresses$ minimale. On a deux cas:
+
+    \begin{description}
+        \item[$\bm{a = (m, \epsilon)}$] $t_{n-1}$ contient un unique trou, et celui-ci est nécessairement remplacé par une feuille, car $t_n \in \trees$. Notons $a_1$ et $a_2$ les adresses de cette feuille.
+        
+        $(t_{n-1}, \Gamma) \in \representationspartial$, d'où $t_{n-1}$ vérifie en particulier la condition \ref{cdespartial} de descendance. On en déduit qu'aucune adresse de la forme $(m, \someadd)$ n'apparaît dans $t_{n-1}$. D'après le calcul de l'algorithme \ref{algo_approx}, on a donc $a = (m, \epsilon) \in \lowapprox((t_i, \sequent), \; j)$, d'où $\lowapprox((t_i, \sequent) \nsubseteq \{a_1, \; a_2\}$. 
+        
+        Ceci contredit la supposition qu'on a fait sur la suite d'approximations immédiates et $\lowapprox$, c'est absurde.
+
+        \item[$\bm{a = (m, \someadd \cdot \alpha)}$] $a$ étant une adresse non utilisée minimale, on en déduit que $a' = (m, \someadd)$ apparaît dans $t_n$.
+    \end{description}
 \end{proof}
 
 \todo{Prouver la complétude à partir d'une suite exacte d'approx partielles}
