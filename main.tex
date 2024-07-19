@@ -634,7 +634,7 @@ $t'_{curr} \gets t'$\;
     \begin{description}
         \item[$\bm{a = (m, \epsilon)}$] $t_{n-1}$ contient un unique trou, et celui-ci est nécessairement remplacé par une feuille, car $t_n \in \trees$. Notons $a_1$ et $a_2$ les adresses de cette feuille.
         
-        $(t_{n-1}, \Gamma) \in \representationspartial$, d'où $t_{n-1}$ vérifie en particulier la condition \ref{cdespartial} de descendance. On en déduit qu'aucune adresse de la forme $(m, \someadd)$ n'apparaît dans $t_{n-1}$. D'après le calcul de l'algorithme \ref{algo_approx}, on a donc $a = (m, \epsilon) \in \lowapprox((t_i, \sequent), \; j)$, d'où $\lowapprox((t_i, \sequent) \nsubseteq \{a_1, \; a_2\}$. 
+        $(t_{n-1}, \Gamma) \in \representationspartial$, d'où $t_{n-1}$ vérifie en particulier la condition \ref{cdespartial} de descendance. On en déduit qu'aucune adresse de la forme $(m, \someadd)$ n'apparaît dans $t_{n-1}$. D'après le calcul de l'algorithme \ref{algo_approx}, l'arbre n'ayant qu'un trou, on a donc $a = (m, \epsilon) \in \lowapprox((t_i, \sequent), \; j)$, d'où $\lowapprox((t_i, \sequent) \nsubseteq \{a_1, \; a_2\}$. 
         
         Ceci contredit la supposition qu'on a fait sur la suite d'approximations immédiates et $\lowapprox$, c'est absurde.
 
