@@ -838,7 +838,7 @@ let proof_4 = Permutation ([|1;6;2;3;4;5|],
                                                                                     Axiom 5))))))));;
 
                                                                                 
-(*Examples from Click & Collect, to prove*)
+(*Examples taken from Click & Collect*)
 let example1 = [P(NA 1, A 1)];;
 let example2 = [P(NA 1, NA 2); T(A 2, A 1)];;
 let example3 = [T(A 1, NA 2); T(A 2, NA 3); P(NA 1, A 3)];;
@@ -848,8 +848,12 @@ let example6 = [P(NA 1, T(A 2, NA 3)); P(NA 2, T(A 1, A 3))];;
 let example7 = [P(NA 1, P(NA 2, NA 3)); T(T(A 1, A 2), A 3)];;
 let example8 = [P(T(A 1, NA 2), NA 3); P(NA 1, T(A 2, A 3))];;
 
-let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
+(*Other examples*)
 
+let example9 = [A(5); A(4); T(NA(1), T(NA(2), T(NA(3), T(NA(4), NA(5))))); A(1); P(A(3), A(2))];;
 let example10 = [P (T (P (NA(1), A(3)), NA(3)), T(P (NA(2), A(3)), NA(3))); P (T (T (A(1), A(2)), NA(3)), A(3))];;
+
+let example_rapport1 = [P(A 1, A 2); T(T(NA 1, NA 2), A 3); NA 3];;
+let example_rapport2 = [NA 1; T(A 1, A 1); NA 1];;
 
 let _ = prove_sequent example9;;
