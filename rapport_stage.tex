@@ -138,7 +138,7 @@ De même que la logique intuitionniste se distingue de la logique classique par 
 
 Il existe plusieurs syntaxes pour construire des preuves en logique linéaire, dont le calcul des séquents. C'est la syntaxe que nous avons choisie, et pour laquelle nous proposons dans la suite un assistant de preuve. Celui-ci vise à rendre la construction des preuves plus dynamique, et partiellement automatique. 
 
- Notre assistant s'inscrit dans la lignée d'un outil déjà existant, Click \& Collect, l'un des premiers assistants de preuve détaillés dans la littérature \cite{callies:lirmm-03271501}. Nous avons toutefois une visée différente, car, si Click \& Collect a un but pédagogique, puisqu'il a été conçu pour des débutants afin de leur permettre l'apprentissage de la logique linéaire, notre outil s'adresse à des utilisateurs experts, et a ainsi été conçu dans un but d'efficacité et de rapidité.
+ Notre assistant s'inscrit dans la lignée d'un outil déjà existant, Click \& Collect, qui est l'une des premières interfaces graphiques détaillées dans la littérature et permettant la construction interactive de preuves en calcul des séquents \cite{callies:lirmm-03271501}. Nous avons toutefois une visée différente, car, si Click \& Collect a un but pédagogique, puisqu'il a été conçu pour des débutants afin de leur permettre l'apprentissage de la logique linéaire, notre outil s'adresse à des utilisateurs experts, et a ainsi été conçu dans un but d'efficacité et de rapidité.
 
 Présentons d'abord la logique linéaire plus en détail, afin de faire saisir les enjeux qui ont sous-tendu la conception de notre assistant de preuve, avant de les développer ensuite.
 
@@ -165,7 +165,7 @@ Introduisons désormais les séquents, qui sont les objets pour lesquels on cons
 \end{definition}
 
 \begin{remark}
-    Intuitivement, un séquent peut être vu comme une unique formule, qui serait, en logique classique, une disjonction des formules qu'il contient. Toute formule en logique classique étant équivalente à une formule en forme normale disjonctive, le fait qu'on ne puisse exprimer en logique linaire que des formes disjonctives n'est pas un problème.
+    Intuitivement, un séquent peut être vu comme une unique formule, qui serait, en logique classique, une disjonction des formules qu'il contient. Toute formule en logique classique étant équivalente à une formule en forme normale disjonctive, le fait qu'on ne puisse exprimer en logique linaire que des séquents correspondant en logique classique à des disjonctions n'est pas un problème.
 
     \begin{example}
     \label{example_tautology}
@@ -210,7 +210,7 @@ Un séquent est prouvable s'il existe une preuve dont il est la conclusion.
 \begin{remark}
     La règle d'axiome $\mathit{ax}$ vient de ce qui a été dit pour l'exemple~\ref{example_tautology}: $X\orth, X$ correspond en logique classique à $\neg X \lor X$, et est donc une tautologie.
 
-    La règle de permutation $\textit{ex}_{\someperm}$ vient d'un choix particulier que nous avons fait pour nos définitions. De manière classique, les séquents sont définis comme des \textit{ensembles} de formules, mais nous avons choisi ici de les définir comme des \textit{listes}, afin de simplifier la conception de notre assistant et les démonstrations. Cette règle de permutation devient alors nécessaire, afin d'avoir un système de preuve équivalent.
+    La règle de permutation $\textit{ex}_{\someperm}$ vient d'un choix particulier que nous avons fait pour nos définitions. De manière classique, les séquents sont définis comme des \textit{multi--ensembles} de formules, mais nous avons choisi ici de les définir comme des \textit{listes}, afin de simplifier la conception de notre assistant et les démonstrations. Cette règle de permutation devient alors nécessaire, afin d'avoir un système de preuve équivalent.
     
     La règle $\parr$ est liée à une remarque faite précédemment: le par correspond à une sorte de $\lor$, et on peut donc transformer une formule $A \parr B$ en un séquent $A, B$. Toutefois, ce constructeur n'est pas inutile, car, dans des formules complexes où les opérateurs sont imbriqués, les $\parr$ ne sont pas toujours à la racine, ce qui les rend plus puissants que la simple disjonction induite par le séquent.
     
@@ -241,24 +241,24 @@ Précisons d'emblée que notre objectif est d'aider l'utilisateur à construire 
     \begin{multlined}
         \begin{prooftree}
                  \axv{{X_1}\orth, X_1}
-                 \permv{2 \;1}{X_1, {X_1}\orth}
+                 \permv{(2, 1)}{X_1, {X_1}\orth}
                  \axv{{X_2}\orth, X_2}
               \tensorv{X_1, {X_1}\orth \tensor {X_2}\orth, X_2}
-              \permv{1 \;3 \;2}{X_1, X_2, {X_1}\orth \tensor {X_2}\orth}
+              \permv{(1, 3, 2)}{X_1, X_2, {X_1}\orth \tensor {X_2}\orth}
               \axv{{X_3}\orth, X_3}
-              \permv{2 \;1}{X_3, {X_3}\orth}
+              \permv{(2, 1)}{X_3, {X_3}\orth}
            \tensorv{X_1, X_2, ({X_1}\orth \tensor {X_2}\orth) \tensor X_3, {X_3}\orth}
         \parrv{X_1 \parr X_2, ({X_1}\orth \tensor {X_2}\orth) \tensor X_3, {X_3}\orth}
         \end{prooftree} \\ \\
         \begin{prooftree}
                  \axv{{X_1}\orth, X_1}
-                 \permv{2 \;1}{X_1, {X_1}\orth}
+                 \permv{(2, 1)}{X_1, {X_1}\orth}
                  \axv{{X_2}\orth, X_2}
               \tensorv{X_1, {X_1}\orth \tensor {X_2}\orth, X_2}
-              \permv{1 \;3 \;2}{X_1, X_2, {X_1}\orth \tensor {X_2}\orth}
+              \permv{(1, 3, 2)}{X_1, X_2, {X_1}\orth \tensor {X_2}\orth}
            \parrv{X_1 \parr X_2, {X_1}\orth \tensor {X_2}\orth}
            \axv{{X_3}\orth, X_3}
-           \permv{2 \;1}{X_3, {X_3}\orth}
+           \permv{(2, 1)}{X_3, {X_3}\orth}
         \tensorv{X_1 \parr X_2, ({X_1}\orth \tensor {X_2}\orth) \tensor X_3, {X_3}\orth}
         \end{prooftree}
     \end{multlined}
@@ -311,7 +311,7 @@ Si l'information requise par Click \& Collect est souvent redondante, c'est qu'i
 
 Là est la raison de la redondance au sein de Click \& Collect, puisque cet outil demande à l'utilisateur de saisir explicitement chaque permutation, alors que leur donnée n'est en réalité jamais nécessaire.
 
-Pour résoudre ce problème, nous proposons de travailler sur des représentations équivalentes aux arbres de preuves, qui éliminent leur redondance. Ces représentations seront manipulées en arrière-plan par notre code.
+Pour résoudre ce problème, nous proposons de travailler sur des représentations équivalentes aux arbres de preuves, qui éliminent leur redondance. Ces représentations sont inspirées des dessins utilisés par Girard dans l'introduction de sa ludique \cite{locus}. Elles seront manipulées en arrière-plan par notre code.
 
 \subsection{Représentations}
 Nous choisissons de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $\sequent$ est le séquent prouvé par $\someproof$. Définissons cela plus en détail, en commençant par nous donner un ensemble d'adresses:
@@ -516,8 +516,8 @@ Si l'on regarde désormais l'ensemble des représentations $\representationslarg
         [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{42 \epsilon }$}
         child {node {$B_{13 \Right \cdot \Right \cdot \Right}$}
-            child {node {$F_{1 \epsilon}$}}
-            child {node {$F_{1 \epsilon}$}}
+            child {node {$F_{1 \epsilon, \; 1 \epsilon}$}}
+            child {node {$F_{1 \epsilon, \; 1 \epsilon}$}}
         };
         \end{tikzpicture}
         \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
@@ -585,23 +585,24 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
 
     Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective, \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
 
-    Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
+    Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{multi--ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
 
     \begin{example}Deux preuves identiques à permutations près:
+        \todo{exemple faux}
         \begin{align*}
         \begin{multlined}
             \begin{prooftree}
                \axv{{X_1}\orth, X_1}
                \axv{{X_1}\orth, X_1}
-               \permv{2 \;1}{X_1, {X_1}\orth}
+               \permv{(2, 1)}{X_1, {X_1}\orth}
             \tensorv{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
             \end{prooftree} \\ \\
             \begin{prooftree}
                \axv{{X_1}\orth, X_1}
                \axv{{X_1}\orth, X_1}
-               \permv{2 \;1}{X_1, {X_1}\orth}
+               \permv{(2, 1)}{X_1, {X_1}\orth}
             \tensorv{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
-            \permv{2, 1}{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
+            \permv{(3, 2, 1)}{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
             \end{prooftree}
         \end{multlined}
         \end{align*}
@@ -882,7 +883,7 @@ Donnons maintenant l'algorithme d'approximation:
     
                 \If{$t_2 \in \trees$}
                     \State $\lowapprox \gets {\lowapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$
-                \ElsIf{$t_2 \notin \trees$}
+                \Else
                     \State $\lowapprox \gets \left\{ (m, \someadd \cdot \Left) \right\}$
                 \EndIf
                 
@@ -902,12 +903,9 @@ Donnons maintenant l'algorithme d'approximation:
     Une adresse minimale dans $t_2$ est une adresse $(n, \someadd)$ n'ayant pas d'ancêtre de la forme $(n, \someadd')$, où $\someadd = \someadd' \cdot \alpha$.
 \end{remark}
 
-\begin{implementation}
-    Cet algorithme est implémenté dans notre code par:
-    \begin{minted}{ocaml}
-    let approx (t, s) a = ...
-    \end{minted}
-\end{implementation}
+\begin{remark}
+    $\highapprox$ est l'approximation haute, et correspond aux adresses qu'on peut choisir pour remplacer le trou. $\lowapprox$ est l'approximation basse, et correspond à des adresses obligatoires dans l'approximation haute.
+\end{remark}
 
 \begin{remark}
     \label{algo_expl}
@@ -919,6 +917,13 @@ Donnons maintenant l'algorithme d'approximation:
     
     Dans ce cas, on vérifie qu'on rentre à chaque appel dans une des clauses du switch. De plus, la longueur de l'adresse $a'$ décroît strictement au fil des appels, et est minorée par 0 ($a' = \epsilon$ est un cas de base).
 \end{remark}
+
+\begin{implementation}
+    Cet algorithme est implémenté dans notre code par:
+    \begin{minted}{ocaml}
+    let approx (t, s) a = ...
+    \end{minted}
+\end{implementation}
 
 \subsubsection{Spécification des approximations}
 
@@ -1074,7 +1079,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
     \begin{example}
         Un contre-exemple à ce théorème:
 
-        $F(1 \epsilon) \vdash X_1, \orth{X_1} \tensor \orth{X_2}, X_2$
+        $F(1 \epsilon, \; 3 \epsilon) \vdash X_1, \orth{X_1} \tensor \orth{X_2}, X_2$
 
         Cette représentation, vue comme partielle, est correcte, mais n'est pourtant pas l'approximation d'une représentation correcte complète. En effet, elle n'est pas correcte si on la voit comme une représentation complète (la linéarité \ref{clin} est violée), et on ne peut pas non plus la prolonger.
     \end{example}
@@ -1275,7 +1280,7 @@ Listons brièvement les heuristiques que nous utilisons dans notre code. Il est 
         L'idée derrière cette heuristique est que les deux atomes duaux doivent forcément être utilisés dans la branche, et qu'ils ne pourront pas l'être à un autre moment, puisqu'il n'y a plus d'opérateur possible.
     \end{remark}
 
-    \item Si, pour un trou, seuls des atomes à l'exception d'un unique opérateur peuvent être choisis, on applique l'opérateur.
+    \item Si, pour un trou, seuls des atomes à l'exception d'un unique opérateur obligatoire peuvent être choisis, on applique l'opérateur.
 
     \begin{remark}
         L'opérateur doit en effet être utilisé dans la branche, et il ne peut l'être à un autre moment, car tout autre choix induirait l'utilisation d'un axiome, et ainsi la fermeture de la branche.
@@ -1305,7 +1310,7 @@ De même, listons quelques heuristiques pour la détection d'erreurs. À nouveau
 \end{implementation}
 
 \begin{itemize}
-    \item Si, pour un trou, un atome est obligatoire, et qu'il ne possède pas de dual parmi les autres choix possibles, on renvoie une erreur.
+    \item Si, pour un trou, seuls des atomes peuvent être choisis, et qu'un atome obligatoire ne possède pas de dual parmi les autres choix possibles, on renvoie une erreur.
 
     \begin{remark}
         Cet atome ne pourra, en effet, jamais être utilisé dans la branche, puisqu'il ne peut l'être qu'avec la règle d'axiome, qui impose de l'associer à un dual.
@@ -1902,5 +1907,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
     La même idée serait utilisée pour les propriétés sur $t'_2$ et $t_2$.
 \end{proof}
+
+\todo{Ajouter une trace d'exécution}
 
 \end{document}
