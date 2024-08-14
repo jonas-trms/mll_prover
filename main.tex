@@ -875,13 +875,13 @@ Donnons maintenant l'algorithme d'approximation:
                 \State \Return $\text{APPROX}(t', \; \someaddbis, \; \highapprox, \; \lowapprox)$
             \EndCase
     
-            \Case{$B((m, \someadd), t_1, t_2), \; \Right \cdot \someaddbis$}
+            \Case{$B((m, \someadd), t_1, t_2), \; \Left \cdot \someaddbis$}
                 \State $\mathcal{M} \gets \left\{\text{$a$, où $a$ est une adresse minimale apparaissant dans $t_2$}\right\}$
                 
                 \State $\highapprox \gets {\highapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$
     
                 \If{$t_2 \in \trees$}
-                    \State $\lowapprox \gets {\lowapprox}_{\setminus \mathcal{M} \cup \{ (n, \someadd) \}} \cup \left\{ (n, \someadd \cdot \Left) \right\}$m
+                    \State $\lowapprox \gets {\lowapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$
                 \ElsIf{$t_2 \notin \trees$}
                     \State $\lowapprox \gets \left\{ (m, \someadd \cdot \Left) \right\}$
                 \EndIf
@@ -977,7 +977,7 @@ Avant de donner la démonstration, définissons une notion qui lui sera utile:
             child {node {$\unknown$}
             };
         \end{tikzpicture}
-        \relapprox
+        \relapproxlarge
         \begin{tikzpicture}%
             [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
