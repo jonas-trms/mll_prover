@@ -33,6 +33,7 @@
 
 % dessins arbres : tikz
 \tikzset{baseline=(current bounding box.center)}
+\tikzset{level distance=1.3cm}
 
 %imported from click and collect
 \newcommand*{\orth}{^\perp}
@@ -316,19 +317,20 @@ Pour résoudre ce problème, nous proposons de travailler sur une représentatio
 On choisit de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, avec $t$ un arbre encodant le squelette de la preuve, et $\sequent$ le séquent prouvé par $\someproof$. Définissons cela plus en détail, en commençant par nous donner un ensemble d'adresses:
 
 \begin{definition}[Adresses]
-On pose
-\begin{equation*}
-\mathcal{A} = \mathbb{N} \times \{ \Left, \Right\}^{*}  
-\end{equation*}
+On pose:
+% \begin{equation*}
+\quad $\mathcal{A} = \mathbb{N} \times \{ \Left, \Right\}^{*}$
+%\end{equation*}
 
 Dans un séquent $\sequent$, l'adresse $(n, \rho) \in \mathcal{A}$ servira ainsi à représenter la sous-formule d'adresse $\rho$ de la $n$\ieme{} formule de $\sequent$, chaque formule pouvant être vue comme un arbre binaire.
 \end{definition}
 
 \begin{example}
 Considérons le séquent suivant:
-\begin{equation*}
-X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth
-\end{equation*}
+%\begin{equation*}
+\quad $X_1\orth, X_1 \tensor (X_2 \tensor X_3), X_3\orth, X_2\orth$
+%\end{equation*}
+
 $(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Left)$ représente la sous-formule $X_2$. $(2, \Right)$ représente la sous-formule $X_2 \tensor X_3$.
 \end{example}
 
@@ -361,8 +363,7 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
 \end{prooftree}
 \quad\leadsto\quad
 \begin{tikzpicture}%
-    [level distance=1.5cm,
-    level 2/.style={sibling distance=3.5cm}]
+    [level 2/.style={sibling distance=3.5cm}]
     \node {$U_{1 \epsilon}$}
     child {node {$B_{1 \Right}$}
         child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -425,8 +426,7 @@ On identifie dans toute la suite une fonction de $\addresses$ dans $\addresses$ 
       \parrv{\sequent, A \parr B, \sequentbis}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
-    [level distance=1.5cm,
-    level 2/.style={sibling distance=3.5cm}]
+    [level 2/.style={sibling distance=3.5cm}]
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left(
            \begin{prooftree}
@@ -453,8 +453,7 @@ On identifie dans toute la suite une fonction de $\addresses$ dans $\addresses$ 
       \tensorv{\sequent, A \tensor B, \sequentbis}
     \end{prooftree}
     \right) = \begin{tikzpicture}%
-    [level distance=1.5cm,
-    level 1/.style={sibling distance=3.5cm}]
+    [level 1/.style={sibling distance=3.5cm}]
     \node {$B_{n \epsilon}$}
         child {node {$\psi_{\tensor\Left} \left( \encode' \left(
                 \begin{prooftree}
@@ -514,8 +513,7 @@ Si l'on regarde désormais l'ensemble des représentations $\representationslarg
     
     \begin{equation*}
         \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=3.5cm}]
+        [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{42 \epsilon }$}
         child {node {$B_{13 \Right \cdot \Right \cdot \Right}$}
             child {node {$F_{1 \epsilon}$}}
@@ -548,8 +546,7 @@ Montrons désormais ce qui vient d'être évoqué : le fait d'être une représe
     \begin{equation*}
     \forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations
     \end{equation*}
-
-    Autrement dit, l'encodage d'une preuve est bien une représentation correcte.
+%    Autrement dit, l'encodage d'une preuve est bien une représentation correcte.
 \end{theorem}
 
 \begin{proof}
@@ -564,7 +561,7 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
 \begin{equation*}
 \forall (t, \sequent) \in \representations, \; \exists \someproof \in \proofs, \; \encode \left( \someproof \right) = (t, \sequent)
 \end{equation*}
-Autrement dit, une représentation correcte est bien l'encodage d'une preuve.
+% Autrement dit, une représentation correcte est bien l'encodage d'une preuve.
 \end{theorem}
 
 \begin{proof}
@@ -658,15 +655,13 @@ Afin de formaliser cette notion de ``gagner de l'information'', dont on aura bes
 Une suite d'approximations immédiates (pour la lisibilité, les séquents ne sont pas représentés):
     \begin{equation*}
     \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=3.5cm}]
+        [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{1 \epsilon}$}
         child {node {$\unknown$}};
     \end{tikzpicture}
     \relapprox
     \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=3.5cm}]
+        [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{1 \epsilon}$}
         child {node {$B_{1 \Right}$}
             child {node {$\unknown$}}
@@ -675,8 +670,7 @@ Une suite d'approximations immédiates (pour la lisibilité, les séquents ne so
     \end{tikzpicture}
     \relapprox
     \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=3.5cm}]
+        [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{1 \epsilon}$}
         child {node {$B_{1 \Right}$}
             child {node {$\unknown$}}
@@ -727,6 +721,7 @@ Les représentations partielles correctes ont bien le sens dont on vient de parl
         \item De même, on n'a fait que retirer des adresses, et on doit vérifier que les adresses qui restent dans $t'$ sont distinctes. C'est vrai, car les adresses de $t$ étaient déjà distinctes.
 
         \item On retire les adresses en percolant vers le haut depuis les feuilles. On ne se trouve donc jamais dans le cas où l'on retire une adresse ayant des descendants, ce qui préserve la condition de descendance.
+\qedhere
     \end{enumerate}
 \end{proof}
 
@@ -754,16 +749,14 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
         \unknown 
         \relapprox
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$\unknown$}
             };
         \end{tikzpicture}
         \relapprox
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$\unknown$}}
@@ -772,8 +765,7 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
         \end{tikzpicture}
         \relapprox
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -782,8 +774,7 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
         \end{tikzpicture}
         \relapprox
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -796,8 +787,7 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
     Il aboutit à la représentation correcte complète suivante:
     \begin{equation*}
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -850,8 +840,7 @@ Expliquons la manière dont calculons nos approximations, avant de les spécifie
 \begin{example} Considérons l'arbre suivant:
     \begin{equation*}
         \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=5cm}
+        [level 2/.style={sibling distance=5cm}
         level 3/.style={sibling distance=10cm}]
         \node {$U_{1 \epsilon}$}
         child {node {$B_{1 \Right}$}
@@ -957,7 +946,6 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons désorma
     \label{highapprox_correction}
     
     Soient $(t, \; \sequent) \in \representationspartial$, et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. Posons $\Sigma = \{ (j, \epsilon), \; 0 \leq j \leq |\sequent| \}$, et considérons l'ensemble $\highapprox$ calculé par APPROX$(t, a', \Sigma, \Sigma)$.
-    
     On a $\highapprox = \highapproxspec \left( t, \; \sequent, \; a' \right)$.
 \end{theorem}
 
@@ -984,16 +972,14 @@ Avant de donner la démonstration, définissons une notion qui lui sera utile:
 
         \begin{equation*}
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$\unknown$}
             };
         \end{tikzpicture}
         \relapprox
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -1027,8 +1013,7 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
 \begin{example}Considérons la représentation suivante:
     \begin{equation*}
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 2/.style={sibling distance=3.5cm}]
+            [level 2/.style={sibling distance=3.5cm}]
             \node {$U_{1 \epsilon}$}
             child {node {$B_{1 \Right}$}
                 child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
@@ -1141,6 +1126,7 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
         Comme dans le cas précédent, on peut désormais considérer $t''_{m-1}$ qui contient un unique trou, remplacé dans $t''_m$ par une feuille. La racine de $t''_{m-1}$ est le ré-adressage de $a' = (m, \rho)$, de la forme $(m', \epsilon)$. De plus, le ré-adressage de $a$, qui est une adresse correcte de $\sequent'$ n'apparaissant pas dans dans $t''_{m-1}$, est de la forme $(m', \alpha)$, et descend donc immédiatement d'une adresse de la branche racine-trou.
 
         D'après le théorème~\ref{lowapprox_correction}, $a'$ appartient donc à l'ensemble $\lowapprox$ calculé au moment où l'on remplace le trou de $t''_{m-1}$ par une feuille, ce qui est absurde, car cela viole à nouveau la condition $\exactcondbis$.
+\qedhere
     \end{description}
 \end{proof}
 
@@ -1188,8 +1174,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                     \unknown
                     \relapprox
                     \begin{tikzpicture}%
-                    [level distance=1.5cm,
-                    level 1/.style={sibling distance=3.5cm}]
+                    [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
                         child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                         g_0\right) \right) = \unknown$}}
@@ -1199,8 +1184,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                     \end{tikzpicture}
                     \relapprox ... \relapprox
                     \begin{tikzpicture}%
-                    [level distance=1.5cm,
-                    level 1/.style={sibling distance=3.5cm}]
+                    [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
                         child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                         g_{m_1}\right) \right)$}}
@@ -1210,8 +1194,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                     \end{tikzpicture}\\
                     \relapprox ... \relapprox
                     \begin{tikzpicture}%
-                    [level distance=1.5cm,
-                    level 1/.style={sibling distance=3.5cm}]
+                    [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
                         child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                         g_{m_1}\right) \right)$}}
@@ -1221,8 +1204,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                     \end{tikzpicture}
                     =
                     \begin{tikzpicture}%
-                    [level distance=1.5cm,
-                    level 1/.style={sibling distance=3.5cm}]
+                    [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
                         child {node {$\someperm \left( \psi_{\tensor\Left} \left( \psi_1 \left(
                             t_1
@@ -1247,6 +1229,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
             Si $t_i = U(n\rho, t') \in \representations$.
             
             L'argument est similaire au cas du constructeur $B$.
+\qedhere
     \end{description}
 \end{proof}
 
@@ -1347,7 +1330,7 @@ Notre assistant de preuve offre, conformément à notre objectif, une solution p
 
 \begin{example}
     L'exemple en question:
-    
+%
     $X_5, X_4, {X_1}\orth \tensor ({X_2}\orth \tensor ({X_3}\orth \tensor ({X_4}\orth \tensor {X_5}\orth))), X_1, X_3 \parr X_2$
 \end{example}
 
@@ -1410,8 +1393,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     On a, de plus:
     \begin{equation*}
     \encode ( \someproof ) = \begin{tikzpicture}%
-    [level distance=1.5cm,
-    level 2/.style={sibling distance=3.5cm}]
+    [level 2/.style={sibling distance=3.5cm}]
     \node {$U_{n \epsilon}$}
         child {node {$\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$}
     };
@@ -1463,8 +1445,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     De plus:
     \begin{equation*}
     \encode ( \someproof ) = \begin{tikzpicture}%
-    [level distance=1.5cm,
-    level 1/.style={sibling distance=3.5cm}]
+    [level 1/.style={sibling distance=3.5cm}]
     \node {$B_{n \epsilon}$}
         child {node {$\psi_{\tensor\Left} \left( \encode' \left( \pi_1 \right) \right)$}}
         child {node {$\psi_{\tensor\Right} \left( \encode' \left( \pi_2 \right) \right)$}
@@ -1491,7 +1472,6 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     \end{description}
 
     Ainsi, $\forall \someproof \in \proofs, \encode \left( \someproof \right) \in \representations$.
-
     \qed{}
 \end{demonstrationappendix}
 
@@ -1557,8 +1537,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
         De plus, $\encode \left( \pi \right) = 
         \begin{tikzpicture}%
-        [level distance=1.5cm,
-        level 2/.style={sibling distance=3.5cm}]
+        [level 2/.style={sibling distance=3.5cm}]
         \node {$U_{n \epsilon}$}
             child {node {$\psi_\parr \left( \psi_\parr^{-1} \left(
                t' \right) \right)$}
@@ -1655,8 +1634,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \right) \right) \\
             & = \someperm \left(
             \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n' \epsilon}$}
                 child {node {$\psi_{\tensor\Left} \left( \encode' \left(
                         \pi_1
@@ -1668,8 +1646,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \end{tikzpicture} 
             \right) \\
             & = \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$\someperm \left( \psi_{\tensor\Left} \left( \psi_1 \left(
                         t_1
@@ -1686,8 +1663,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
         Il en découle finalement que $\encode \left( \pi \right) = 
         \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$t_1$}}
                 child {node {$t_2$}
@@ -1696,9 +1672,8 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \vdash \sequent_1, F_1 \tensor F_2, \sequent_2$. 
             
             Soit $\encode \left( \pi \right) = \left( t, \sequent \right)$.
+\qed
     \end{description}
-      
-    \qed{}
 \end{demonstrationappendix}
 
 \begin{demonstrationappendix}
@@ -1786,11 +1761,10 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
             \item[$U$] Si $t_i = U(n\rho, t') \in \representations$.
     
-            $a_i'$ adresse dans $t_i$ le trou adressé par $a'$ dans $t$, d'où, nécessairement, $a_i' = \Left \cdot a_{i+1}'$ (d'après la convention d'adressage dans un arbre). Ce cas correspond bien à celui du pseudo-code, et l'argument de correction est similaire au cas du constructeur $B$. 
+            $a_i'$ adresse dans $t_i$ le trou adressé par $a'$ dans $t$, d'où, nécessairement, $a_i' = \Left \cdot a_{i+1}'$ (d'après la convention d'adressage dans un arbre). Ce cas correspond bien à celui du pseudo-code, et l'argument de correction est similaire au cas du constructeur $B$.
+\qed
         \end{description}
     \end{description}
-
-    \qed{}
 \end{demonstrationappendix}
 
 \begin{demonstrationappendix}
@@ -1832,11 +1806,9 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \item[$U$] Si $t_i = U(n\rho, t') \in \representations$.
 
             L'argument est similaire au cas du constructeur $B$.
-            
+\qed
         \end{description}
     \end{description}
-
-    \qed{}
 \end{demonstrationappendix}
 
 \begin{theorem}[Propriétés de contexte]
@@ -1850,8 +1822,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     \begin{align*}
         \begin{multlined}
             t'_1 = \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                 t_1\right) \right)$}}
@@ -1860,8 +1831,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \end{tikzpicture}
             \vdash \sequent \\
             t'_2 = \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$\gamma$}}
                 child {node {$\someperm \left( \psi_{\tensor\Right} \left(t_2\right) \right) = \unknown$}
@@ -1891,8 +1861,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
         \item[Si la condition $\exactcond$ était violée:] On aurait remplacé un trou d'un arbre 
             \begin{equation*}
             \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                 g_i\right) \right)$}}
@@ -1909,8 +1878,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
         \item[Si la condition $\exactcondbis$ était violée:] On aurait fermé une branche d'un arbre 
             \begin{equation*}
             \begin{tikzpicture}%
-            [level distance=1.5cm,
-            level 1/.style={sibling distance=3.5cm}]
+            [level 1/.style={sibling distance=3.5cm}]
             \node {$B_{n \epsilon}$}
                 child {node {$\someperm \left( \psi_{\tensor\Left} \left(
                 g_i\right) \right)$}}
