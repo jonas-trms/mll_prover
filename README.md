@@ -14,7 +14,7 @@ Un séquent est une liste OCaml de formules, et les formules sont représentées
 
 ## Exécution
 La boucle d'interaction se lance en exécutant le code OCaml :
-```ocaml code.ml```.    
+```ocaml mll_prover.ml```.    
 
 ## Boucle d'interaction
 L'utilisateur est guidé pas à pas par notre code, qui lui affiche au fur et à mesure des instructions. 
