@@ -133,7 +133,7 @@
 \section{Introduction}
 La logique linéaire a été introduite en 1987 par Jean-Yves Girard \cite{GIRARD19871}, et vise à enrichir les logiques classique et intuitionniste, en introduisant une notion de coût sur les hypothèses. En effet, dans une preuve en logique linéaire, chaque hypothèse doit être utilisée exactement une fois. 
 
-De même que la logique intuitionniste se distingue de la logique classique par la notion de constructivité des preuves qu'elle apporte, la logique linéaire introduit donc une vision des hypothèses comme ressources. Elle offre en ce sens une perspective intéressante dans le cadre de l'informatique, et y a de nombreuses applications, notamment pour la programmation fonctionnelle et la théorie de la preuve \cite{10.1093/jigpal/2.1.77} (voir également l'annexe \ref{inst_contex}). Celles-ci impliquent souvent de construire des preuves, d'où la nécessité de rendre cette tâche simple et rapide.
+De même que la logique intuitionniste se distingue de la logique classique par la notion de constructivité des preuves qu'elle apporte, la logique linéaire introduit donc une vision des hypothèses comme ressources. Elle offre en ce sens une perspective intéressante dans le cadre de l'informatique, et y a de nombreuses applications, notamment pour la programmation fonctionnelle et la théorie de la preuve \cite{10.1093/jigpal/2.1.77} (voir également l'annexe~\ref{inst_contex}). Celles-ci impliquent souvent de construire des preuves, d'où la nécessité de rendre cette tâche simple et rapide.
 
 Il existe plusieurs syntaxes pour construire des preuves en logique linéaire, dont le calcul des séquents. C'est la syntaxe que nous avons choisie, et pour laquelle nous proposons dans la suite un assistant de preuve. Celui-ci vise à rendre la construction des preuves plus dynamique, et partiellement automatique. 
 
@@ -142,7 +142,7 @@ Il existe plusieurs syntaxes pour construire des preuves en logique linéaire, d
 Présentons tout d'abord la logique linéaire plus en détail, afin de faire saisir les enjeux qui ont sous-tendu la conception de notre assistant de preuve, avant de les développer ensuite.
 
 \subsection{Présentation de la logique linéaire}
-Dans toute la suite, on ne considérera que le fragment dit multiplicatif de la logique linéaire, appelé MLL. Comme en logique classique, les briques de base en sont des formules, qu'on définit inductivement:
+Dans toute la suite, on ne considérera que le fragment dit \emph{multiplicatif} de la logique linéaire, appelé MLL. Comme en logique classique, les briques de base en sont des formules, qu'on définit inductivement:
 
 \begin{definition}[Formules]
 On se donne un ensemble $\mathcal{X}$ infini d'atomes. Les formules sont définies par la grammaire suivante:
@@ -152,9 +152,9 @@ F := X \mid X\orth \mid F \parr F \mid F \tensor F
 \end{definition}
 
 \begin{remark}
-    Intuitivement, un atome $X$ correspond à ce qui serait une variable en logique classique, et le constructeur $\orth$ à la négation $\neg$. La "négation" d'un atome s'appelle son dual. Remarquons qu'on ne peut nier que les atomes. Ce choix se justifie, si l'on pense aux lois de De Morgan en logique classique. En effet, on peut faire "descendre" progressivement les négations dans une formule, en appliquant successivement ces lois, jusqu'à ce que les négations ne concernent plus que les variables. La négation sur les formules au sens large n'offre donc pas d'expressivité supplémentaire, on peut ainsi s'en passer.
+    Intuitivement, un atome $X$ correspond à ce qui serait une variable en logique classique, et le constructeur $\orth$ à la négation $\neg$. La ``négation'' d'un atome s'appelle son dual. Remarquons qu'on ne peut nier que les atomes. Ce choix se justifie, si l'on pense aux lois de De Morgan en logique classique. En effet, on peut faire ``descendre'' progressivement les négations dans une formule, en appliquant successivement ces lois, jusqu'à ce que les négations ne concernent plus que les variables. La négation sur les formules au sens large n'offre donc pas d'expressivité supplémentaire, on peut ainsi s'en passer.
 
-    Le constructeur $\parr$, appelé par, peut être vu comme une sorte de $\lor$, et le constructeur $\tensor$, appelé tenseur, comme un $\land$. Cela se précisera par la suite, lorsque nous parlerons des règles les concernant.
+    Le constructeur $\parr$, appelé \emph{par}, peut être vu comme une sorte de $\lor$, et le constructeur $\tensor$, appelé \emph{tenseur}, comme un $\land$. Cela se précisera par la suite, lorsque nous parlerons des règles les concernant.
 \end{remark}
 
 Introduisons désormais les séquents, qui sont les objets pour lesquels on construit des preuves:
@@ -207,7 +207,7 @@ Un séquent est prouvable s'il existe une preuve dont il est la conclusion.
 \end{definition}
 
 \begin{remark}
-    La règle d'axiome $\mathit{ax}$ vient de ce qui a été dit pour l'exemple \ref{example_tautology}: $X\orth, X$ correspond en logique classique à $\neg X \lor X$, et est donc une tautologie.
+    La règle d'axiome $\mathit{ax}$ vient de ce qui a été dit pour l'exemple~\ref{example_tautology}: $X\orth, X$ correspond en logique classique à $\neg X \lor X$, et est donc une tautologie.
 
     La règle de permutation $\textit{ex}_{\someperm}$ vient d'un choix particulier que nous avons fait pour nos définitions. De manière classique, les séquents sont définis comme des \textit{ensembles} de formules, mais nous avons choisi ici de les définir comme des \textit{listes}, afin de simplifier la conception de notre assistant et les démonstrations. Cette règle de permutation devient alors nécessaire, afin d'avoir un système de preuve équivalent.
     
@@ -270,7 +270,7 @@ Notons qu'une solution, peu commode, pourrait être de construire automatiquemen
 
 De ce fait, nous avons plutôt choisi de concevoir un assistant de preuve interactif, guidant l'utilisateur pas à pas, et lui faisant construire une preuve de bas en haut. L'utilisateur part ainsi d'un séquent qu'il veut prouver, et remonte petit à petit, règle après règle, jusqu'à atteindre les axiomes.
 
-En cela, notre assistant de preuve est assez à Click \& Collect. Cependant, si le lecteur l'a essayé, il s'est sans doute rendu compte de la redondance de l'information qu'il devait fournir à cet outil, à cause de la règle de permutation. Ce n'est pas dérangeant dans un but pédagogique, mais cela alourdit rapidement le travail d'un utilisateur expert. La contribution apportée par notre assistant consiste donc à réduire l'information à fournir, dans un objectif d'efficacité.
+En cela, notre assistant de preuve est assez similaire à Click \& Collect. Cependant, si le lecteur l'a essayé, il s'est sans doute rendu compte de la redondance de l'information qu'il devait fournir à cet outil, à cause de la règle de permutation. Ce n'est pas dérangeant dans un but pédagogique, mais cela alourdit rapidement le travail d'un utilisateur expert. La contribution apportée par notre assistant consiste donc à réduire l'information à fournir, dans un objectif d'efficacité.
 
 Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/ll_prover}{ici}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
 
@@ -288,7 +288,7 @@ Si l'information requise par Click \& Collect est souvent redondante, c'est qu'i
     \end{equation*}
     
 
-    Si l'on regarde la définition \ref{proofs_def}, on remarque que toute l'information de cette preuve est entièrement déterminée par la donnée du séquent de conclusion et de la règle $\parr$, et que tout le reste de l'arbre est superflu.
+    Si l'on regarde la définition~\ref{proofs_def}, on remarque que toute l'information de cette preuve est entièrement déterminée par la donnée du séquent de conclusion et de la règle $\parr$, et que tout le reste de l'arbre est superflu.
 \end{example}
 
 \begin{example}
@@ -344,9 +344,9 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 \end{itemize}
 \end{definition}
 
-Dans une réprésentation, chaque n\oe ud de l'arbre symbolisera ainsi une règle de la preuve. En effet, chaque n\oe ud portera une adresse qui renverra à une sous-formule de $\sequent$, et on remarque, en s'attardant sur la définition \ref{proofs_def}, qu'une sous-formule de $\sequent$ correpond exactement à une application de règle.
+Dans une réprésentation, chaque n\oe ud de l'arbre symbolisera ainsi une règle de la preuve. En effet, chaque n\oe ud portera une adresse qui renverra à une sous-formule de $\sequent$, et on remarque, en s'attardant sur la définition~\ref{proofs_def}, qu'une sous-formule de $\sequent$ correpond exactement à une application de règle.
 
-Le cas de l'axiome est un peu particulier: un axiome sera représenté par une feuille ayant deux adresses, qui renverront aux deux atomes duaux concernés. À nouveau, en regardant la définition \ref{proofs_def}, on voit que cette information est équivalente à la donnée de l'axiome.
+Le cas de l'axiome est un peu particulier: un axiome sera représenté par une feuille ayant deux adresses, qui renverront aux deux atomes duaux concernés. À nouveau, en regardant la définition~\ref{proofs_def}, on voit que cette information est équivalente à la donnée de l'axiome.
 
 \begin{example}
 \label{rep_example}
@@ -383,7 +383,7 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
     \end{minted}
 
     \begin{remark}
-        Les arbres que nous implémentons ne sont pas exactement ceux dont nous venons de parler, mais une version qui leur est plus générale, et dont nous parlerons quand nous nous intéresserons à la manipulation interactive, dans la partie \ref{partial_rep}.
+        Les arbres que nous implémentons ne sont pas exactement ceux dont nous venons de parler, mais une version qui leur est plus générale, et dont nous parlerons quand nous nous intéresserons à la manipulation interactive, dans la section~\ref{partial_rep}.
     \end{remark}
 
 \end{implementation}
@@ -497,7 +497,7 @@ On identifie dans toute la suite une fonction de $\addresses$ dans $\addresses$ 
 \end{remark}
 
 \begin{remark}
-    On vérifie au passage que l'encodage de l'exemple \ref{rep_example} par notre fonction correspond bien à la représentation qu'on en avait donnée.
+    On vérifie au passage que l'encodage de l'exemple~\ref{rep_example} par notre fonction correspond bien à la représentation qu'on en avait donnée.
 \end{remark}
 
 \begin{implementation}
@@ -528,7 +528,7 @@ Si l'on regarde désormais l'ensemble des représentations $\representationslarg
     Elle appartient bien à notre ensemble $\representationslarge$, puisque celui-ci n'impose aucune contrainte de lien entre l'arbre et le séquent, mais on se rend vite compte qu'elle n'a aucun sens, ses adresses étant absurdes. Elle ne peut pas être l'image d'une preuve.
 \end{example}
 
-On impose donc des contraintes sur nos représentations, afin de restreindre leur ensemble et de ne conserver que celles qui "ont du sens". Cette notion "d'avoir du sens", qu'on définit par nos contraintes, va correspondre au fait d'être l'encodage d'une preuve, comme on le montrera.
+On impose donc des contraintes sur nos représentations, afin de restreindre leur ensemble et de ne conserver que celles qui ``ont du sens''. Cette notion ``d'avoir du sens'', qu'on définit par nos contraintes, va correspondre au fait d'être l'encodage d'une preuve, comme on le montrera.
 
 \begin{definition}[Représentations correctes]
     \label{def_rep}
@@ -553,7 +553,7 @@ Montrons désormais ce qui vient d'être évoqué : le fait d'être une représe
 \end{theorem}
 
 \begin{proof}
-    Par induction sur $\someproof \in \proofs$. La preuve est relativement directe, puisqu'il suffit de vérifier les trois conditions pour chaque cas. Elle se trouve en annexe: \ref{proof_img_encode}.
+    Par induction sur $\someproof \in \proofs$. La preuve est relativement directe, puisqu'il suffit de vérifier les trois conditions pour chaque cas. Elle se trouve en démonstration annexe~\ref{proof_img_encode}.
 \end{proof}
 
 \subsubsection{Décodage}
@@ -568,7 +568,7 @@ Autrement dit, une représentation correcte est bien l'encodage d'une preuve.
 \end{theorem}
 
 \begin{proof}
-    Par récurrence sur la hauteur $\height$ de $t \in \trees$. On construit un antécédant dans $\proofs$. La preuve complète est en annexe: \ref{proof_rep_inversion}.
+    Par récurrence sur la hauteur $\height$ de $t \in \trees$. On construit un antécédant dans $\proofs$. La preuve complète est en démonstration annexe~\ref{proof_rep_inversion}.
 \end{proof}
 
 \begin{remark}
@@ -588,7 +588,7 @@ Autrement dit, une représentation correcte est bien l'encodage d'une preuve.
 
     Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective, \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre, en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
 
-    Cette injectivité particulière vient d'un choix que nous avons fait pour nos définitions, mentionné dans la définition \ref{proofs_def}: en réalité, les séquents sont des \textit{ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas, pour des raisons pratiques.
+    Cette injectivité particulière vient d'un choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas, pour des raisons pratiques.
 
     \begin{example}Deux preuves identiques à permutations près:
         \begin{align*}
@@ -620,12 +620,12 @@ Nous venons de donner et de justifier une représentation équivalente aux preuv
 \subsection{Représentations partielles}
 \label{partial_rep}
 
-Celles-ci seront identiques aux représentations complètes, à la différence que leurs arbres contiendront éventuellement des trous, aux endroits où on ne saura pas encore quoi mettre. On étend en ce sens la définition \ref{def_trees}:
+Celles-ci seront identiques aux représentations complètes, à la différence que leurs arbres contiendront éventuellement des trous, aux endroits où on ne saura pas encore quoi mettre. On étend en ce sens la définition~\ref{def_trees}:
 
 \begin{definition}[Arbres partiels]
     L'ensemble \treespartial{} des arbres partiels est défini inductivement, par quatre constructeurs:
     \begin{itemize}
-      \item un constructeur $0$-aire, le "trou": $\unknown: \treespartial$
+      \item un constructeur $0$-aire, le \emph{trou}: $\unknown: \treespartial$
       \item un constructeur $0$-aire étiqueté par deux adresses: $F: \mathcal{A} \rightarrow \mathcal{A} \rightarrow \treespartial$
       \item un constructeur unaire étiqueté par une adresse: $U: \mathcal{A} \rightarrow \treespartial \rightarrow \treespartial$
       \item un constructeur binaire étiqueté par une adresse: $B: \mathcal{A} \rightarrow \treespartial \rightarrow \treespartial \rightarrow \treespartial$
@@ -633,7 +633,7 @@ Celles-ci seront identiques aux représentations complètes, à la différence q
 \end{definition}
 
 \begin{implementation}
-    Voir le point d'implémentation \ref{implement_trees}. Les arbres plus généraux dont on parlait sont ceux que nous venons de définir.
+    Voir le point d'implémentation~\ref{implement_trees}. Les arbres plus généraux dont on parlait sont ceux que nous venons de définir.
 \end{implementation}
 
 \begin{remark}
@@ -644,7 +644,7 @@ Celles-ci seront identiques aux représentations complètes, à la différence q
     Le constructeur $\unknown$ correspond à ce qui a été expliqué: il s'agit d'une partie de l'arbre qu'on ne connaît pas encore. Au cours de l'interaction, on les éliminera peu à peu, au fur et à mesure qu'on gagnera de l'information.
 \end{remark}
 
-Afin de formaliser cette notion de "gagner de l'information", dont on aura besoin plus tard pour justifier une correspondance entre les représentations et les preuves partielles, on définit une relation d'approximation sur \treespartial{}:
+Afin de formaliser cette notion de ``gagner de l'information'', dont on aura besoin plus tard pour justifier une correspondance entre les représentations et les preuves partielles, on définit une relation d'approximation sur \treespartial{}:
 
 \begin{definition}[Relation d'approximation]
     Soient $t', t \in \treespartial$. On dit que $t'$ est une approximation immédiate de $t$, qu'on note $t' \relapprox t$, ssi $t$ s'obtient en remplaçant un trou $\unknown$ quelconque de $t'$ par un constructeur de la forme $F(a_1, a_2)$, $U(a_1, \unknown)$ ou $B(a_1, \unknown, \unknown)$, avec $a_1, a_2 \in \addresses$.
@@ -686,16 +686,16 @@ Une suite d'approximations immédiates (pour la lisibilité, les séquents ne so
     \end{equation*}
 \end{example}
 
-À nouveau, on ne souhaite s'intéresser qu'à des représentations partielles qui "ont du sens". Cette fois, "avoir du sens" signifiera ne pas être une représentation partielle dont on peut déjà savoir qu'elle est incorrecte. On étend donc la définition \ref{def_rep}, en imposant à nouveau des contraintes:
+À nouveau, on ne souhaite s'intéresser qu'à des représentations partielles qui ``ont du sens''. Cette fois, ``avoir du sens'' signifiera ne pas être une représentation partielle dont on peut déjà savoir qu'elle est incorrecte. On étend donc la définition~\ref{def_rep}, en imposant à nouveau des contraintes:
 
 \begin{definition}[Représentations partielles correctes]
     \label{def_rep_partial}
     L'ensemble \representationspartial{} des représentations partielles correctes est l'ensemble des éléments $(t, \sequent)$ de $\representationspartiallarge$ vérifiant les trois conditions suivantes:
     
     \begin{enumerate}
-    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition \ref{def_rep}, en considérant que les feuilles $\unknown$ ne portent aucune adresse.
+    \item\label{caddpartial} \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition~\ref{def_rep}, en considérant que les feuilles $\unknown$ ne portent aucune adresse.
     \item\label{clinpartial} \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît au plus une fois dans les adresses de $t$.
-    \item\label{cdespartial} \textbf{Descendance:} Même condition que \ref{cdes} de la définition \ref{def_rep}.
+    \item\label{cdespartial} \textbf{Descendance:} Même condition que \ref{cdes} de la définition~\ref{def_rep}.
     \end{enumerate}
 \end{definition}
 
@@ -717,9 +717,9 @@ Les représentations partielles correctes ont bien le sens dont on vient de parl
 \end{remark}
 
 \begin{proof}
-    Les trois conditions de la définition \ref{def_rep} sont vérifiées pour $(t, \sequent)$, et en particulier les conditions de la définition \ref{def_rep_partial}, qui en sont une version plus faible. 
+    Les trois conditions de la définition~\ref{def_rep} sont vérifiées pour $(t, \sequent)$, et en particulier les conditions de la définition~\ref{def_rep_partial}, qui en sont une version plus faible. 
     
-    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des feuilles $\unknown$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition \ref{def_rep_partial}:
+    $t'$ s'obtient en remplaçant un nombre fini de noeuds de $t$ par des feuilles $\unknown$, en partant des feuilles et en percolant vers le haut. Cette opération préserve les trois conditions de la définition~\ref{def_rep_partial}:
 
     \begin{enumerate}
         \item On a seulement retiré des adresses, les adresses qui restent dans $t'$ sont donc correctes car elles l'étaient déjà dans $t$.
@@ -962,7 +962,7 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons désorma
 \end{theorem}
 
 \begin{remark}
-    L'invariant qu'on prouvera dans la démonstration vient de la remarque \ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représenation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent.
+    L'invariant qu'on prouvera dans la démonstration vient de la remarque~\ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représenation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent.
 \end{remark}
 
 \begin{remark}
@@ -976,7 +976,7 @@ Avant de donner la démonstration, définissons une notion qui lui sera utile:
 \end{definition}
 
 \begin{remark}
-    D'après le théorème \ref{approxofcorrect}, on a $\treesimplify(t, \; a') \in \representationspartial$.
+    D'après le théorème~\ref{approxofcorrect}, on a $\treesimplify(t, \; a') \in \representationspartial$.
 \end{remark}
 
 \begin{example}
@@ -1006,7 +1006,7 @@ Avant de donner la démonstration, définissons une notion qui lui sera utile:
 \begin{proof}
     Montrons une propriété plus générale. Au fil des appels récursifs, on conserve un invariant: au début du i\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a que $t_i$ est un sous-arbre de $t$, dont la racine est adressée par ${\alpha}_i$ dans $t$. De plus, $a'_i$ adresse dans $t_i$ le trou adressé par $a'$ dans $t$, et ${\highapprox}^i = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
 
-    La preuve de cet invariant est en annexe: \ref{highapprox_correction_proof}. On en déduit, ainsi que de la terminaison, la correction de notre algorithme: il termine, et se retrouve donc forcément dans le cas où $a'_i = \epsilon$. Or, à ce moment-là, $\alpha_i = a'$, et, d'après l'invariant, ${\highapprox}^i = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$. L'algorithme renvoie donc ${\highapprox}^i$, d'où $\highapprox = \highapproxspec \left( \treesimplify( t, \; a' ), \sequent, \; a' \right)$. Comme $a'$ adresse un trou dans $t$, on a $\treesimplify( t, \; a' ) = t$, et ainsi $\highapprox = \highapproxspec \left( t, \sequent, \; a' \right)$.
+    La preuve de cet invariant est en démonstration annexe~\ref{highapprox_correction_proof}. On en déduit, ainsi que de la terminaison, la correction de notre algorithme: il termine, et se retrouve donc forcément dans le cas où $a'_i = \epsilon$. Or, à ce moment-là, $\alpha_i = a'$, et, d'après l'invariant, ${\highapprox}^i = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$. L'algorithme renvoie donc ${\highapprox}^i$, d'où $\highapprox = \highapproxspec \left( \treesimplify( t, \; a' ), \sequent, \; a' \right)$. Comme $a'$ adresse un trou dans $t$, on a $\treesimplify( t, \; a' ) = t$, et ainsi $\highapprox = \highapproxspec \left( t, \sequent, \; a' \right)$.
 \end{proof}
 
 Spécifions maintenant l'approximation basse, en ne considérant qu'un cas particulier. Cette spécification restreinte suffira à justifier la correction de notre assistant, et nous nous en contenterons. Pour justifier la complétude, il nous faudra en effet recourir à un autre type de propriété sur les approximations, différent des spécifications.
@@ -1052,7 +1052,7 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
 \begin{proof}
     À nouveau, on prouve un invariant: au début du i\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a ${\lowapprox}^i = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
 
-    La preuve de l'invariant est en annexe: \ref{lowapprox_correction}. Comme pour la preuve du théorème \ref{highapprox_correction}, la correction de l'algorithme en découle.
+    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction}. Comme pour la preuve du théorème~\ref{highapprox_correction}, la correction de l'algorithme en découle.
 \end{proof}
 
 \subsection{Correction de l'assistant de preuve}
@@ -1085,7 +1085,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 \begin{remark}
     La condition $t_n \in \trees$ ne nous fait considérer que les cas où l'utilsateur a abouti, puisqu'il doit avoir fermé l'arbre. C'est la correction la plus forte que l'on puisse donner.
     
-    En effet, on ne peut rien dire des cas où l'arbre n'a pas encore été fermé, car l'utilisateur peut s'être déjà trompé, ou bien le séquent peut ne pas être prouvable, mais nos conditions de correction partielles ne permettent pas toujours de le savoir. Cela vient du fait que la réciproque du théorème \ref{approxofcorrect} est fausse.
+    En effet, on ne peut rien dire des cas où l'arbre n'a pas encore été fermé, car l'utilisateur peut s'être déjà trompé, ou bien le séquent peut ne pas être prouvable, mais nos conditions de correction partielles ne permettent pas toujours de le savoir. Cela vient du fait que la réciproque du théorème~\ref{approxofcorrect} est fausse.
 
     \begin{example}
         Un contre-exemple à ce théorème:
@@ -1123,12 +1123,12 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 \begin{proof}
     D'après la condition $\exactcond$ et la spécification de $\highapprox$, on a, par récurrence immédiate, $(t_i, \sequent) \in \representationspartial, \; \; \forall 0 \leq i \leq n$.
 
-    Supposons par l'absurde qu'on ait $(t_n, \sequent) \notin \representations$. Comme $(t_n, \sequent) \in \representationspartial$, il existe nécessairement des adresses de sous-formules de $\sequent$ n'apparaissant pas dans $t_n$. Choisissons une telle adresse $a \in \addresses$ minimale (au sens de la remarque \ref{min_address}). On a deux cas:
+    Supposons par l'absurde qu'on ait $(t_n, \sequent) \notin \representations$. Comme $(t_n, \sequent) \in \representationspartial$, il existe nécessairement des adresses de sous-formules de $\sequent$ n'apparaissant pas dans $t_n$. Choisissons une telle adresse $a \in \addresses$ minimale (au sens de la remarque~\ref{min_address}). On a deux cas:
 
     \begin{description}
         \item[$\bm{a = (m, \epsilon)}$] $t_{n-1}$ contient un unique trou, et celui-ci est nécessairement remplacé par une feuille, car $t_n \in \trees$. Notons $a_1$ et $a_2$ les adresses de cette feuille, et $\beta$ l'adresse du trou.
         
-        $a$ est une adresse racine correcte n'apparissant pas dans $t$. D'après le théorème \ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_i, \sequent, \; \beta)$, d'où $\lowapprox(t_i, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$. 
+        $a$ est une adresse racine correcte n'apparissant pas dans $t$. D'après le théorème~\ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_i, \sequent, \; \beta)$, d'où $\lowapprox(t_i, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$. 
         
         Ceci contredit la condition $\exactcondbis$, c'est absurde.
 
@@ -1140,13 +1140,13 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 
         Comme dans le cas précédent, on peut désormais considérer $t''_{m-1}$ qui contient un unique trou, remplacé dans $t''_m$ par une feuille. La racine de $t''_{m-1}$ est le ré-adressage de $a' = (m, \rho)$, de la forme $(m', \epsilon)$. De plus, le ré-adressage de $a$, qui est une adresse correcte de $\sequent'$ n'apparaissant pas dans dans $t''_{m-1}$, est de la forme $(m', \alpha)$, et descend donc immédiatement d'une adresse de la branche racine-trou.
 
-        D'après le théorème \ref{lowapprox_correction}, $a'$ appartient donc à l'ensemble $\lowapprox$ calculé au moment où l'on remplace le trou de $t''_{m-1}$ par une feuille, ce qui est absurde, car cela viole à nouveau la condition $\exactcondbis$.
+        D'après le théorème~\ref{lowapprox_correction}, $a'$ appartient donc à l'ensemble $\lowapprox$ calculé au moment où l'on remplace le trou de $t''_{m-1}$ par une feuille, ce qui est absurde, car cela viole à nouveau la condition $\exactcondbis$.
     \end{description}
 \end{proof}
 
 \subsection{Complétude de l'assistant de preuve}
 
-Justifions maintenant une complétude, qui garantit que, si notre assistant n'empêche pas l'utilisateur de se tromper, il lui permet néanmoins, s'il ne se trompe pas, de construire n'importe quelle représentation correcte, et donc, en un certain sens, n'importe quelle preuve (voir la remarque \ref{remark_kernel}).
+Justifions maintenant une complétude, qui garantit que, si notre assistant n'empêche pas l'utilisateur de se tromper, il lui permet néanmoins, s'il ne se trompe pas, de construire n'importe quelle représentation correcte, et donc, en un certain sens, n'importe quelle preuve (voir la remarque~\ref{remark_kernel}).
 
 \begin{theorem}[Complétude de l'assistant de preuve]
     \label{completeness}
@@ -1165,20 +1165,20 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
         \item[$F:$] 
             Si $(t, \sequent) = F(n\rho, n'\rho') \vdash \sequent \in \representations$.
         
-            De la même manière que dans la preuve du théorème \ref{rep_inversion}, on a $t = F(1 \epsilon, \; 2 \epsilon)$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome.
+            De la même manière que dans la preuve du théorème~\ref{rep_inversion}, on a $t = F(1 \epsilon, \; 2 \epsilon)$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome.
     
             Dans les deux cas, la suite $H, \; F(1 \epsilon, \; 2 \epsilon)$ convient. En effet, celle-ci est une suite d'approximations immédiates, et les deux conditions d'exactitude par rapport à $\sequent$ sont vérifiées:
     
             \begin{enumerate}
                 \item[$\exactcond$:] On n'a ajouté aucun n\oe ud interne, il n'y a rien à vérifier.
     
-                \item[$\exactcondbis$:] L'ensemble des sous-adresses de $\sequent$ est $\{ 1 \epsilon, 2 \epsilon \}$. De plus, $H$ n'a qu'un seul trou, d'où, d'après le théorème \ref{lowapprox_branch} spécifiant $\lowapprox$, la propriété d'inclusion à vérifier pour $\exactcondbis$ ne peut être violée.
+                \item[$\exactcondbis$:] L'ensemble des sous-adresses de $\sequent$ est $\{ 1 \epsilon, 2 \epsilon \}$. De plus, $H$ n'a qu'un seul trou, d'où, d'après le théorème~\ref{lowapprox_branch} spécifiant $\lowapprox$, la propriété d'inclusion à vérifier pour $\exactcondbis$ ne peut être violée.
             \end{enumerate}
 
         \item[$B$:] 
             Si $(t, \sequent) = B(n\rho, t_1, t_2) \vdash \sequent \in \representations$.
 
-            De même que dans la preuve du théorème \ref{rep_inversion}, $\rho = \epsilon$, et, en reprenant les mêmes notations, on construit les représentations correctes $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$. On se donne de plus une permutation $\someperm$, telle que ${G, F_1 \tensor F_2, D}_\someperm = \sequent_1, F_1 \tensor F_2, \sequent_2$. Rappelons que $\sequentbis_1 = G, F_1$, et $\sequentbis_2 = F_2, D$.
+            De même que dans la preuve du théorème~\ref{rep_inversion}, $\rho = \epsilon$, et, en reprenant les mêmes notations, on construit les représentations correctes $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$. On se donne de plus une permutation $\someperm$, telle que ${G, F_1 \tensor F_2, D}_\someperm = \sequent_1, F_1 \tensor F_2, \sequent_2$. Rappelons que $\sequentbis_1 = G, F_1$, et $\sequentbis_2 = F_2, D$.
     
             Par hypothèses de récurrence sur $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$, il existe deux suites d'approximations immédiates $g_0 = H \relapprox ... \relapprox g_{m_1} = \psi_1 \left( t_1 \right)$ et $d_0 = H \relapprox ... \relapprox d_{m_2} = \psi_2 \left( t_2 \right)$ respectivement exactes par rapport à $\sequentbis_1$ et $\sequentbis_2$.
     
@@ -1237,11 +1237,11 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
     
             Chaque élément de cette suite est bien une approximation immédiate de son successeur, car $(g_i)$ et $(d_i)$ sont des suites d'approximations immédiates, et le fait d'être une approximation immédiate est stable par ré-adressage et ajout de contexte (cela se vérifie facilement).
     
-            De plus, comme montré dans la preuve du théorème \ref{lowapprox_branch}, $\someperm \circ \psi_{\tensor\Left} \circ \psi_1 = Id$, et $\someperm \circ \psi_{\tensor\Right} \circ \psi_2 = Id$. La suite $(t_i)$ part donc bien de $H$, et termine en $t$.
+            De plus, comme montré dans la preuve du théorème~\ref{lowapprox_branch}, $\someperm \circ \psi_{\tensor\Left} \circ \psi_1 = Id$, et $\someperm \circ \psi_{\tensor\Right} \circ \psi_2 = Id$. La suite $(t_i)$ part donc bien de $H$, et termine en $t$.
     
             Il reste à montrer que cette suite $(t_i)$ est exacte selon $\sequent$.
 
-            Cela se prouve par des propriétés de contexte, données en annexe: \ref{context_prop}. Elles disent essentiellement que le fait de contextualiser une suite exacte, comme nous l'avons fait ici en ajoutant une racine et un voisin droit ou gauche, préserve l'exactitude. 
+            Cela se prouve par des propriétés de contexte, données en annexe~\ref{context_prop}. Elles disent essentiellement que le fait de contextualiser une suite exacte, comme nous l'avons fait ici en ajoutant une racine et un voisin droit ou gauche, préserve l'exactitude. 
 
         \item[$U$:]
             Si $t_i = U(n\rho, t') \in \representations$.
@@ -1304,7 +1304,7 @@ Listons brièvement les heuristiques que nous utilisons dans notre code. Il est 
 
 Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la représentation induite est autocomplétée successivement, jusqu'à ce que ce ne soit plus possible. Pour ne pas perdre l'utilisateur, chaque autocomplétion est affichée, avec le cas qui l'a engendrée.
 
-Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir \ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite pour lui. Nous revenons donc complètement en arrière, et rejetons son choix. Cela renforce la correction que l'on avait déjà justifiée.
+Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite pour lui. Nous revenons donc complètement en arrière, et rejetons son choix. Cela renforce la correction que l'on avait déjà justifiée.
 
 \subsection{Détection d'erreurs}
 
@@ -1366,7 +1366,7 @@ Ce stage a été effectué au LIP (Laboratoire de l'Informatique et du Parallél
 
 Ce laboratoire a été créé à l’École Normale Supérieure de Lyon en 1988, et accueille une soixantaine de chercheurs permanents, ainsi qu'une quarantaine de doctorants. Il comporte huit équipes (Aric, Avalon, Cash, Ockham, Hownet, MC2, Plume et Roma), travaillant sur des domaines variés de l'informatique théorique et des sciences de l'information. 
 
-L'équipe Plume travaille plus particulièrement sur la théorie de la preuve et la sémantique formelle, en cherchant à fournir des méthodes pour prouver la correction des programmes informatiques. Deux types de méthodes y sont étudiées: les méthodes \textit{a priori}, dites "par construction", et les méthodes \textit{a posteriori}, dites "par vérification". Les outils utilisés vont ainsi de Coq à la théorie des catégories, en passant par les bases de données orientées graphe et la logique linéaire, sujet de ce stage. La logique linéaire s'inscrit dans les méthodes dites "par construction".
+L'équipe Plume travaille plus particulièrement sur la théorie de la preuve et la sémantique formelle, en cherchant à fournir des méthodes pour prouver la correction des programmes informatiques. Deux types de méthodes y sont étudiées: les méthodes \textit{a priori}, dites ``par construction'', et les méthodes \textit{a posteriori}, dites ``par vérification''. Les outils utilisés vont ainsi de Coq à la théorie des catégories, en passant par les bases de données orientées graphe et la logique linéaire, sujet de ce stage. La logique linéaire s'inscrit dans les méthodes dites ``par construction''.
 
 Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de recherche au CNRS et chercheur permanent au LIP. J'ai eu l'occasion de participer aux groupes de travail et conférences hebdomadaires organisées par l'équipe Plume, ainsi qu'à la grande conférence CHoCoLa de juin. J'ai également pu discuter et interagir avec des doctorants et chercheurs, dont Samuel Arsac, Amélie Rima, Le Thanh Dung ‘Tito’ Nguyen, Denis Kuperberg et Daniel Hirschkoff.
 
@@ -1374,7 +1374,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
 \begin{demonstrationappendix}
     \label{proof_img_encode}
-    On démontre le théorème \ref{encode_img} par induction sur $\someproof \in \proofs$:
+    On démontre le théorème~\ref{encode_img} par induction sur $\someproof \in \proofs$:
     \begin{description}
     \item[Axiome:] $\someproof =
     \begin{prooftree}
@@ -1382,7 +1382,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     \end{prooftree}$,
     et donc $\encode \left( \someproof \right) = F(1 \epsilon, 2 \epsilon) \vdash X\orth, X$
 
-    On vérifie aisément les conditions \ref{cadd}, \ref{clin} et \ref{cdes} de la définition \ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.
+    On vérifie aisément les conditions \ref{cadd}, \ref{clin} et \ref{cdes} de la définition~\ref{def_rep}, d'où $\encode \left( \someproof \right) \in \representations$.
 
     \item[Échange:] $\someproof =
     \begin{prooftree}
@@ -1492,7 +1492,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
 \begin{demonstrationappendix}
     \label{proof_rep_inversion}
-    On démontre le théorème \ref{rep_inversion} par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe ud présent à la racine:
+    On démontre le théorème~\ref{rep_inversion} par récurrence sur la hauteur $\height$ de $t \in \trees$. On regarde le n\oe ud présent à la racine:
     \begin{description}
         \item[$F$:]    
         Si $(t, \sequent) = F(n\rho, n'\rho') \vdash \sequent \in \representations$.
@@ -1533,11 +1533,11 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
         et on montre que $\left( \psi_\parr^{-1} \left( t' \right), \; \sequent_1, F_1, F_2, \sequent_2 \right)$ vérifie \ref{cadd}, \ref{clin}, \ref{cdes}. Remarquons d'abord que la définition de $\psi_\parr^{-1}$ ne pose pas problème, puisque, d'après \ref{clin}, les adresses de $t$ sont disctinctes, $n \epsilon$ n'apparaît donc pas dans $t'$.
     
         \begin{enumerate}
-            \item Cela découle de $\bigstar$, et de la correction du ré-adressage effectué par $\psi_\parr^{-1}$ (la preuve est similaire à celles faites dans la preuve du théorème \ref{encode_img}).
+            \item Cela découle de $\bigstar$, et de la correction du ré-adressage effectué par $\psi_\parr^{-1}$ (la preuve est similaire à celles faites dans la preuve du théorème~\ref{encode_img}).
     
             \item Idem.
     
-            \item La descendance est conservée par $\psi_\parr^{-1}$ (à nouveau, la preuve est similaire à celles du théorème \ref{encode_img}).
+            \item La descendance est conservée par $\psi_\parr^{-1}$ (à nouveau, la preuve est similaire à celles du théorème~\ref{encode_img}).
         \end{enumerate}
     
         Ainsi, $\left( \psi_\parr^{-1} \left( t' \right), \; \sequent_1, F_1, F_2, \sequent_2 \right) \in \representations$. Par hypothèse de récurrence, il existe donc $\pi' \in \proofs$ tel que $\encode \left( \pi' \right) = \left( \psi_\parr^{-1} \left( t' \right), \; \sequent_1, F_1, F_2, \sequent_2 \right)$.
@@ -1790,7 +1790,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
 \begin{demonstrationappendix}
     \label{lowapprox_correction_proof}
-    On montre à nouveau l'invariant de la démonstration \ref{lowapprox_correction} par récurrence sur le nombre d'appels. On se servira, sans le préciser, de l'invariant montré dans la preuve du théorème \ref{highapprox_correction}, qui donne des informations sur $t_i$, $a'_i$, $\alpha_i$, et leur lien avec le trou. Les raisonnements seront, de plus, assez similaires.
+    On montre à nouveau l'invariant de la démonstration \ref{lowapprox_correction} par récurrence sur le nombre d'appels. On se servira, sans le préciser, de l'invariant montré dans la preuve du théorème~\ref{highapprox_correction}, qui donne des informations sur $t_i$, $a'_i$, $\alpha_i$, et leur lien avec le trou. Les raisonnements seront, de plus, assez similaires.
 
     \begin{description}
         \item[Initialisation:] Lors du premier appel, on a $t_1 = t$, $a'_1 = a'$, et $\alpha_1 = \epsilon$. Ainsi, $\treesimplify( t, \; {\alpha}_i ) = H$, qui ne contient aucune adresse.
@@ -1820,7 +1820,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
             Ces deux transformations correspondent à celles effectuées par le code.
 
-            On vérifie ensuite, comme dans la preuve du théorème \ref{highapprox_correction}, que les adresses de $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$ qu'on n'a pas modifiées sont toujours valides dans $\treesimplify( t, \; {\alpha}_{i+1} )$. De plus, il n'existe pas d'autre adresse valide que celles qu'on a gardées ou ajoutées.
+            On vérifie ensuite, comme dans la preuve du théorème~\ref{highapprox_correction}, que les adresses de $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$ qu'on n'a pas modifiées sont toujours valides dans $\treesimplify( t, \; {\alpha}_{i+1} )$. De plus, il n'existe pas d'autre adresse valide que celles qu'on a gardées ou ajoutées.
 
             Ainsi, $\lowapprox^{i+1} = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$, et l'invariant est conservé.
 
@@ -1840,7 +1840,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
     Supposons que $\sequentbis_1 = G, F_1$, et $\sequentbis_2 = F_2, D$, avec $F_1$, $F_2$ des formules, et $G$, $D$ des séquents. On suppose de plus qu'il existe une permutation $\someperm$ et un séquent $\sequent$ tels que ${G, F_1 \tensor F_2, D}_\someperm = \sequent_1, F_1 \tensor F_2, \sequent_2$.
 
-    On s'intéresse aux représentations partielles "contextuelles" suivantes:
+    On s'intéresse aux représentations partielles ``contextuelles'' suivantes:
 
     \begin{align*}
         \begin{multlined}
@@ -1878,7 +1878,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 \end{remark}
 
 \begin{remark}
-    Il découle de ces propriétés que la suite $(t'_i)$ construite dans la démonstration du théorème \ref{completeness} est exacte selon $\sequent$:
+    Il découle de ces propriétés que la suite $(t'_i)$ construite dans la démonstration du théorème~\ref{completeness} est exacte selon $\sequent$:
 
     Supposons par l'absurde qu'elle ne le soit pas, et supposons de plus, sans perte de généralité, qu'une des deux conditions d'exactitude soit violée dans la première moitié de la suite utilisant $(g_i)$ (l'argument serait similaire pour la moitié de la suite utilisant $(d_i)$):
 
