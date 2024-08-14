@@ -10,7 +10,7 @@ Un séquent est une liste OCaml de formules, et les formules sont représentées
 
 ```type formula = A of int | NA of int | P of formula * formula | T of formula * formula```.
 
-```A``` correspond à un atome, ```NA``` à un atome nié, ```P```  un  par, et ```T``` à un tenseur.
+```A``` correspond à un atome, ```NA``` à un atome nié, ```P``` à un  par, et ```T``` à un tenseur.
 
 ## Exécution
 La boucle d'interaction se lance en exécutant le code OCaml :
