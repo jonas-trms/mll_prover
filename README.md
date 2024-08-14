@@ -6,7 +6,9 @@ Un assistant de preuve interactif pour le fragment multiplicatif MLL de la logiq
 Pour prouver un séquent, il faut le définir à la fin du code de la même manière que nos exemples. Il faut  ensuite modifier la dernière ligne du code, en y mettant le séquent en question: ```let _ = prove_sequent [à modifier];;```
 
 ## Définir un séquent
-Un séquent est une liste OCaml de formules, et les formules sont représentées par le type suivant: ```type formula = A of int | NA of int | P of formula * formula | T of formula * formula```.
+Un séquent est une liste OCaml de formules, et les formules sont représentées par le type suivant :
+
+```type formula = A of int | NA of int | P of formula * formula | T of formula * formula```.
 
 ```A``` correspond à un atome, ```NA``` à un atome nié, ```P```  un  par, et ```T``` à un tenseur.
 
