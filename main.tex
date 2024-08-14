@@ -911,7 +911,7 @@ Donnons maintenant l'algorithme d'approximation:
 
 \begin{remark}
     \label{algo_expl}
-    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine-trou, en faisant à chaque fois comme si le n\oe ud sur lequel on se trouve était un trou. On calcule pour celui-ci les deux approximations d'adresses, en mettant à jour celles qu'on avait calculées pour son père.
+    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine--trou, en faisant à chaque fois comme si le n\oe ud sur lequel on se trouve était un trou. On calcule pour celui-ci les deux approximations d'adresses, en mettant à jour celles qu'on avait calculées pour son père.
 \end{remark}
 
 \begin{remark}
@@ -1001,7 +1001,7 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
     \label{lowapprox_branch}
     Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $t$ a un unique trou adressé par $a'$.
 
-    On pose $\lowapproxspec \left( t, \; \sequent, \; a' \right)$ l'ensemble des adresses n'apparaissant pas dans $t$, qui sont des adresses racines correctes, ou des adresses correctes descendant immédiatement d'une adresse présente sur la branche racine-trou de $t$.
+    On pose $\lowapproxspec \left( t, \; \sequent, \; a' \right)$ l'ensemble des adresses n'apparaissant pas dans $t$, qui sont des adresses racines correctes, ou des adresses correctes descendant immédiatement d'une adresse présente sur la branche racine--trou de $t$.
 \end{definition}
 
 \begin{remark}
@@ -1030,7 +1030,6 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
     \label{lowapprox_correction}
     
     Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $t$ a un unique trou adressé par $a'$.
-    
     On a, dans ce cas, $\lowapprox = \lowapproxspec \left( t, \; \sequent, \; a' \right)$. 
 \end{theorem}
 
@@ -1090,7 +1089,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 
     En effet, lorsque l'utilisateur fait un choix violant l'une de nos deux conditions, le code revient en arrière et n'accepte pas son opération. Une message d'erreur est affiché, et il lui est demandé de faire un autre choix. 
     
-    Notons qu'il est possible de se retrouver bloqué, si plus aucun choix autorisé n'est bon. Cela se produit lorsqu'il est devenu impossible d'aboutir, à cause d'erreurs précédentes non détectées, ou d'une non-prouvabilité du séquent, que nous ne pouvons pas détecter non plus.
+    Notons qu'il est possible de se retrouver bloqué, si plus aucun choix autorisé n'est bon. Cela se produit lorsqu'il est devenu impossible d'aboutir, à cause d'erreurs précédentes non détectées, ou d'une non prouvabilité du séquent, que nous ne pouvons pas détecter non plus.
 \end{implementation}
 
 Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exacte selon le séquent qu'il cherche à prouver, et nous pouvons alors lui garantir la correction de sa preuve: 
@@ -1122,7 +1121,7 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 
         En extrayant de ces arbres les sous-arbres enracinés en $\beta$, on obtient une nouvelle suite d'approximations immédiates commençant en $H$, et terminant en un arbre complet. On peut alors modifier $\sequent$ pour ne conserver que les sous-formules mentionnées par l'arbre complet, puis ré-adresser tous les arbres de la suite pour que leurs adresses correspondent au nouveau séquent. On obtient ainsi un séquent $\sequent'$ et une suite d'approximations immédiates $t''_0 \relapprox \cdots \relapprox t''_m$ vérifiant $t''_0 = H$, $t''_m \in \trees$, ainsi que les conditions $\exactcond$ et $\exactcondbis$.
 
-        Comme dans le cas précédent, on peut désormais considérer $t''_{m-1}$ qui contient un unique trou, remplacé dans $t''_m$ par une feuille. La racine de $t''_{m-1}$ est le ré-adressage de $a' = (m, \rho)$, de la forme $(m', \epsilon)$. De plus, le ré-adressage de $a$, qui est une adresse correcte de $\sequent'$ n'apparaissant pas dans dans $t''_{m-1}$, est de la forme $(m', \alpha)$, et descend donc immédiatement d'une adresse de la branche racine-trou.
+        Comme dans le cas précédent, on peut désormais considérer $t''_{m-1}$ qui contient un unique trou, remplacé dans $t''_m$ par une feuille. La racine de $t''_{m-1}$ est le ré-adressage de $a' = (m, \rho)$, de la forme $(m', \epsilon)$. De plus, le ré-adressage de $a$, qui est une adresse correcte de $\sequent'$ n'apparaissant pas dans dans $t''_{m-1}$, est de la forme $(m', \alpha)$, et descend donc immédiatement d'une adresse de la branche racine--trou.
 
         D'après le théorème~\ref{lowapprox_correction}, $a'$ appartient donc à l'ensemble $\lowapprox$ calculé au moment où l'on remplace le trou de $t''_{m-1}$ par une feuille, ce qui est absurde, car cela viole à nouveau la condition $\exactcondbis$.
 \qedhere
@@ -1136,7 +1135,6 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
 \begin{theorem}[Complétude de l'assistant de preuve]
     \label{completeness}
     Soient $t \in \trees, \; \sequent \in \sequents$, tels que $(t, \; \sequent) \in \representations$.
-
     Il existe une suite d'approximations immédiates $t_0 \relapprox \cdots \relapprox t_n$, exacte selon $\sequent$, telle que $t_n = t$.
 \end{theorem}
 
@@ -1325,15 +1323,15 @@ Lorsqu'une de ces erreurs est détectée, cela produit le même effet que quand 
 
 \section{Conclusion}
 
-Notre assistant de preuve offre, conformément à notre objectif, une solution plus pratique que Click \& Collect pour les utilisateurs experts. Si le lecteur veut s'en convaincre, il peut comparer les deux outils sur des exemples en construisant des preuves. L'exemple 9 de notre code est particulièrement parlant, et on peut également le manipuler, \href{https://click-and-collect.linear-logic.org/?s=X5%2C+X4%2C+X1%5E+*+%28X2%5E+*+%28X3%5E+*+%28X4%5E+*+X5%5E%29%29%29%2C+X1%2C+X3+%7C+X2}{sur ce lien}, dans Click \& Collect.
+Notre assistant de preuve offre, conformément à notre objectif, une solution plus pratique que Click \& Collect pour les utilisateurs experts. Si le lecteur veut s'en convaincre, il peut comparer les deux outils sur des exemples, en construisant des preuves. L'exemple~\ref{exconcl} de notre code est particulièrement parlant, et on peut également le manipuler, \href{https://click-and-collect.linear-logic.org/?s=X5%2C+X4%2C+X1%5E+*+%28X2%5E+*+%28X3%5E+*+%28X4%5E+*+X5%5E%29%29%29%2C+X1%2C+X3+%7C+X2}{sur ce lien}, dans Click \& Collect.
 
-\begin{example}
+\begin{example}\label{exconcl}
     L'exemple en question:
 %
     $X_5, X_4, {X_1}\orth \tensor ({X_2}\orth \tensor ({X_3}\orth \tensor ({X_4}\orth \tensor {X_5}\orth))), X_1, X_3 \parr X_2$
 \end{example}
 
-La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant, et les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non-détectée.
+La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant, et les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non détectée.
 
 De plus, l'autocomplétion pourrait être encore enrichie, en intégrant directement les approximations basses et hautes d'adresses aux représentations. Ceci donnerait une puissance de calcul supplémentaire, puisqu'on pourrait alors exploiter les liens entre les différents trous, et ainsi affiner itérativement nos approximations. On rentrerait de cette manière plus souvent dans des cas d'autocomplétion, et on détecterait également plus d'erreurs.
 
@@ -1792,9 +1790,9 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             
             On veut désormais calculer $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$. On a deux transformations à appliquer à $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$, qui correspondent au remplacement du trou $\alpha_{i}$ de $\treesimplify( t, \; {\alpha}_i )$.
             
-            D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t_1$, on a $t_2 \in \representations$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t_2$. D'après la condition $\ref{cdespartial}$ de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine-trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
+            D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t_1$, on a $t_2 \in \representations$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t_2$. D'après la condition $\ref{cdespartial}$ de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine--trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
 
-            D'autre part, comme on a ajouté l'adresse $n\rho$ sur la branche racine-trou, le descendant immédiat d'une adresse de cette branche ayant pour entier $n$, qui était auparavant $n\rho$ d'après $\ref{cdespartial}$ sur $\treesimplify( t, \; {\alpha}_{i} )$, devient $n\rho \cdot \Right$. On met cela à jour.
+            D'autre part, comme on a ajouté l'adresse $n\rho$ sur la branche racine--trou, le descendant immédiat d'une adresse de cette branche ayant pour entier $n$, qui était auparavant $n\rho$ d'après $\ref{cdespartial}$ sur $\treesimplify( t, \; {\alpha}_{i} )$, devient $n\rho \cdot \Right$. On met cela à jour.
 
             Ces deux transformations correspondent à celles effectuées par le code.
 
@@ -1898,7 +1896,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 \begin{proof}
     Ces propriétés se prouveraient de la même manière que ce qui a été fait dans les démonstrations annexes \ref{highapprox_correction_proof} et \ref{lowapprox_correction_proof}. Donnons les grandes lignes de la démonstration qu'on ferait pour les propriétés sur $t_1$ et $t'_1$. 
     
-    On considérerait des exécutions parallèles de l'algorithme sur $t'_1$ et $t_1$, et on montrerait à nouveau un invariant, plus général que le théorème, justifiant les propriétés de contexte pour des simplifications de $t'_1$ et $t_1$ liées aux appels récursifs. En effet, lors des appels, on descend le long des deux branches racine-trou : si l'on considère alors, à chaque étape, les n\oe uds sur lesquels on se trouve comme des trous, et qu'on simplifie $t'_1$ et $t_1$ en conséquence, on peut montrer, par invariant, les propriétés de contexte sur ces simplifications.
+    On considérerait des exécutions parallèles de l'algorithme sur $t'_1$ et $t_1$, et on montrerait à nouveau un invariant, plus général que le théorème, justifiant les propriétés de contexte pour des simplifications de $t'_1$ et $t_1$ liées aux appels récursifs. En effet, lors des appels, on descend le long des deux branches racine--trou : si l'on considère alors, à chaque étape, les n\oe uds sur lesquels on se trouve comme des trous, et qu'on simplifie $t'_1$ et $t_1$ en conséquence, on peut montrer, par invariant, les propriétés de contexte sur ces simplifications.
 
     Ces propriétés se propagent donc, et on en déduit, avec la terminaison de l'algorithme, les propriétés de contexte pour $t'_1$ et $t_1$
     
