@@ -212,7 +212,7 @@ Un séquent est prouvable s'il existe une preuve dont il est la conclusion.
 
     La règle de permutation $\textit{ex}_{\someperm}$ vient d'un choix particulier que nous avons fait pour nos définitions. De manière classique, les séquents sont définis comme des \textit{ensembles} de formules, mais nous avons choisi ici de les définir comme des \textit{listes}, afin de simplifier la conception de notre assistant et les démonstrations. Cette règle de permutation devient alors nécessaire, afin d'avoir un système de preuve équivalent.
     
-    La règle $\parr$ est liée à une remarque faite précédemment: le par correpond à une sorte de $\lor$, et on peut donc transformer une formule $A \parr B$ en un séquent $A, B$. Toutefois, ce constructeur n'est pas inutile, car, dans des formules complexes où les opérateurs sont imbriqués, les $\parr$ ne sont pas toujours à la racine, ce qui les rend plus puissants que la simple disjonction induite par le séquent.
+    La règle $\parr$ est liée à une remarque faite précédemment: le par correspond à une sorte de $\lor$, et on peut donc transformer une formule $A \parr B$ en un séquent $A, B$. Toutefois, ce constructeur n'est pas inutile, car, dans des formules complexes où les opérateurs sont imbriqués, les $\parr$ ne sont pas toujours à la racine, ce qui les rend plus puissants que la simple disjonction induite par le séquent.
     
     La règle $\tensor$ vient également du lien entre $\tensor$ et $\land$, ainsi que de la notion de coût des hypothèses évoquée dans l'introduction. Intuitivement, prouver $A \tensor B$ revient à prouver $A \land B$ en logique classique, et donc à prouver $A$ et $B$ séparément. La subtilité réside dans le choix des hypothèses. Si l'on veut prouver $A \tensor B$ à partir d'un ensemble $\Sigma$ d'hypothèses, on doit en effet partitionner $\Sigma$ en deux ensembles $\sequent$ et $\sequentbis$, et prouver $A$ avec toutes les hypothèses de $\sequent$, et $B$ avec toutes celles de $\sequentbis$. On assiste ici à ce qui était évoqué dans l'introduction : chaque hypothèse de $\Sigma$ apparaît comme une ressource unique, qui doit être utilisée exactement une fois dans la preuve. 
     
@@ -346,7 +346,7 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 \end{itemize}
 \end{definition}
 
-Dans une réprésentation, chaque n\oe ud de l'arbre symbolisera ainsi une règle de la preuve. En effet, chaque n\oe ud portera une adresse qui renverra à une sous-formule de $\sequent$, et on remarque, en s'attardant sur la définition~\ref{proofs_def}, qu'une sous-formule de $\sequent$ correpond exactement à une application de règle.
+Dans une représentation, chaque n\oe ud de l'arbre symbolisera ainsi une règle de la preuve. En effet, chaque n\oe ud portera une adresse qui renverra à une sous-formule de $\sequent$, et on remarque, en s'attardant sur la définition~\ref{proofs_def}, qu'une sous-formule de $\sequent$ correspond exactement à une application de règle.
 
 Le cas de l'axiome est un peu particulier: un axiome sera représenté par une feuille ayant deux adresses, qui renverront aux deux atomes duaux concernés. À nouveau, en regardant la définition~\ref{proofs_def}, on voit que cette information est équivalente à la donnée de l'axiome.
 
@@ -565,7 +565,7 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
 \end{theorem}
 
 \begin{proof}
-    Par récurrence sur la hauteur $\height$ de $t \in \trees$. On construit un antécédant dans $\proofs$. La preuve complète est en démonstration annexe~\ref{proof_rep_inversion}.
+    Par récurrence sur la hauteur $\height$ de $t \in \trees$. On construit un antécédent dans $\proofs$. La preuve complète est en démonstration annexe~\ref{proof_rep_inversion}.
 \end{proof}
 
 \begin{remark}
@@ -911,7 +911,7 @@ Donnons maintenant l'algorithme d'approximation:
 
 \begin{remark}
     \label{algo_expl}
-    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine-trou, en faisant à chaque fois comme si le n\oe ud sur lesquel on se trouve était un trou, pour lequel on calcule un ensemble d'adresse possibles, en mettant à jour celui qu'on avait calculé pour son père.
+    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine-trou, en faisant à chaque fois comme si le n\oe ud sur lequel on se trouve était un trou, pour lequel on calcule un ensemble d'adresse possibles, en mettant à jour celui qu'on avait calculé pour son père.
 \end{remark}
 
 \begin{remark}
@@ -920,7 +920,7 @@ Donnons maintenant l'algorithme d'approximation:
     Dans ce cas, on vérifie alors qu'on rentre toujours dans une des clauses du switch. De plus, la longueur de l'adresse $a'$ décroît strictement au fil des appels, et est minorée par 0 ($a' = \epsilon$ est un cas de base).
 \end{remark}
 
-\subsubsection{Spécifiation des approximations}
+\subsubsection{Spécification des approximations}
 
 Comme notre algorithme termine dans ses cas d'application, nous pouvons désormais le spécifier, en commençant par l'approximation haute:
 
@@ -950,7 +950,7 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons désorma
 \end{theorem}
 
 \begin{remark}
-    L'invariant qu'on prouvera dans la démonstration vient de la remarque~\ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représenation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent.
+    L'invariant qu'on prouvera dans la démonstration vient de la remarque~\ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représentation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent.
 \end{remark}
 
 \begin{remark}
@@ -1054,10 +1054,10 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
     On dit que $(t_i)$ est une suite exacte selon $\sequent$ ssi les deux conditions suivantes sont vérifiées:
     \begin{enumerate}
         \item[$\exactcond$:]
-        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne (et pas une feuille) étiquetté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox(t_i, \; \sequent, \; \beta)$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
+        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne (et pas une feuille) étiqueté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox(t_i, \; \sequent, \; \beta)$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
 
         \item[$\exactcondbis$:]
-        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ une feuille $F$ étiquettée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox(t_i, \; \sequent, \; \beta) \subseteq \{a_1, \; a_2\}$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
+        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ une feuille $F$ étiquetée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox(t_i, \; \sequent, \; \beta) \subseteq \{a_1, \; a_2\}$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
     \end{enumerate}
 \end{definition}
 
@@ -1068,7 +1068,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 \end{remark}
 
 \begin{remark}
-    La condition $t_n \in \trees$ ne nous fait considérer que les cas où l'utilsateur a abouti, puisqu'il doit avoir fermé l'arbre. C'est la correction la plus forte que l'on puisse donner.
+    La condition $t_n \in \trees$ ne nous fait considérer que les cas où l'utilisateur a abouti, puisqu'il doit avoir fermé l'arbre. C'est la correction la plus forte que l'on puisse donner.
     
     En effet, on ne peut rien dire des cas où l'arbre n'a pas encore été fermé, car l'utilisateur peut s'être déjà trompé, ou bien le séquent peut ne pas être prouvable, mais nos conditions de correction partielles ne permettent pas toujours de le savoir. Cela vient du fait que la réciproque du théorème~\ref{approxofcorrect} est fausse.
 
@@ -1112,11 +1112,11 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
     \begin{description}
         \item[$\bm{a = (m, \epsilon)}$] $t_{n-1}$ contient un unique trou, et celui-ci est nécessairement remplacé par une feuille, car $t_n \in \trees$. Notons $a_1$ et $a_2$ les adresses de cette feuille, et $\beta$ l'adresse du trou.
         
-        $a$ est une adresse racine correcte n'apparissant pas dans $t$. D'après le théorème~\ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_i, \sequent, \; \beta)$, d'où $\lowapprox(t_i, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$. 
+        $a$ est une adresse racine correcte n'apparaissant pas dans $t$. D'après le théorème~\ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_i, \sequent, \; \beta)$, d'où $\lowapprox(t_i, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$. 
         
         Ceci contredit la condition $\exactcondbis$, c'est absurde.
 
-        \item[$\bm{a = (m, \someadd \cdot \alpha)}$] $a$ étant une adresse non utilisée minimale, $a' = (m, \someadd)$ apparaît nécessairement dans $t_n$. Notons $\beta$ l'adresse du n\oe ud étiquetté par $a'$.
+        \item[$\bm{a = (m, \someadd \cdot \alpha)}$] $a$ étant une adresse non utilisée minimale, $a' = (m, \someadd)$ apparaît nécessairement dans $t_n$. Notons $\beta$ l'adresse du n\oe ud étiqueté par $a'$.
 
         Comme la suite d'approximations immédiates $t_0 \relapprox t_1 \relapprox \cdots \relapprox t_n$ commence en $H$ et termine en $t_n \in \trees$, on peut en extraire une sous-suite $t'_0 \relapprox \cdots \relapprox t'_m$, où $t'_0$ est le dernier arbre ne contenant pas l'adresse $a' = (m, \someadd)$, et $t'_m$ est le premier arbre dont le sous-arbre enraciné en $\beta$ est complet.
 
@@ -1236,7 +1236,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
 
 Lors de l'interaction avec l'utilisateur, il arrive parfois qu'on soit capable de compléter automatiquement la représentation qu'il est en train de construire, sans lui retirer de contrôle dessus. Cela se produit lorsque le choix qu'il peut faire est unique, et qu'on peut donc l'appliquer pour lui, afin de lui faire gagner du temps.
 
-Par ailleurs, certains cas d'erreurs, non détectés par nos contraintes sur les représentations partielles correctes, peuvent être repérés par d'autres vérifications que nous donnerons, qui permettent de renforcer la correction que nous avons justifée.
+Par ailleurs, certains cas d'erreurs, non détectés par nos contraintes sur les représentations partielles correctes, peuvent être repérés par d'autres vérifications que nous donnerons, qui permettent de renforcer la correction que nous avons justifiée.
 
 \subsection{Complétion automatique}
 
@@ -1260,7 +1260,7 @@ $f: \representationspartial \rightarrow \representationspartial$ est une fonctio
 Listons brièvement les heuristiques que nous utilisons dans notre code. Il est assez clair, au vu des spécification des approximations basse et haute, qu'elles sont des autocomplétions, les démonstrations ne seront donc pas détaillées. Notons qu'il serait possible, si l'on trouvait d'autres heuristiques, de les ajouter à celles déjà présentes, sans que cela ne pose problème.
 
 \begin{implementation}
-    L'autocompletion est implémentée dans notre code par:
+    L'autocomplétion est implémentée dans notre code par:
 
     \begin{minted}{ocaml}
         let atom_auto_complete t s a = ...
@@ -1423,7 +1423,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
         Par ailleurs, le ré-adressage par $\psi_\parr$ préserve le fait d'être une sous-adresse. On vérifie donc aisément que la condition \ref{cdes} est maintenue pour les adresses $(m, \someadd)$ de $\encode' \left( \pi_1 \right)$, où $m \notin \{ n, \; n+1 \}$.
         
-        Si $m = n$: soit $\someadd = \epsilon$, auquel cas l'adresse modifiée vaut $(n, \Left)$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, et descend de la racine étiquettée par $(n, \epsilon)$, soit $\someadd = \someadd' \cdot \alpha$, d'où, d'après \ref{cdes}, l'adresse $(n, \someadd)$ descend de $(n, \someadd')$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, et l'adresse modifiée $(n, \Left \cdot \someadd)$ descend de $(n, \Left \cdot \someadd')$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, ce qui convient.
+        Si $m = n$: soit $\someadd = \epsilon$, auquel cas l'adresse modifiée vaut $(n, \Left)$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, et descend de la racine étiquetée par $(n, \epsilon)$, soit $\someadd = \someadd' \cdot \alpha$, d'où, d'après \ref{cdes}, l'adresse $(n, \someadd)$ descend de $(n, \someadd')$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, et l'adresse modifiée $(n, \Left \cdot \someadd)$ descend de $(n, \Left \cdot \someadd')$ dans $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$, ce qui convient.
 
         Le cas $m = n+1$ se traite de même.
 
@@ -1514,7 +1514,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
             \end{cases*}
         \end{equation*}
         
-        et on montre que $\left( \psi_\parr^{-1} \left( t' \right), \; \sequent_1, F_1, F_2, \sequent_2 \right)$ vérifie \ref{cadd}, \ref{clin}, \ref{cdes}. Remarquons d'abord que la définition de $\psi_\parr^{-1}$ ne pose pas problème, puisque, d'après \ref{clin}, les adresses de $t$ sont disctinctes, $n \epsilon$ n'apparaît donc pas dans $t'$.
+        et on montre que $\left( \psi_\parr^{-1} \left( t' \right), \; \sequent_1, F_1, F_2, \sequent_2 \right)$ vérifie \ref{cadd}, \ref{clin}, \ref{cdes}. Remarquons d'abord que la définition de $\psi_\parr^{-1}$ ne pose pas problème, puisque, d'après \ref{clin}, les adresses de $t$ sont distinctes, $n \epsilon$ n'apparaît donc pas dans $t'$.
     
         \begin{enumerate}
             \item Cela découle de $\bigstar$, et de la correction du ré-adressage effectué par $\psi_\parr^{-1}$ (la preuve est similaire à celles faites dans la preuve du théorème~\ref{encode_img}).
@@ -1700,7 +1700,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
                 \end{enumerate}
     
                 \item[$\supseteq$]
-                Supposons par l'absurde qu'il existe $\beta \in \highapproxspec \left( H, \sequent, \; \epsilon \right)$ telle que $\beta \notin \Sigma$. Une telle adresse serait nécessairement de la forme $(i, \alpha \cdot \someadd)$, et devrait pourtant étiquetter la racine de $t'$, ce qui ne respecterait pas la condition \ref{cdespartial} de descendance.
+                Supposons par l'absurde qu'il existe $\beta \in \highapproxspec \left( H, \sequent, \; \epsilon \right)$ telle que $\beta \notin \Sigma$. Une telle adresse serait nécessairement de la forme $(i, \alpha \cdot \someadd)$, et devrait pourtant étiqueter la racine de $t'$, ce qui ne respecterait pas la condition \ref{cdespartial} de descendance.
             \end{description}
 
         \item[Hérédité:] Supposons que l'invariant est vérifié au début du $i$\ieme{} appel. On regarde le n\oe ud présent à la racine de $t_i$:
@@ -1724,16 +1724,16 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 
             \begin{description}
                 \item[$\subseteq$] 
-                    Remaraquons d'abord que $(t, \sequent) \in \representationspartial$. Par propriété sur la simplification, il vient donc $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$. Soit $\beta = (m, \someadd) \in {\highapprox}^{i+1}$. On a deux cas:
+                    Remarquons d'abord que $(t, \sequent) \in \representationspartial$. Par propriété sur la simplification, il vient donc $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$. Soit $\beta = (m, \someadd) \in {\highapprox}^{i+1}$. On a deux cas:
 
                     \begin{description}
                         \item[Si $m = n$:] 
                             Nécessairement, $\beta = (n, \rho \cdot \Left)$, car, par hypothèse de récurrence, ${\highapprox}^{i}$ était correct, et, comme $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$, cet ensemble ne contenait qu'une seule adresse d'entier $n$, à savoir $(n, \rho)$.
                             
-                            Or, le trou que l'on remplace par $\beta$ est le fils gauche d'un n\oe ud $B$ étiquetté par $(n, \rho)$, cela ne pose donc aucun problème.
+                            Or, le trou que l'on remplace par $\beta$ est le fils gauche d'un n\oe ud $B$ étiqueté par $(n, \rho)$, cela ne pose donc aucun problème.
                             
                         \item[Si $m \neq n$:] 
-                            Nécessairement, $\beta \in {\highapprox}^{i}$, et, de plus, $\beta \notin \mathcal{M}$. Le fait que $\beta \in {\highapprox}^{i}$ assure qu'on peut remplacer le n\oe ud $\alpha_i$ de $s(t, \alpha_i)$ par un n\oe ud étiquetté par $\beta$, en conservant les trois conditions partielles \ref{cadd}, \ref{clin}, \ref{cdes} $\bigstar$. Il en découle qu'on peut également remplacer le n\oe ud $\alpha_{i+1} = \alpha_i \cdot \Right$ de $s(t, \alpha_{i+1})$ par un n\oe ud étiquetté par $\beta$ en conservant \ref{cadd}, \ref{clin}, et \ref{cdes}.
+                            Nécessairement, $\beta \in {\highapprox}^{i}$, et, de plus, $\beta \notin \mathcal{M}$. Le fait que $\beta \in {\highapprox}^{i}$ assure qu'on peut remplacer le n\oe ud $\alpha_i$ de $s(t, \alpha_i)$ par un n\oe ud étiqueté par $\beta$, en conservant les trois conditions partielles \ref{cadd}, \ref{clin}, \ref{cdes} $\bigstar$. Il en découle qu'on peut également remplacer le n\oe ud $\alpha_{i+1} = \alpha_i \cdot \Right$ de $s(t, \alpha_{i+1})$ par un n\oe ud étiqueté par $\beta$ en conservant \ref{cadd}, \ref{clin}, et \ref{cdes}.
     
                         \begin{enumerate}
                             \item Cela découle de $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$ et de $\bigstar$, car la condition à vérifier est la même, qu'on substitue dans $(s(t, \alpha_{i}), \sequent)$ ou dans $(s(t, \alpha_{i+1}), \sequent)$.
@@ -1751,7 +1751,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
                     
                     Nécessairement, $\beta \neq (n, \someadd \cdot \Left)$ car $\beta \notin {\highapprox}^{i+1}$. On en déduit, par un argument de descendance, que $\beta = (m, \someadd')$ avec $m \neq n$. En utilisant un argument similaire à ceux du cas $\subseteq$, il en découle que $\beta \in \highapproxspec \left( \treesimplify( t_{i}, \; {\alpha}_{i} ) \right)$. Par hypothèse de récurrence, ${\highapprox}^{i}$ est correct, d'où $\beta \in {\highapprox}^{i}$.
                     
-                    Or, la racine de $t_{i+1}$, dont on cherche à remplacer le fils droit dans $\treesimplify( t, \; {\alpha}_{i+1} )$, est étiquettée par $(n, \rho)$, et a un fils gauche portant les adresses de l'ensemble $\mathcal{M}$. Ainsi, pour que la descendance soit respectée, on a $\beta \notin \mathcal{M} \cup \{ (n, \someadd) \}$.
+                    Or, la racine de $t_{i+1}$, dont on cherche à remplacer le fils droit dans $\treesimplify( t, \; {\alpha}_{i+1} )$, est étiquetée par $(n, \rho)$, et a un fils gauche portant les adresses de l'ensemble $\mathcal{M}$. Ainsi, pour que la descendance soit respectée, on a $\beta \notin \mathcal{M} \cup \{ (n, \someadd) \}$.
 
                     Par construction de ${\highapprox}^{i+1}$, on devrait donc avoir $\beta \in {\highapprox}^{i+1}$, ce qui est absurde.
             \end{description}
@@ -1898,7 +1898,7 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
 \begin{proof}
     Ces propriétés se prouveraient de la même manière que ce qui a été fait dans les démonstrations annexes \ref{highapprox_correction_proof} et \ref{lowapprox_correction_proof}. Donnons les grandes lignes de la démonstration qu'on ferait pour les propriétés sur $t_1$ et $t'_1$. 
     
-    On considérerait des exécutions parallèles de l'algorithme sur $t'_1$ et $t_1$, et on montrerait à nouveau un invariant, plus général que le théorème, justifiant les propriétés de contexte pour des simplifications de $t'_1$ et $t_1$ liées aux appels récursifs. En effet, lors des appels, on descend le long des deux branches racine-trou : si l'on considère alors, à chaque étape, les n\oe uds sur lequels on se trouve comme des trous, et qu'on simplifie $t'_1$ et $t_1$ en conséquence, on peut montrer, par invariant, les propriétés de contexte sur ces simplifications.
+    On considérerait des exécutions parallèles de l'algorithme sur $t'_1$ et $t_1$, et on montrerait à nouveau un invariant, plus général que le théorème, justifiant les propriétés de contexte pour des simplifications de $t'_1$ et $t_1$ liées aux appels récursifs. En effet, lors des appels, on descend le long des deux branches racine-trou : si l'on considère alors, à chaque étape, les n\oe uds sur lesquels on se trouve comme des trous, et qu'on simplifie $t'_1$ et $t_1$ en conséquence, on peut montrer, par invariant, les propriétés de contexte sur ces simplifications.
 
     Ces propriétés se propagent donc, et on en déduit, avec la terminaison de l'algorithme, les propriétés de contextes pour $t'_1$ et $t_1$
     
