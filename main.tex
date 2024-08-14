@@ -1049,7 +1049,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 
 
 \begin{definition}[Suite exacte]
-    Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox ... \relapprox t_n$ une suite d'approximations immédiates, telles que $t_0 = \unknown$ et $t_n \in \trees$.
+    Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox \cdots \relapprox t_n$ une suite d'approximations immédiates, telles que $t_0 = \unknown$ et $t_n \in \trees$.
 
     On dit que $(t_i)$ est une suite exacte selon $\sequent$ ssi les deux conditions suivantes sont vérifiées:
     \begin{enumerate}
@@ -1096,8 +1096,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exacte selon le séquent qu'il cherche à prouver, et nous pouvons alors lui garantir la correction de sa preuve: 
 
 \begin{theorem}[Correction de l'assistant]
-    Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox ... \relapprox t_n$ une suite exacte selon $\sequent$.
-
+    Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox \cdots \relapprox t_n$ une suite exacte selon $\sequent$.
     On a $(t_n, \sequent) \in \representations$.
 \end{theorem}
 
@@ -1119,9 +1118,9 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 
         \item[$\bm{a = (m, \someadd \cdot \alpha)}$] $a$ étant une adresse non utilisée minimale, $a' = (m, \someadd)$ apparaît nécessairement dans $t_n$. Notons $\beta$ l'adresse du n\oe ud étiquetté par $a'$.
 
-        Comme la suite d'approximations immédiates $t_0 \relapprox t_1 \relapprox ... \relapprox t_n$ commence en $H$ et termine en $t_n \in \trees$, on peut en extraire une sous-suite $t'_0 \relapprox ... \relapprox t'_m$, où $t'_0$ est le dernier arbre ne contenant pas l'adresse $a' = (m, \someadd)$, et $t'_m$ est le premier arbre dont le sous-arbre enraciné en $\beta$ est complet.
+        Comme la suite d'approximations immédiates $t_0 \relapprox t_1 \relapprox \cdots \relapprox t_n$ commence en $H$ et termine en $t_n \in \trees$, on peut en extraire une sous-suite $t'_0 \relapprox \cdots \relapprox t'_m$, où $t'_0$ est le dernier arbre ne contenant pas l'adresse $a' = (m, \someadd)$, et $t'_m$ est le premier arbre dont le sous-arbre enraciné en $\beta$ est complet.
 
-        En extrayant de ces arbres les sous-arbres enracinés en $\beta$, on obtient une nouvelle suite d'approximations immédiates commençant en $H$, et terminant en un arbre complet. On peut alors modifier $\sequent$ pour ne conserver que les sous-formules mentionnées par l'arbre complet, puis ré-adresser tous les arbres de la suite pour que leurs adresses correspondent au nouveau séquent. On obtient ainsi un séquent $\sequent'$ et une suite d'approximations immédiates $t''_0 \relapprox ... \relapprox t''_m$ vérifiant $t''_0 = H$, $t''_m \in \trees$, ainsi que les conditions $\exactcond$ et $\exactcondbis$.
+        En extrayant de ces arbres les sous-arbres enracinés en $\beta$, on obtient une nouvelle suite d'approximations immédiates commençant en $H$, et terminant en un arbre complet. On peut alors modifier $\sequent$ pour ne conserver que les sous-formules mentionnées par l'arbre complet, puis ré-adresser tous les arbres de la suite pour que leurs adresses correspondent au nouveau séquent. On obtient ainsi un séquent $\sequent'$ et une suite d'approximations immédiates $t''_0 \relapprox \cdots \relapprox t''_m$ vérifiant $t''_0 = H$, $t''_m \in \trees$, ainsi que les conditions $\exactcond$ et $\exactcondbis$.
 
         Comme dans le cas précédent, on peut désormais considérer $t''_{m-1}$ qui contient un unique trou, remplacé dans $t''_m$ par une feuille. La racine de $t''_{m-1}$ est le ré-adressage de $a' = (m, \rho)$, de la forme $(m', \epsilon)$. De plus, le ré-adressage de $a$, qui est une adresse correcte de $\sequent'$ n'apparaissant pas dans dans $t''_{m-1}$, est de la forme $(m', \alpha)$, et descend donc immédiatement d'une adresse de la branche racine-trou.
 
@@ -1138,7 +1137,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
     \label{completeness}
     Soient $t \in \trees, \; \sequent \in \sequents$, tels que $(t, \; \sequent) \in \representations$.
 
-    Il existe une suite d'approximations immédiates $t_0 \relapprox ... \relapprox t_n$, exacte selon $\sequent$, telle que $t_n = t$.
+    Il existe une suite d'approximations immédiates $t_0 \relapprox \cdots \relapprox t_n$, exacte selon $\sequent$, telle que $t_n = t$.
 \end{theorem}
 
 \begin{remark}
@@ -1166,7 +1165,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
 
             De même que dans la preuve du théorème~\ref{rep_inversion}, $\rho = \epsilon$, et, en reprenant les mêmes notations, on construit les représentations correctes $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$. On se donne de plus une permutation $\someperm$, telle que ${G, F_1 \tensor F_2, D}_\someperm = \sequent_1, F_1 \tensor F_2, \sequent_2$. Rappelons que $\sequentbis_1 = G, F_1$, et $\sequentbis_2 = F_2, D$.
     
-            Par hypothèses de récurrence sur $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$, il existe deux suites d'approximations immédiates $g_0 = H \relapprox ... \relapprox g_{m_1} = \psi_1 \left( t_1 \right)$ et $d_0 = H \relapprox ... \relapprox d_{m_2} = \psi_2 \left( t_2 \right)$ respectivement exactes par rapport à $\sequentbis_1$ et $\sequentbis_2$.
+            Par hypothèses de récurrence sur $\left( \psi_1 \left( t_1 \right), \; \sequentbis_1 \right)$ et $\left( \psi_2 \left( t_2 \right), \; \sequentbis_2 \right)$, il existe deux suites d'approximations immédiates $g_0 = H \relapprox \cdots \relapprox g_{m_1} = \psi_1 \left( t_1 \right)$ et $d_0 = H \relapprox \cdots \relapprox d_{m_2} = \psi_2 \left( t_2 \right)$ respectivement exactes par rapport à $\sequentbis_1$ et $\sequentbis_2$.
     
             On construit alors une suite d'approximations immédiates $(t'_i):$
             \begin{align*}
@@ -1182,7 +1181,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                         d_0\right) \right) = \unknown$}
                     };
                     \end{tikzpicture}
-                    \relapprox ... \relapprox
+                    \relapprox \cdots \relapprox
                     \begin{tikzpicture}%
                     [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
@@ -1192,7 +1191,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
                         d_0\right) \right) = \unknown$}
                     };
                     \end{tikzpicture}\\
-                    \relapprox ... \relapprox
+                    \relapprox \cdots \relapprox
                     \begin{tikzpicture}%
                     [level 1/.style={sibling distance=3.5cm}]
                     \node {$B_{n \epsilon}$}
