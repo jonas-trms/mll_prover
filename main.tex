@@ -140,7 +140,7 @@ Il existe plusieurs syntaxes pour construire des preuves en logique linéaire, d
 
  Notre assistant s'inscrit dans la lignée d'un outil déjà existant, Click \& Collect, l'un des premiers assistants de preuve détaillés dans la littérature \cite{callies:lirmm-03271501}. Nous avons toutefois une visée différente, car, si Click \& Collect a un but pédagogique, puisqu'il a été conçu pour des débutants afin de leur permettre l'apprentissage de la logique linéaire, notre outil s'adresse à des utilisateurs experts, et a ainsi été conçu dans un but d'efficacité et de rapidité.
 
-Présentons tout d'abord la logique linéaire plus en détail, afin de faire saisir les enjeux qui ont sous-tendu la conception de notre assistant de preuve, avant de les développer ensuite.
+Présentons d'abord la logique linéaire plus en détail, afin de faire saisir les enjeux qui ont sous-tendu la conception de notre assistant de preuve, avant de les développer ensuite.
 
 \subsection{Présentation de la logique linéaire}
 Dans toute la suite, on ne considérera que le fragment dit \emph{multiplicatif} de la logique linéaire, appelé MLL. Comme en logique classique, les briques de base en sont des formules, qu'on définit inductivement:
@@ -155,7 +155,7 @@ F := X \mid X\orth \mid F \parr F \mid F \tensor F
 \begin{remark}
     Intuitivement, un atome $X$ correspond à ce qui serait une variable en logique classique, et le constructeur $\orth$ à la négation $\neg$. La ``négation'' d'un atome s'appelle son dual. Remarquons qu'on ne peut nier que les atomes. Ce choix se justifie, si l'on pense aux lois de De Morgan en logique classique. En effet, on peut faire ``descendre'' progressivement les négations dans une formule, en appliquant successivement ces lois, jusqu'à ce que les négations ne concernent plus que les variables. La négation sur les formules au sens large n'offre donc pas d'expressivité supplémentaire, on peut ainsi s'en passer.
 
-    Le constructeur $\parr$, appelé \emph{par}, peut être vu comme une sorte de $\lor$, et le constructeur $\tensor$, appelé \emph{tenseur}, comme un $\land$. Cela se précisera par la suite, lorsque nous parlerons des règles les concernant.
+    Le constructeur $\parr$, appelé \emph{par}, peut être vu comme un $\lor$, et le constructeur $\tensor$, appelé \emph{tenseur}, comme un $\land$. Cela se précisera par la suite, lorsque nous parlerons des règles les concernant.
 \end{remark}
 
 Introduisons désormais les séquents, qui sont les objets pour lesquels on construit des preuves:
@@ -177,7 +177,7 @@ Introduisons désormais les séquents, qui sont les objets pour lesquels on cons
     L'unilatéralité des séquents ne réduit donc pas non plus l'expressivité.
 \end{remark}
 
-Avec cette idée en tête, introduisons enfin les preuves, qui définissent la notion de vérité sur les séquents.
+Avec cette idée en tête, introduisons enfin les preuves, qui définissent la notion de vérité sur les séquents:
 
 \begin{definition}[Preuves]
 \label{proofs_def}
@@ -273,7 +273,7 @@ De ce fait, nous avons plutôt choisi de concevoir un assistant de preuve intera
 
 En cela, notre assistant de preuve est assez similaire à Click \& Collect. Cependant, si le lecteur l'a essayé, il s'est sans doute rendu compte de la redondance de l'information qu'il devait fournir à cet outil, à cause de la règle de permutation. Ce n'est pas dérangeant dans un but pédagogique, mais cela alourdit rapidement le travail d'un utilisateur expert. La contribution apportée par notre assistant consiste donc à réduire l'information à fournir, dans un objectif d'efficacité.
 
-Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/ll_prover}{ici}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
+Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/mll_prover}{ici}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
 
 \section{Représentation des preuves}
 Si l'information requise par Click \& Collect est souvent redondante, c'est qu'il y a, en réalité, une redondance au sein même de la structure des preuves.
@@ -293,7 +293,7 @@ Si l'information requise par Click \& Collect est souvent redondante, c'est qu'i
 \end{example}
 
 \begin{example}
-    Allons plus loin, et regardons la preuve suivante:
+    Allons plus loin, et considérons la preuve suivante:
 
     \begin{equation*}
         \begin{prooftree}
@@ -311,10 +311,10 @@ Si l'information requise par Click \& Collect est souvent redondante, c'est qu'i
 
 Là est la raison de la redondance au sein de Click \& Collect, puisque cet outil demande à l'utilisateur de saisir explicitement chaque permutation, alors que leur donnée n'est en réalité jamais nécessaire.
 
-Pour résoudre ce problème, nous proposons de travailler sur une représentation équivalente aux arbres de preuves, qui élimine leur redondance. C'est cette représentation qui sera manipulée en arrière-plan par le code.
+Pour résoudre ce problème, nous proposons de travailler sur des représentations équivalentes aux arbres de preuves, qui éliminent leur redondance. Ces représentations seront manipulées en arrière-plan par notre code.
 
 \subsection{Représentations}
-On choisit de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, avec $t$ un arbre encodant le squelette de la preuve, et $\sequent$ le séquent prouvé par $\someproof$. Définissons cela plus en détail, en commençant par nous donner un ensemble d'adresses:
+Nous choisissons de représenter une preuve $\someproof \in \mathcal{P}$ par un couple $(t, \sequent) \in \representationslarge$, où $t$ est un arbre encodant le squelette de la preuve, et $\sequent$ est le séquent prouvé par $\someproof$. Définissons cela plus en détail, en commençant par nous donner un ensemble d'adresses:
 
 \begin{definition}[Adresses]
 On pose:
@@ -334,7 +334,7 @@ Considérons le séquent suivant:
 $(1, \epsilon)$ représente la sous-formule $X_1\orth$, et $(2, \Right \cdot \Left)$ représente la sous-formule $X_2$. $(2, \Right)$ représente la sous-formule $X_2 \tensor X_3$.
 \end{example}
 
-Nous pouvons maintenant définir les arbres, qui servent à représenter les squelettes des preuves:
+Nous pouvons maintenant définir les arbres, qui serviront à représenter les squelettes des preuves:
 
 \begin{definition}[Arbres]
 \label{def_trees}
@@ -348,7 +348,7 @@ L'ensemble \trees{} des arbres est défini inductivement, par trois constructeur
 
 Dans une représentation, chaque n\oe ud de l'arbre symbolisera ainsi une règle de la preuve. En effet, chaque n\oe ud portera une adresse qui renverra à une sous-formule de $\sequent$, et on remarque, en s'attardant sur la définition~\ref{proofs_def}, qu'une sous-formule de $\sequent$ correspond exactement à une application de règle.
 
-Le cas de l'axiome est un peu particulier: un axiome sera représenté par une feuille ayant deux adresses, qui renverront aux deux atomes duaux concernés. À nouveau, en regardant la définition~\ref{proofs_def}, on voit que cette information est équivalente à la donnée de l'axiome.
+Le cas de l'axiome est particulier: un axiome sera représenté par une feuille ayant deux adresses, qui renverront aux deux atomes duaux concernés. À nouveau, en regardant la définition~\ref{proofs_def}, on voit que cette information est équivalente à la donnée de l'axiome.
 
 \begin{example}
 \label{rep_example}
@@ -375,7 +375,7 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
 \end{example}
 
 \begin{implementation}
-    Ces structures élémentaires sont celles utilisées et implémentées par notre code:
+    Ces structures sont implémentées dans notre code par:
     
     \label{implement_trees}
     \begin{minted}{ocaml}
@@ -384,7 +384,7 @@ Une preuve et sa représentation (la racine de la preuve est positionnée en bas
     \end{minted}
 
     \begin{remark}
-        Les arbres que nous implémentons ne sont pas exactement ceux dont nous venons de parler, mais une version qui leur est plus générale, et dont nous parlerons quand nous nous intéresserons à la manipulation interactive, dans la section~\ref{partial_rep}.
+        Les arbres que nous implémentons ne sont pas exactement ceux dont nous venons de parler, mais une version qui leur est plus générale, et dont nous parlerons quand nous nous intéresserons à la manipulation interactive des représentations, dans la section~\ref{partial_rep}.
     \end{remark}
 
 \end{implementation}
@@ -490,7 +490,7 @@ On identifie dans toute la suite une fonction de $\addresses$ dans $\addresses$ 
 \end{definition}
 
 \begin{remark}
-    On préserve l'ordre lexicographique sur les feuilles, car on souhaite étiqueter celles-ci par des paires d'adresses. La règle d'axiome étant unique, elle ne demande pas d'ordre sur les atomes, ce qui fait d'une paire une information suffisante. 
+    On préserve l'ordre lexicographique sur les feuilles, car on souhaite étiqueter celles-ci par des paires d'adresses. La règle d'axiome étant unique, elle ne demande pas d'ordre sur les atomes, ce qui fait de leur paire une information suffisante. 
     
     Pour des questions d'implémentation, on réalise en pratique les paires par des couples ordonnés, d'où l'ordre lexicographique.
 \end{remark}
@@ -583,9 +583,9 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
     \label{remark_kernel}
     Nous venons de montrer que l'espace d'arrivée de la fonction d'encodage est $\representations$, et qu'elle est surjective. Une question reste de savoir si elle injective, puisque nous aimerions avoir un système de représentation équivalent aux preuves.
 
-    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective, \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre, en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
+    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective, \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
 
-    Cette injectivité particulière vient d'un choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas, pour des raisons pratiques.
+    Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
 
     \begin{example}Deux preuves identiques à permutations près:
         \begin{align*}
@@ -733,11 +733,11 @@ Les représentations partielles correctes ont bien le sens dont on vient de parl
 
 \subsection{Construction interactive d'une preuve}
 
-Les représentions partielles étant introduites, nous avons désormais tous les éléments nécessaires pour le fonctionnement de notre assistant. Nous pouvons ainsi donner sa méthode, qui guide l'utilisateur interactivement et pas à pas.
+Les représentions partielles étant introduites, nous avons désormais tous les éléments nécessaires au fonctionnement de notre assistant. Nous pouvons ainsi donner sa méthode, qui guide l'utilisateur interactivement et pas à pas.
 
 La construction d'une preuve se fait de la manière suivante : l'utilisateur donne en entrée un séquent, qu'il veut prouver, et part de la représentation partielle correcte minimale $(\unknown, \; \sequent)$. 
 
-Étape par étape, il remplace ensuite les trous de l'arbre, dans l'ordre de son choix, par des nouveaux n\oe{}uds, et construit ainsi une suite d'approximations immédiates. Cette suite aboutit, si le séquent est prouvable et que l'utilisateur a fait les bons choix, à une représentation totale correcte. L'assistant décode alors cette représentation, et affiche la preuve construite.
+Étape par étape, il remplace ensuite les trous de l'arbre, dans l'ordre de son choix, par des nouveaux n\oe{}uds, et construit ainsi une suite d'approximations immédiates. Cette suite aboutit, si le séquent est prouvable, et que l'utilisateur a fait les bons choix, à une représentation totale correcte. L'assistant la décode, et affiche alors la preuve construite.
 
 \begin{example}
     Construction d'une preuve pour le séquent ${X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth$ (qui ne sera pas représenté pour la lisibilité):
@@ -810,7 +810,7 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
 \end{example}
 
 \begin{implementation}
-    Cette boucle d'interaction est celle implémentée dans notre code par:
+    Cette boucle d'interaction est implémentée dans notre code par:
 
     \begin{minted}{ocaml}
         let prove_sequent s = ...
@@ -819,19 +819,19 @@ La construction d'une preuve se fait de la manière suivante : l'utilisateur don
 
 \subsection{Approximations d'adresses}
 
-Une difficulté que l'on remarque est que l'utilisateur doit faire les bons choix. Notre objectif est de le guider au mieux dans cette démarche, en lui indiquant, pour chaque trou, un ensemble de n\oe{}uds parmi lesquels il peut piocher, et en surlignant dans cet ensemble certains n\oe{}uds obligatoires. Nous calculons ainsi des approximations basse et haute d'adresses, et ces deux ensembles permettront de justifier une correction et une complétude de notre assistant, que nous allons détailler.
+Une difficulté que l'on remarque est que l'utilisateur doit faire les bons choix. Notre objectif est de le guider au mieux dans cette démarche, en lui indiquant, pour chaque trou, un ensemble de n\oe{}uds parmi lesquels il peut piocher, et en surlignant dans cet ensemble certains n\oe{}uds obligatoires. Nous calculons ainsi des approximations basse et haute d'adresses, qui permettront de justifier une correction et une complétude de notre assistant.
 
 \begin{remark}
     Nos ensembles ne contiennent en pratique que des adresses, puisque, pour un séquent et une adresse donnés, un unique constructeur que nous pouvons retrouver leur est associé. 
 \end{remark}
 
 \begin{implementation}
-    En pratique, au cours des interactions, les représentations partielles sont affichées dans le terminal comme du pseudo-code \LaTeX. L'utilisateur choisit, en donnant un indice numérique, le trou sur lequel il veut travailler. Un séquent est ensuite affiché, contenant les sous-formules liées aux adresses qu'il peut choisir. L'utilisateur fait ensuite son choix en donnant un indice numérique, indiquant la sous-formule qu'il pioche dans le séquent.
+    En pratique, au cours des interactions, les représentations partielles sont affichées dans le terminal comme du pseudo-code \LaTeX. L'utilisateur choisit, en donnant un indice numérique, le trou sur lequel il veut travailler. Un séquent est ensuite affiché, contenant les sous-formules liées aux adresses qu'il peut choisir. L'utilisateur fait son choix en donnant un nouvel indice numérique, indiquant la sous-formule qu'il pioche dans le séquent.
 \end{implementation}
 
 \subsubsection{Calcul des approximations}
 
-Expliquons la manière dont calculons nos approximations, avant de les spécifier. Introduisons d'abord une notion utile:
+Expliquons comment nous calculons nos approximations, avant de les spécifier. Introduisons d'abord une notion utile:
 
 \begin{definition}[Adresse dans un arbre]
     On définit une notion d'adresse dans les arbres, qui servira à adresser les n\oe uds. On pose ainsi l'ensemble $\mathcal{A'} = \{ \Left, \Right\}^{*}$, et on utilise une convention pour le cas du n\oe ud unaire: son descendant est considéré comme son fils gauche.
@@ -911,18 +911,18 @@ Donnons maintenant l'algorithme d'approximation:
 
 \begin{remark}
     \label{algo_expl}
-    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine-trou, en faisant à chaque fois comme si le n\oe ud sur lequel on se trouve était un trou, pour lequel on calcule un ensemble d'adresse possibles, en mettant à jour celui qu'on avait calculé pour son père.
+    Notre algorithme est récursif. L'idée est que l'on descend le long de la branche racine-trou, en faisant à chaque fois comme si le n\oe ud sur lequel on se trouve était un trou. On calcule pour celui-ci les deux approximations d'adresses, en mettant à jour celles qu'on avait calculées pour son père.
 \end{remark}
 
 \begin{remark}
-    Dans les cas où l'on appelle APPROX sur $t \in \treespartial$ et $a \in \treeaddresses$, tels que $a$ adresse un trou dans $t$, l'algorithme termine. Ces cas sont ceux qui nous intéressent, puisqu'on cherchera toujours à calculer un ensemble d'adresses possibles pour un trou.
+    Dans les cas où l'on appelle APPROX sur $t \in \treespartial$ et $a \in \treeaddresses$, tels que $a$ adresse un trou dans $t$, l'algorithme termine. Ce cas est celui qui nous intéresse, puisqu'on cherchera toujours à calculer des approximations d'adresses pour un trou.
     
-    Dans ce cas, on vérifie alors qu'on rentre toujours dans une des clauses du switch. De plus, la longueur de l'adresse $a'$ décroît strictement au fil des appels, et est minorée par 0 ($a' = \epsilon$ est un cas de base).
+    Dans ce cas, on vérifie qu'on rentre à chaque appel dans une des clauses du switch. De plus, la longueur de l'adresse $a'$ décroît strictement au fil des appels, et est minorée par 0 ($a' = \epsilon$ est un cas de base).
 \end{remark}
 
 \subsubsection{Spécification des approximations}
 
-Comme notre algorithme termine dans ses cas d'application, nous pouvons désormais le spécifier, en commençant par l'approximation haute:
+Comme notre algorithme termine dans ses cas d'application, nous pouvons le spécifier, en commençant par l'approximation haute:
 
 \begin{definition}[Spécification de l'approximation haute]
     Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. On pose
@@ -1051,7 +1051,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 \begin{definition}[Suite exacte]
     Soient un séquent $\sequent \in \sequents$, et $t_0 \relapprox t_1 \relapprox \cdots \relapprox t_n$ une suite d'approximations immédiates, telles que $t_0 = \unknown$ et $t_n \in \trees$.
 
-    On dit que $(t_i)$ est une suite exacte selon $\sequent$ ssi les deux conditions suivantes sont vérifiées:
+    On dit que $(t_i)$ est une suite exacte selon $\sequent$, ssi les deux conditions suivantes sont vérifiées:
     \begin{enumerate}
         \item[$\exactcond$:]
         Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne (et pas une feuille) étiqueté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox(t_i, \; \sequent, \; \beta)$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
@@ -1234,9 +1234,9 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
 
 \section{Complétion automatique et détection d'erreurs}
 
-Lors de l'interaction avec l'utilisateur, il arrive parfois qu'on soit capable de compléter automatiquement la représentation qu'il est en train de construire, sans lui retirer de contrôle dessus. Cela se produit lorsque le choix qu'il peut faire est unique, et qu'on peut donc l'appliquer pour lui, afin de lui faire gagner du temps.
+Lors de l'interaction avec l'utilisateur, il arrive parfois qu'on soit capable de compléter automatiquement la représentation qu'il est en train de construire, sans lui retirer de contrôle dessus. Cela se produit lorsque le choix qu'il peut faire est unique, et qu'on peut donc l'appliquer à sa place afin de lui faire gagner du temps.
 
-Par ailleurs, certains cas d'erreurs, non détectés par nos contraintes sur les représentations partielles correctes, peuvent être repérés par d'autres vérifications que nous donnerons, qui permettent de renforcer la correction que nous avons justifiée.
+Par ailleurs, certains cas d'erreurs, non détectés par nos contraintes sur les représentations partielles correctes, peuvent être repérés par d'autres vérifications que nous donnerons, et qui permettent de renforcer la correction que nous avons justifiée.
 
 \subsection{Complétion automatique}
 
@@ -1257,7 +1257,7 @@ $f: \representationspartial \rightarrow \representationspartial$ est une fonctio
     Remarquons qu'on utilise la relation d'approximation large, puisque notre autocomplétion peut modifier l'ordre dans lequel l'utilisateur aurait fait ses opérations. Cela n'a pas beaucoup d'importance, puisque la représentation obtenue à l'issue reste la même.
 \end{remark}
 
-Listons brièvement les heuristiques que nous utilisons dans notre code. Il est assez clair, au vu des spécification des approximations basse et haute, qu'elles sont des autocomplétions, les démonstrations ne seront donc pas détaillées. Notons qu'il serait possible, si l'on trouvait d'autres heuristiques, de les ajouter à celles déjà présentes, sans que cela ne pose problème.
+Listons brièvement les heuristiques que nous utilisons dans notre code. Il est assez clair, au vu des spécification des approximations basse et haute, qu'elles sont des autocomplétions. Les démonstrations ne seront donc pas détaillées. Notons qu'il serait possible, si l'on trouvait d'autres heuristiques, de les ajouter à celles déjà présentes, sans que cela ne pose problème.
 
 \begin{implementation}
     L'autocomplétion est implémentée dans notre code par:
@@ -1267,7 +1267,7 @@ Listons brièvement les heuristiques que nous utilisons dans notre code. Il est 
         let rec autocomplete t s  ...
     \end{minted}
     
-    La fonction autocomplete se sert de atom\_auto\_complete, et ces fonctions ont été conçues dans le but de pouvoir être modifiées et incrémentées.
+    La fonction autocomplete se sert de atom\_auto\_complete, et ces fonctions ont été conçues afin de pouvoir être modifiées et incrémentées.
 \end{implementation}
 
 \begin{itemize}
@@ -1284,13 +1284,13 @@ Listons brièvement les heuristiques que nous utilisons dans notre code. Il est 
     \end{remark}
 \end{itemize}
 
-Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la représentation induite est autocomplétée successivement, jusqu'à ce que ce ne soit plus possible. Pour ne pas perdre l'utilisateur, chaque autocomplétion est affichée, avec le cas qui l'a engendrée.
+Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la représentation résultante est autocomplétée itérativement, jusqu'à ce que ce ne soit plus possible. Pour ne pas perdre l'utilisateur, chaque autocomplétion est affichée, avec le cas qui l'a engendrée.
 
-Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite pour lui. Nous revenons donc complètement en arrière, et rejetons son choix. Cela renforce la correction que l'on avait déjà justifiée.
+Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite à sa place. Nous revenons donc complètement en arrière, et rejetons son choix. Cela renforce la correction que nous avions déjà justifiée.
 
 \subsection{Détection d'erreurs}
 
-De même, listons quelques heuristiques pour la détection d'erreurs. À nouveau, les preuves ne seront pas détaillées, et ces heuristiques pourraient également être enrichies, sans que ça ne pose problème.
+De même, listons quelques heuristiques pour la détection d'erreurs. À nouveau, les preuves ne seront pas détaillées, et ces heuristiques pourraient également être enrichies sans que ça ne pose problème.
 
 \begin{implementation}
     La majorité des heuristiques sont implémentées dans notre code par:
@@ -1320,12 +1320,12 @@ De même, listons quelques heuristiques pour la détection d'erreurs. À nouveau
     \end{remark}
 \end{itemize}
 
-Lorsqu'une de ces erreurs est détectée, cela produit le même effet que quand une de nos deux conditions de correction partielle est violée: on revient en arrière, et on rejette le choix de l'utilisateur. Cette détection d'erreur, combinée à l'autocomplétion, renforce à nouveau la correction que l'on avait.
+Lorsqu'une de ces erreurs est détectée, cela produit le même effet que quand une de nos deux conditions de correction partielle est violée: on revient en arrière, et on rejette le choix de l'utilisateur. Cette détection d'erreur, combinée à l'autocomplétion, renforce à nouveau la correction que nous avions.
 
 
 \section{Conclusion}
 
-Notre assistant de preuve offre, conformément à notre objectif, une solution plus pratique que Click \& Collect pour les utilisateurs experts. Si le lecteur veut s'en convaincre, il peut comparer les deux outils sur des exemples, en construisant des preuves. L'exemple 9 de notre code est particulièrement parlant, et on peut également le manipuler, \href{https://click-and-collect.linear-logic.org/?s=X5%2C+X4%2C+X1%5E+*+%28X2%5E+*+%28X3%5E+*+%28X4%5E+*+X5%5E%29%29%29%2C+X1%2C+X3+%7C+X2}{sur ce lien}, dans Click \& Collect.
+Notre assistant de preuve offre, conformément à notre objectif, une solution plus pratique que Click \& Collect pour les utilisateurs experts. Si le lecteur veut s'en convaincre, il peut comparer les deux outils sur des exemples en construisant des preuves. L'exemple 9 de notre code est particulièrement parlant, et on peut également le manipuler, \href{https://click-and-collect.linear-logic.org/?s=X5%2C+X4%2C+X1%5E+*+%28X2%5E+*+%28X3%5E+*+%28X4%5E+*+X5%5E%29%29%29%2C+X1%2C+X3+%7C+X2}{sur ce lien}, dans Click \& Collect.
 
 \begin{example}
     L'exemple en question:
@@ -1335,7 +1335,7 @@ Notre assistant de preuve offre, conformément à notre objectif, une solution p
 
 La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant, et les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non-détectée.
 
-De plus, l'autocomplétion pourrait être encore enrichie, en intégrant directement les approximations basses et hautes d'adresses aux représentations. Ceci donnerait une puissance de calcul supplémentaire, puisqu'on pourrait alors exploiter les liens entre les différents trous, et ainsi affiner itérativement nos approximations. On rentrerait de cette manière plus souvent dans des cas d'autocomplétion, et on détecterait donc également plus d'erreurs.
+De plus, l'autocomplétion pourrait être encore enrichie, en intégrant directement les approximations basses et hautes d'adresses aux représentations. Ceci donnerait une puissance de calcul supplémentaire, puisqu'on pourrait alors exploiter les liens entre les différents trous, et ainsi affiner itérativement nos approximations. On rentrerait de cette manière plus souvent dans des cas d'autocomplétion, et on détecterait également plus d'erreurs.
 
 Enfin, nous n'avons considéré que le fragment multiplicatif MLL de la logique linéaire, mais notre assistant pourrait être étendu, en utilisant la même méthode, aux fragments plus grands, comme par exemple LL.
 
