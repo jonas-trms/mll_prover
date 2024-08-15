@@ -138,7 +138,7 @@ De même que la logique intuitionniste se distingue de la logique classique par 
 
 Il existe plusieurs syntaxes pour construire des preuves en logique linéaire, dont le calcul des séquents. C'est la syntaxe que nous avons choisie, et pour laquelle nous proposons dans la suite un assistant de preuve. Celui-ci vise à rendre la construction des preuves plus dynamique, et partiellement automatique. 
 
- Notre assistant s'inscrit dans la lignée d'un outil déjà existant, Click \& Collect, qui est l'une des premières interfaces graphiques détaillées dans la littérature et permettant la construction interactive de preuves en calcul des séquents \cite{callies:lirmm-03271501}. Nous avons toutefois une visée différente, car, si Click \& Collect a un but pédagogique, puisqu'il a été conçu pour des débutants afin de leur permettre l'apprentissage de la logique linéaire, notre outil s'adresse à des utilisateurs experts, et a ainsi été conçu dans un but d'efficacité et de rapidité.
+ Notre assistant s'inscrit dans la lignée d'un outil déjà existant, Click \& Collect, qui est l'une des premières interfaces graphiques détaillées dans la littérature permettant la construction interactive de preuves en calcul des séquents \cite{callies:lirmm-03271501}. Nous avons toutefois une visée différente, car, si Click \& Collect a un but pédagogique, puisqu'il a été conçu pour des débutants afin de leur permettre l'apprentissage de la logique linéaire, notre outil s'adresse à des utilisateurs experts, et a ainsi été conçu dans un but d'efficacité et de rapidité.
 
 Présentons d'abord la logique linéaire plus en détail, afin de faire saisir les enjeux qui ont sous-tendu la conception de notre assistant de preuve, avant de les développer ensuite.
 
@@ -583,7 +583,7 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
     \label{remark_kernel}
     Nous venons de montrer que l'espace d'arrivée de la fonction d'encodage est $\representations$, et qu'elle est surjective. Une question reste de savoir si elle injective, puisque nous aimerions avoir un système de représentation équivalent aux preuves.
 
-    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective, \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
+    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
 
     Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{multi--ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
 
@@ -599,7 +599,6 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
             \parrv{{X_1}\orth, X_2 \parr X_3, {X_4}\orth}
             \end{prooftree}
         \end{equation*}
-    On souhaite identifier ces deux preuves partielles, qui sont bien la même, si l'on voit les séquents comme des \textit{ensembles}.
     \end{example}
 \end{remark}
 
@@ -1035,7 +1034,7 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
 \begin{proof}
     À nouveau, on prouve un invariant: au début du i\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a ${\lowapprox}^i = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
 
-    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction}. Comme pour la preuve du théorème~\ref{highapprox_correction}, la correction de l'algorithme en découle.
+    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction}, et la correction en découle.
 \end{proof}
 
 \subsection{Correction de l'assistant de preuve}
@@ -1147,9 +1146,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
         \item[$F:$] 
             Si $(t, \sequent) = F(n\rho, n'\rho') \vdash \sequent \in \representations$.
         
-            De la même manière que dans la preuve du théorème~\ref{rep_inversion}, on a $t = F(1 \epsilon, \; 2 \epsilon)$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome.
-    
-            Dans les deux cas, la suite $H, \; F(1 \epsilon, \; 2 \epsilon)$ convient. En effet, celle-ci est une suite d'approximations immédiates, et les deux conditions d'exactitude par rapport à $\sequent$ sont vérifiées:
+            De la même manière que dans la preuve du théorème~\ref{rep_inversion}, on a $t = F(1 \epsilon, \; 2 \epsilon)$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome. Dans les deux cas, la suite $H, \; F(1 \epsilon, \; 2 \epsilon)$ convient. En effet, celle-ci est une suite d'approximations immédiates, et les deux conditions d'exactitude par rapport à $\sequent$ sont vérifiées:
     
             \begin{enumerate}
                 \item[$\exactcond$:] On n'a ajouté aucun n\oe ud interne, il n'y a rien à vérifier.
@@ -1217,8 +1214,8 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
     
             De plus, comme montré dans la preuve du théorème~\ref{lowapprox_branch}, $\someperm \circ \psi_{\tensor\Left} \circ \psi_1 = Id$, et $\someperm \circ \psi_{\tensor\Right} \circ \psi_2 = Id$. La suite $(t_i)$ part donc bien de $H$, et termine en $t$.
     
-            Il reste à montrer que cette suite $(t_i)$ est exacte selon $\sequent$.
-
+            Il reste à montrer que cette suite $(t_i)$ est exacte selon $\sequent$. 
+            
             Cela se prouve par des propriétés de contexte, données en annexe~\ref{context_prop}. Elles disent essentiellement que le fait de contextualiser une suite exacte, comme nous l'avons fait ici en ajoutant une racine et un voisin droit ou gauche, préserve l'exactitude. 
 
         \item[$U$:]
