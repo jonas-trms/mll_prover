@@ -1360,6 +1360,86 @@ L'équipe Plume travaille plus particulièrement sur la théorie de la preuve et
 
 Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de recherche au CNRS et chercheur permanent au LIP. J'ai eu l'occasion de participer aux groupes de travail et conférences hebdomadaires organisées par l'équipe Plume, ainsi qu'à la grande conférence CHoCoLa de juin. J'ai également pu discuter et interagir avec des doctorants et chercheurs, dont Samuel Arsac, Amélie Rima, Le Thanh Dung ‘Tito’ Nguyen, Denis Kuperberg et Daniel Hirschkoff.
 
+\section{Une trace d'exécution de notre assistant}
+\label{exec_trace}
+\begin{minted}{shell-session}
+\hypv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Unique hole 1 automatically selected
+Selected hole:
+  <(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>
+Please choose the rule to apply:
+3
+
+   \hypv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
+\parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Unique hole 1 automatically selected
+Selected hole:
+  <(1) * (2^)>, <(2) * (3^)>, <1^>, <3>
+Please choose the rule to apply:
+1
+
+      \hypv{<1>, (2) * (3^), 1^, 3}
+
+      \hypv{<2^>, (2) * (3^), 1^, 3}
+   \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
+\parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Quasi-atomic sequent <2^>, (2) * (3^), 1^, 3 with a unique mandatory (or possible)
+tensor operator: applying it
+
+      \hypv{<1>, 1^, 3}
+
+         \hypv{2^, <2>, 1^, 3}
+
+         \hypv{2^, <3^>, 1^, 3}
+      \tensorv{<2^>, <(2) * (3^)>, 1^, 3}
+   \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
+\parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Atomic sequent <1>, 1^, 3 with a unique mandatory atom having a unique
+complement: applying it
+
+      \axv{<1>, <1^>}
+
+         \hypv{2^, <2>, 3}
+
+         \hypv{2^, <3^>, 3}
+      \tensorv{<2^>, <(2) * (3^)>, <3>}
+   \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
+\parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Atomic sequent 2^, <2>, 3 with a unique mandatory atom having a unique
+complement: applying it
+
+      \axv{<1>, <1^>}
+
+         \axv{<2^>, <2>}
+
+         \hypv{<3^>, <3>}
+      \tensorv{<2^>, <(2) * (3^)>, <3>}
+   \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
+\parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+
+Atomic sequent <3^>, <3> having only two mandatory and dual atoms: 
+applying them
+
+Proven!
+
+\begin{prooftree}
+      \axv{{X_1}\orth, X_1}
+
+         \axv{{X_2}\orth, X_2}
+
+         \axv{{X_3}\orth, X_3}
+      \tensorv{{X_2}\orth, (X_2) \tensor ({X_3}\orth), X_3}
+   \tensorv{{X_1}\orth, (X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), X_3}
+   \permv{3 \;1 \;2 \;4}{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), {X_1}\orth, X_3}
+\parrv{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), ({X_1}\orth) \parr (X_3)}
+\end{prooftree}
+\end{minted}
+
 \section{Démonstrations annexes}
 
 \begin{demonstrationappendix}
@@ -1907,7 +1987,5 @@ Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de rec
     
     La même idée serait utilisée pour les propriétés sur $t'_2$ et $t_2$.
 \end{proof}
-
-\todo{Ajouter une trace d'exécution}
 
 \end{document}
