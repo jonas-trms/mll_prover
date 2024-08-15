@@ -273,7 +273,7 @@ De ce fait, nous avons plutôt choisi de concevoir un assistant de preuve intera
 
 En cela, notre assistant de preuve est assez similaire à Click \& Collect. Cependant, si le lecteur l'a essayé, il s'est sans doute rendu compte de la redondance de l'information qu'il devait fournir à cet outil, à cause de la règle de permutation. Ce n'est pas dérangeant dans un but pédagogique, mais cela alourdit rapidement le travail d'un utilisateur expert. La contribution apportée par notre assistant consiste donc à réduire l'information à fournir, dans un objectif d'efficacité.
 
-Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/mll_prover}{ici}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
+Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/mll_prover}{ici}. Une trace d'exécution est également donnée en annexe \ref{exec_trace}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
 
 \section{Représentation des preuves}
 Si l'information requise par Click \& Collect est souvent redondante, c'est qu'il y a, en réalité, une redondance au sein même de la structure des preuves.
@@ -587,27 +587,19 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
 
     Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{multi--ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
 
-    \begin{example}Deux preuves identiques à permutations près:
-        \todo{exemple faux}
-        \begin{align*}
-        \begin{multlined}
+    \begin{example}Deux preuves partielles identiques à permutations près:
+        \begin{equation*}
             \begin{prooftree}
-               \axv{{X_1}\orth, X_1}
-               \axv{{X_1}\orth, X_1}
-               \permv{(2, 1)}{X_1, {X_1}\orth}
-            \tensorv{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
-            \end{prooftree} \\ \\
-            \begin{prooftree}
-               \axv{{X_1}\orth, X_1}
-               \axv{{X_1}\orth, X_1}
-               \permv{(2, 1)}{X_1, {X_1}\orth}
-            \tensorv{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
-            \permv{(3, 2, 1)}{{X_1}\orth, X_1 \tensor X_1, {X_1}\orth}
+               \hypv{{X_1}\orth, X_2, X_3, {X_4}\orth}
+            \parrv{{X_1}\orth, X_2 \parr X_3, {X_4}\orth}
             \end{prooftree}
-        \end{multlined}
-        \end{align*}
-
-    On souhaite identifier ces deux preuves, qui sont bien la même, si l'on voit les séquents comme des \textit{ensembles}.
+             \begin{prooftree}
+                \hypv{X_2, {X_4}\orth, X_3, {X_1}\orth}
+               \permv{(4, 1, 3, 2)}{{X_1}\orth, X_2, X_3, {X_4}\orth}
+            \parrv{{X_1}\orth, X_2 \parr X_3, {X_4}\orth}
+            \end{prooftree}
+        \end{equation*}
+    On souhaite identifier ces deux preuves partielles, qui sont bien la même, si l'on voit les séquents comme des \textit{ensembles}.
     \end{example}
 \end{remark}
 
@@ -828,6 +820,8 @@ Une difficulté que l'on remarque est que l'utilisateur doit faire les bons choi
 
 \begin{implementation}
     En pratique, au cours des interactions, les représentations partielles sont affichées dans le terminal comme du pseudo-code \LaTeX. L'utilisateur choisit, en donnant un indice numérique, le trou sur lequel il veut travailler. Un séquent est ensuite affiché, contenant les sous-formules liées aux adresses qu'il peut choisir. L'utilisateur fait son choix en donnant un nouvel indice numérique, indiquant la sous-formule qu'il pioche dans le séquent.
+
+    Pour s'en faire une idée plus concrète, on peut consulter la trace d'exécution donnée en annexe \ref{exec_trace}.
 \end{implementation}
 
 \subsubsection{Calcul des approximations}
