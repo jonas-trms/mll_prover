@@ -279,7 +279,7 @@ De ce fait, nous avons plutôt choisi de concevoir un assistant de preuve intera
 
 En cela, notre assistant de preuve est assez similaire à Click \& Collect. Cependant, si le lecteur l'a essayé, il s'est sans doute rendu compte de la redondance de l'information qu'il devait fournir à cet outil, à cause de la règle de permutation. Ce n'est pas dérangeant dans un but pédagogique, mais cela alourdit rapidement le travail d'un utilisateur expert. La contribution apportée par notre assistant consiste donc à réduire l'information à fournir, dans un objectif d'efficacité.
 
-Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/mll_prover}{ici}. Une trace d'exécution est également donnée en annexe \ref{exec_trace}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
+Notre assistant de preuve a été implémenté en OCaml, et peut être consulté et essayé \href{https://github.com/jonas-trms/mll_prover}{ici}. Une trace d'exécution est également donnée en annexe~\ref{exec_trace}. Nous ferons régulièrement le lien, dans la suite, entre les résultats théoriques que nous présentons, et leur implémentation dans le code.
 
 \section{Représentation des preuves}
 Si l'information requise par Click \& Collect est souvent redondante, c'est qu'il y a, en réalité, une redondance au sein même de la structure des preuves.
@@ -1291,7 +1291,7 @@ Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la r
 
 Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite à sa place. Nous revenons donc complètement en arrière, et rejetons son choix.
 
-Cela enrichit la correction, au sens de la remarque \ref{correction_desc}. En effet, nous ne garantissons toujours pas que chaque choix permet d'aboutir, mais nous éliminons plus de choix incorrects. Nous facilitons ainsi le travail de l'utilisateur, en lui évitant plus souvent de se tromper, mais nous ne pouvons toujours pas montrer de correction ``forte''.
+Cela enrichit la correction, au sens de la remarque~\ref{correction_desc}. En effet, nous ne garantissons toujours pas que chaque choix permet d'aboutir, mais nous éliminons plus de choix incorrects. Nous facilitons ainsi le travail de l'utilisateur, en lui évitant plus souvent de se tromper, mais nous ne pouvons toujours pas montrer de correction ``forte''.
 
 \subsection{Détection d'erreurs}
 
@@ -2149,7 +2149,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
 \end{remark}
 
 \begin{proof}
-    Ces propriétés se prouveraient de la même manière que ce qui a été fait dans les démonstrations annexes \ref{highapprox_correction_proof} et \ref{lowapprox_correction_proof}. Donnons les grandes lignes de la démonstration qu'on ferait pour les propriétés sur $t_1$ et $t'_1$. 
+    Ces propriétés se prouveraient de la même manière que ce qui a été fait dans les démonstrations annexes~\ref{highapprox_correction_proof} et~\ref{lowapprox_correction_proof}. Donnons les grandes lignes de la démonstration qu'on ferait pour les propriétés sur $t_1$ et $t'_1$.
     
     On considérerait des exécutions parallèles de l'algorithme sur $t'_1$ et $t_1$, et on montrerait à nouveau un invariant, plus général que le théorème, justifiant les propriétés de contexte pour des simplifications de $t'_1$ et $t_1$ liées aux appels récursifs. En effet, lors des appels, on descend le long des deux branches racine--trou : si l'on considère alors, à chaque étape, les n\oe uds sur lesquels on se trouve comme des trous, et qu'on simplifie $t'_1$ et $t_1$ en conséquence, on peut montrer, par invariant, les propriétés de contexte sur ces simplifications.
 
