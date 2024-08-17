@@ -869,9 +869,9 @@ Donnons maintenant l'algorithme d'approximation: algorithme~\ref{algo_approx}.
             \EndCase
     
             \Case{$U((m, \someadd), t'), \; \Left \cdot \someaddbis$}
-                \State $\highapprox \gets {\highapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
+                \State $\highapprox \gets ({\highapprox}\setminus \{ (m, \someadd) \}) \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
                 
-                \State $\lowapprox \gets {\lowapprox}_{\setminus \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
+                \State $\lowapprox \gets ({\lowapprox}\setminus \{ (m, \someadd) \}) \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
                 
                 \State \Return $\text{APPROX}(t', \; \someaddbis, \; \highapprox, \; \lowapprox)$
             \EndCase
@@ -879,10 +879,10 @@ Donnons maintenant l'algorithme d'approximation: algorithme~\ref{algo_approx}.
             \Case{$B((m, \someadd), t_1, t_2), \; \Left \cdot \someaddbis$}
                 \State $\mathcal{M} \gets \left\{\text{$a$, où $a$ est une adresse minimale apparaissant dans $t_2$}\right\}$
                 
-                \State $\highapprox \gets {\highapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$
+                \State $\highapprox \gets ({\highapprox}\setminus (\mathcal{M} \cup \{ (m, \someadd) \})) \cup \left\{ (m, \someadd \cdot \Left) \right\}$
     
                 \If{$t_2 \in \trees$}
-                    \State $\lowapprox \gets {\lowapprox}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$
+                    \State $\lowapprox \gets ({\lowapprox}\setminus (\mathcal{M} \cup \{ (m, \someadd) \})) \cup \left\{ (m, \someadd \cdot \Left) \right\}$
                 \Else
                     \State $\lowapprox \gets \left\{ (m, \someadd \cdot \Left) \right\}$
                 \EndIf
@@ -1986,7 +1986,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
 
             On a, d'après le pseudo-code, $t_{i+1} = t'$, et $\alpha_{i+1} = \alpha_i \cdot \Left$. Ainsi, $t_{i+1}$ est bien sous-arbre de $t_i$, et, par hypothèse de récurrence, $\alpha_i$ adresse la racine de $t_i$, d'où $\alpha_{i+1}$ adresse la racine de $t_{i+1}$. De même, $a_{i+1}'$ adresse dans $t_{i+1}$ le trou adressé par $a_i'$ dans $t_i$, qui est par HR le trou adressé par $a'$ dans $t$.
             
-            Par ailleurs, d'après le pseudo-code, ${\highapprox}^{i+1} = {\highapprox}^{i}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$, où $\mathcal{M}$ est l'ensemble des adresses minimales de $t''$.
+            Par ailleurs, d'après le pseudo-code, ${\highapprox}^{i+1} = ({\highapprox}^{i}\setminus (\mathcal{M} \cup \{ (m, \someadd) \})) \cup \left\{ (m, \someadd \cdot \Left) \right\}$, où $\mathcal{M}$ est l'ensemble des adresses minimales de $t''$.
 
             Montrons que ${\highapprox}^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
 
