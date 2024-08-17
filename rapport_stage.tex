@@ -39,10 +39,6 @@
 %imported from click and collect
 \newcommand*{\orth}{^\perp}
 \newcommand*{\tensor}{\otimes}
-\newcommand*{\one}{1}
-\newcommand*{\plus}{\oplus}
-\newcommand*{\zero}{0}
-\newcommand*{\limp}{\multimap}
 
 \newcommand*{\namedproofv}[2]{\hypo{#1}\infer[no rule]{1}{\vdash #2}}
 \newcommand*{\hypv}[1]{\hypo{\vdash #1}}
@@ -84,7 +80,7 @@
 \newcommand*{\representations}{\ensuremath{\mathcal{R}}}
 \newcommand*{\representationspartiallarge}{\ensuremath{\treespartial \times \sequents}}
 \newcommand*{\representationspartial}{\ensuremath{\mathcal{R'}}}
-\newcommand*{\setshuffle}{\triangleright \triangleleft}
+\newcommand*{\setshuffle}{\bowtie}
 
 \newcommand*{\encode}{\ensuremath{\varphi}}
 \newcommand*{\decode}{\ensuremath{\gamma}}
@@ -120,7 +116,7 @@
 \author{Jonas Torriero-Meskour}
 \affil{ENS de Lyon, stage de L3 au LIP encadré par Olivier Laurent}
 
-\date{4 juin 2024 - 19 juillet 2024}
+\date{4 juin 2024 -- 19 juillet 2024}
 
 \begin{document}
 
@@ -691,7 +687,7 @@ Une suite d'approximations immédiates:
     
     \begin{enumerate}
     \item[\caddpartial] \textbf{Bon adressage:} Même condition que \ref{cadd} de la définition~\ref{def_rep}, en considérant que les feuilles $\unknown$ ne portent aucune adresse.
-    \item[\clinpartial] \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît au plus une fois dans les adresses de $t$.
+    \item[\clinpartial] \textbf{Sous-linéarité:} Chaque sous-formule de $\sequent$ apparaît \emph{au plus} une fois dans les adresses de $t$.
     \item[\cdespartial] \textbf{Descendance:} Même condition que \ref{cdes} de la définition~\ref{def_rep}.
     \end{enumerate}
 \end{definition}
@@ -955,7 +951,7 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons le spéc
 \begin{theorem}[Correction de l'approximation haute]
     \label{highapprox_correction}
     
-    Soient $(t, \; \sequent) \in \representationspartial$, et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. Posons $\Sigma = \{ (j, \epsilon), \; 0 \leq j \leq |\sequent| \}$, et considérons l'ensemble $\highapprox$ calculé par APPROX$(t, a', \Sigma, \Sigma)$.
+    Soient $(t, \; \sequent) \in \representationspartial$, et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. Posons $\Sigma = \{ (j, \epsilon), \; 1 \leq j \leq |\sequent| \}$, et considérons l'ensemble $\highapprox$ calculé par APPROX$(t, a', \Sigma, \Sigma)$.
     On a $\highapprox = \highapproxspec \left( t, \; \sequent, \; a' \right)$.
 \end{theorem}
 
@@ -1674,7 +1670,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     \begin{enumerate}
         \item\label{pcadd} L'adresse $n \epsilon$, adressant un par, étiquette la racine d'arité 1, celle-ci est donc correcte.
         
-        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \sequentbis$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \tensor B$, celles de $B$ des sous-adresses droites de $A \tensor B$, et les adresses de $\sequentbis$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
+        Par ailleurs, \ref{cadd} est vérifié pour $\encode ' \left( \pi_1 \right) \vdash \sequent, A, B, \sequentbis$, d'où, grâce au ré-adressage effectué par $\psi_\parr$, les adresses de $\psi_\parr \left( \encode' \left( \pi_1 \right) \right)$ sont correctes. En effet, les sous-adresses de $A$ deviennent des sous-adresses gauches de $A \parr B$, celles de $B$ des sous-adresses droites de $A \parr B$, et les adresses de $\sequentbis$ dont décalées de $1$, étant donné que $A$ et $B$ ont été fusionnées, diminuant la longueur du séquent de $1$.
         
         Toutes les adresses sont donc correctes, et le bon adressage est préservé.
         
@@ -1773,12 +1769,13 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     
         D'après la condition \ref{cdes}, $\rho = \epsilon$.
     
-        D'après la condition \ref{cadd}, $\sequent = \sequent_1, \; F_1 \parr F_2, \; \sequent_2$, et $n\epsilon$ adresse $F_1 \parr F_2$. Puis, d'après \ref{cadd} et \ref{clin}, les adresses de $t'$ sont exactement celles des sous-formules de $\sequent$, à l'exception de $F_1 \parr F_2$ $\bigstar$.
+        D'après la condition \ref{cadd}, $\sequent = \sequent_1, \; F_1 \parr F_2, \; \sequent_2$, et $n\epsilon$ adresse $F_1 \parr F_2$ ($\size{\sequent_1} = n-1$). Puis, d'après \ref{cadd} et \ref{clin}, les adresses de $t'$ sont exactement celles des sous-formules de $\sequent$, à l'exception de $F_1 \parr F_2$ $\bigstar$.
     
         Modifions alors $t'$ pour obtenir une représentation correcte plus petite. On pose 
         \begin{equation*}
             \psi_\parr^{-1} =
             \begin{cases*}
+                (i, \someadd) \mapsto (i, \someadd) & si $i < n$\\
                 (n, \Left \cdot \someadd) \mapsto (n, \someadd)\\
                 (n, \Right \cdot \someadd) \mapsto (n+1, \someadd)\\
                 (i, \someadd) \mapsto (i+1, \someadd) & si $i \geq n+1$
@@ -1824,25 +1821,25 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     
         De plus, par \ref{clin}, toutes les sous-adresses de $F_1$ apparaissent exactement une fois dans $t$. D'après \ref{cdes}, elles apparaissent nécessairement dans $t_1$. Idem pour les sous-adresses de $F_2$, qui apparaissent exactement une fois dans $t_2$.
     
-        Par ailleurs, en notant $\sequent' = \sequent_1, \sequent_2$, d'après \ref{clin}, il existe deux uniques séquents $G$ et $D$ tels que $\sequent' = G \setshuffle  D$, où les formules de $G$ sont adressées dans $\sequent$ par des adresses de $t_1$, et celles de $D$ par des adresses de $t_2$. En effet, chaque formule de $\sequent'$ apparaît exactement une fois dans $t$, et chaque formule apparaît nécessairement dans $t_1$ ou $t_2$, car la racine adresse $F_1 \tensor F_2$.
+        Par ailleurs, en notant $\sequent' = \sequent_1, \sequent_2$, d'après \ref{clin}, il existe deux uniques séquents $G$ et $D$ tels que $\sequent' = G \setshuffle  D$ (``shuffle'': $G$ et $D$ forment une paritition des éléments de $\sequent'$ respectant chacun l'ordre des éléments dans $\sequent'$), où les formules de $G$ sont adressées dans $\sequent$ par des adresses de $t_1$, et celles de $D$ par des adresses de $t_2$. En effet, chaque formule de $\sequent'$ apparaît exactement une fois dans $t$, et chaque formule apparaît nécessairement dans $t_1$ ou $t_2$, car la racine adresse $F_1 \tensor F_2$.
     
         Posons alors $\sequentbis_1 = G, F_1$, et $\sequentbis_2 = F_2, D$. D'après les propriétés déjà énoncées, les formules de $\sequentbis_1$ sont des formules de $\sequent$ adressées par $t_1$, et celles de $\sequentbis_2$ des formules de $\sequent$ adressées par $t_2$. De plus, par construction, les sous-formules de $\sequent$ correspondent exactement à celles de $\sequentbis_1$ et $\sequentbis_2$, en leur ajoutant $F_1 \tensor F_2$ $\bigstar_1$.
         
         D'après \ref{cadd} et \ref{clin}, les adresses de $t$ sont exactement celles des sous-formules de $\sequent$, et, par ailleurs, $F_1 \tensor F_2$ est adressé par la racine. On en déduit que $\sequentbis_1$ correspond exactement aux formules de $\sequent$ dont les sous-adresses sont dans $t_1$, idem pour $\sequentbis_2$, dont les sous-adresses sont exactement celles de $t_2$ $\bigstar_2$.
     
         Construisons désormais des preuves de $\sequentbis_1$ et $\sequentbis_2$. Soient
-        \begin{equation*}
-            \psi_1 = 
+        \begin{align*}
+            \psi_1 &= 
             \begin{cases*}
                 (i, \someadd) \mapsto (\beta_{\sequentbis_1} \left( i \right), \someadd) & si $i \neq n$\\
                 (n, \Left \cdot \someadd) \mapsto (| \sequentbis_1 | + 1, \someadd)
-            \end{cases*}
-            \psi_2 = 
+            \end{cases*} \\[1ex]
+            \psi_2 &= 
             \begin{cases*}
                 (i, \someadd) \mapsto (\beta_{\sequentbis_2} \left( i \right) + 1, \someadd) & si $i \neq n$\\
                 (n, \Right \cdot \someadd) \mapsto (1, \someadd)
             \end{cases*} 
-        \end{equation*}
+        \end{align*}
     
         où $\beta_{\sequentbis_j} \left( i \right)$ est la position de la $i\ieme$ formule de $\sequent$ dans $\sequentbis_j$. Par exemple, si $\sequent = A, B, C, D$, et $\sequentbis_1 = B, C$, on a $\beta_{\sequentbis_1} \left( 3 \right) = 2$ (position de $C$).
     
@@ -1872,7 +1869,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
         \end{prooftree} 
         \in \proofs$. 
     
-        Par ailleurs, d'après $\bigstar_2$, il existe une unique permutation $\someperm$ telle que ${G, F_1 \tensor F_2, D}_\someperm = \sequent_1, F_1 \tensor F_2, \sequent_2$. Posons $n' = | G | + 1$, et exprimons celle-ci explicitement :
+        Par ailleurs, d'après $\bigstar_2$, il existe une unique permutation $\someperm$ telle que $\permapp{\someperm}{(G, F_1 \tensor F_2, D)} = \sequent_1, F_1 \tensor F_2, \sequent_2$. Posons $n' = | G | + 1$, et exprimons celle-ci explicitement :
         \begin{equation*}
             \someperm = 
             \begin{cases*}
