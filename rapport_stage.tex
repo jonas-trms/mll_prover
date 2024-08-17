@@ -1291,7 +1291,7 @@ Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la r
 
 Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite à sa place. Nous revenons donc complètement en arrière, et rejetons son choix.
 
-Cela enrichit la correction, au sens de la remarque \ref{correction_desc}. En effet, nous ne garantissons toujours pas que chaque choix permet d'aboutir, mais nous éliminons plus de choix incorrects. Nous facilitons ainsi le travail de l'utilisateur, en lui évitant plus souvent de se tromper, mais nous ne pouvons toujours pas montrer de correction plus forte.
+Cela enrichit la correction, au sens de la remarque \ref{correction_desc}. En effet, nous ne garantissons toujours pas que chaque choix permet d'aboutir, mais nous éliminons plus de choix incorrects. Nous facilitons ainsi le travail de l'utilisateur, en lui évitant plus souvent de se tromper, mais nous ne pouvons toujours pas montrer de correction ``forte''.
 
 \subsection{Détection d'erreurs}
 
@@ -1341,7 +1341,7 @@ Notre assistant de preuve offre, conformément à notre objectif, une solution p
 
 La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant. Les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non détectée.
 
-De plus, l'autocomplétion pourrait être encore enrichie, en étiquettant directement les trous des représentations par leurs approximations d'adresses. Ceci permettrait d'avoir des approximations plus fines, en utilisant un algorithme global. Celui-ci prendrait en entrée une représentation partielle, et mettrait à jour ses étiquettes d'approximations de manière itérative. Les approximations ne seraient donc plus calculées individuellement, pour un trou donné, mais en même temps, et les unes par rapport aux autres. Elles seraient ainsi plus précises, et cela permettrait de rentrer plus souvent dans des cas d'autocomplétion, et donc de détecter plus d'erreurs.
+De plus, l'autocomplétion pourrait être encore enrichie, en étiquetant directement les trous des représentations par leurs approximations d'adresses. Ceci permettrait d'avoir des approximations plus fines, en utilisant un algorithme global. Celui-ci prendrait en entrée une représentation partielle, et mettrait à jour ses étiquettes d'approximations de manière itérative. Les approximations ne seraient donc plus calculées individuellement, pour un trou donné, mais en même temps, et les unes par rapport aux autres. Elles seraient ainsi plus précises, et cela permettrait de rentrer plus souvent dans des cas d'autocomplétion, et donc de détecter plus d'erreurs.
 
 Enfin, nous n'avons considéré que le fragment multiplicatif MLL de la logique linéaire, mais notre assistant pourrait être étendu, en utilisant la même méthode, aux fragments plus grands, comme par exemple LL.
 
