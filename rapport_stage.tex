@@ -2052,7 +2052,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
             \item[$H$]
                 On n'a rien à vérifier, car les appels s'arrêtent ici. 
 
-            \item[$B$] Si $t_i = B(n\rho, t_1, t_2)$.
+            \item[$B$] Si $t_i = B(n\rho, t', t'')$.
 
             On a $a_i' = \alpha \cdot a_{i+1}'$. Détaillons le cas où $\alpha = \Left$.
 
@@ -2060,7 +2060,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
             
             On veut désormais calculer $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$. On a deux transformations à appliquer à $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$, qui correspondent au remplacement du trou $\alpha_{i}$ de $\treesimplify( t, \; {\alpha}_i )$.
             
-            D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t_1$, on a $t_2 \in \representations$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t_2$. D'après la condition \cdespartial{} de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine--trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
+            D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t'$, on a $t'' \in \representations$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t''$. D'après la condition \cdespartial{} de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine--trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
 
             D'autre part, comme on a ajouté l'adresse $n\rho$ sur la branche racine--trou, le descendant immédiat d'une adresse de cette branche ayant pour entier $n$, qui était auparavant $n\rho$ d'après \cdespartial{} sur $\treesimplify( t, \; {\alpha}_{i} )$, devient $n\rho \cdot \Right$. On met cela à jour.
 
