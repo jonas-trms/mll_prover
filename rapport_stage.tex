@@ -1829,12 +1829,12 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     
         Construisons désormais des preuves de $\sequentbis_1$ et $\sequentbis_2$. Soient
         \begin{align*}
-            \psi_1 &= 
+            \psi_1 &=
             \begin{cases*}
                 (i, \someadd) \mapsto (\beta_{\sequentbis_1} \left( i \right), \someadd) & si $i \neq n$\\
                 (n, \Left \cdot \someadd) \mapsto (| \sequentbis_1 | + 1, \someadd)
             \end{cases*} \\[1ex]
-            \psi_2 &= 
+            \psi_2 &=
             \begin{cases*}
                 (i, \someadd) \mapsto (\beta_{\sequentbis_2} \left( i \right) + 1, \someadd) & si $i \neq n$\\
                 (n, \Right \cdot \someadd) \mapsto (1, \someadd)
@@ -1980,13 +1980,13 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
             \item[$H$]
                 Si $t_i = H$, il n'y a pas de $i+1$\ieme{} appel, on n'a donc rien à vérifier. 
 
-            \item[$B$] Si $t_i = B(n\rho, t_1, t_2)$.
+            \item[$B$] Si $t_i = B(n\rho, t', t'')$.
 
             $a_i'$ adresse dans $t_i$ le trou adressé par $a'$ dans $t$, d'où $a_i'$ est nécessairement de la forme $\alpha \cdot a_{i+1}'$. Détaillons le cas où $\alpha = \Left$.
 
-            On a, d'après le pseudo-code, $t_{i+1} = t_1$, et $\alpha_{i+1} = \alpha_i \cdot \Left$. Ainsi, $t_{i+1}$ est bien sous-arbre de $t_i$, et, par hypothèse de récurrence, $\alpha_i$ adresse la racine de $t_i$, d'où $\alpha_{i+1}$ adresse la racine de $t_{i+1}$. De même, $a_{i+1}'$ adresse dans $t_{i+1}$ le trou adressé par $a_i'$ dans $t_i$, qui est par HR le trou adressé par $a'$ dans $t$.
+            On a, d'après le pseudo-code, $t_{i+1} = t'$, et $\alpha_{i+1} = \alpha_i \cdot \Left$. Ainsi, $t_{i+1}$ est bien sous-arbre de $t_i$, et, par hypothèse de récurrence, $\alpha_i$ adresse la racine de $t_i$, d'où $\alpha_{i+1}$ adresse la racine de $t_{i+1}$. De même, $a_{i+1}'$ adresse dans $t_{i+1}$ le trou adressé par $a_i'$ dans $t_i$, qui est par HR le trou adressé par $a'$ dans $t$.
             
-            Par ailleurs, d'après le pseudo-code, ${\highapprox}^{i+1} = {\highapprox}^{i}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$, où $\mathcal{M}$ est l'ensemble des adresses minimales de $t_2$.
+            Par ailleurs, d'après le pseudo-code, ${\highapprox}^{i+1} = {\highapprox}^{i}_{\setminus \mathcal{M} \cup \{ (m, \someadd) \}} \cup \left\{ (m, \someadd \cdot \Left) \right\}$, où $\mathcal{M}$ est l'ensemble des adresses minimales de $t''$.
 
             Montrons que ${\highapprox}^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
 
@@ -2008,7 +2008,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     
                             \item Idem, en ajoutant que $\beta$ est également distincte du n\oe ud que $(s(t, \alpha_{i+1}))$ a en plus que $(s(t, \alpha_{i}))$, car $m \neq n$.
     
-                            \item D'après $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$, on sait que, dans $(s(t, \alpha_{i+1}), \sequent)$ où l'on a fait le remplacement de $\alpha_{i+1}$ par $\beta$, \cdespartial est respectée pour tous les n\oe uds, sauf éventuellement celui adressé par $\alpha_{i+1}$. Or, $m \neq n$ et $\beta \notin \mathcal{M}$, ce qui assure que ce n\oe ud ne pose pas problème non plus.
+                            \item D'après $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$, on sait que, dans $(s(t, \alpha_{i+1}), \sequent)$ où l'on a fait le remplacement de $\alpha_{i+1}$ par $\beta$, \cdespartial{} est respectée pour tous les n\oe uds, sauf éventuellement celui adressé par $\alpha_{i+1}$. Or, $m \neq n$ et $\beta \notin \mathcal{M}$, ce qui assure que ce n\oe ud ne pose pas problème non plus.
                         \end{enumerate}
                         
                         D'où $\beta \in \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$, et donc ${\highapprox}^{i+1} \subseteq \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
