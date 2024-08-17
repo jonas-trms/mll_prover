@@ -590,11 +590,11 @@ Il reste à montrer l'autre sens, à savoir qu'une représentation correcte est 
     \label{remark_kernel}
     Nous venons de montrer que l'espace d'arrivée de la fonction d'encodage est $\representations$, et qu'elle est surjective. Une question reste de savoir si elle injective, puisque nous aimerions avoir un système de représentation équivalent aux preuves.
 
-    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective \textit{à permutations près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation. Précisons toutefois que le séquent conclusion, lui, doit bien être identique dans les deux preuves.
+    Ce n'est en fait pas le cas, mais cela ne pose pas problème. En effet, notre fonction d'encodage est injective \textit{à permutations intermédiaires près}. Cela signifie que deux preuves ont la même image ssi l'une peut être obtenue à partir de l'autre en lui ajoutant des règles de permutation intermédiaires, c'est-à-dire des règles qui ne modifient ni le séquent conclusion ni les axiomes.
 
-    Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{multi--ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
+    Cette injectivité particulière vient du choix que nous avons fait pour nos définitions, mentionné dans la définition~\ref{proofs_def}: en réalité, les séquents sont des \textit{multi--ensembles} de formules, mais nous les représentons par des \textit{listes}. Il est donc cohérent que nous identifiions les preuves identiques à permutations intermédiaires près, car elles représentent toutes, en réalité, la même preuve. On pourrait même identifier les preuves ayant des conclusions identiques à permutation près, mais nous ne le faisons pas pour des raisons pratiques.
 
-    \begin{example}Deux preuves partielles identiques à placement des permutations près:
+    \begin{example}Deux preuves partielles identiques à permutations intermédiaires près:
         \begin{equation*}
             \begin{prooftree}
                \hypv{{X_1}\orth, X_2, X_3, {X_4}\orth}
@@ -1076,6 +1076,7 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
 \end{remark}
 
 \begin{remark}
+    \label{correction_desc}
     La condition $t_n \in \trees$ ne nous fait considérer que les cas où l'utilisateur a abouti, puisqu'il doit avoir fermé l'arbre. C'est la correction la plus forte que l'on puisse donner.
     
     En effet, on ne peut rien dire des cas où l'arbre n'a pas encore été fermé, car l'utilisateur peut s'être déjà trompé, ou bien le séquent peut ne pas être prouvable, mais nos conditions de correction partielles ne permettent pas toujours de le savoir. Cela vient du fait que la réciproque du théorème~\ref{approxofcorrect} est fausse.
@@ -1279,16 +1280,18 @@ Listons brièvement les heuristiques que nous utilisons dans notre code. Il est 
         L'idée derrière cette heuristique est que les deux atomes duaux doivent forcément être utilisés dans la branche, et qu'ils ne pourront pas l'être à un autre moment, puisqu'il n'y a plus d'opérateur possible.
     \end{remark}
 
-    \item Si, pour un trou, seuls des atomes à l'exception d'un unique opérateur obligatoire peuvent être choisis, on applique l'opérateur.
+    \item Si, pour un trou, seuls des atomes à l'exception d'un unique opérateur peuvent être choisis, et que l'opérateur est obligatoire, ou qu'aucun des atomes n'a de paire duale, on applique l'opérateur.
 
     \begin{remark}
-        L'opérateur doit en effet être utilisé dans la branche, et il ne peut l'être à un autre moment, car tout autre choix induirait l'utilisation d'un axiome, et ainsi la fermeture de la branche.
+        Dans le cas où l'opérateur est obligatoire, on doit l'utiliser à ce moment car tout autre choix induirait l'utilisation d'un axiome, et ainsi la fermeture de la branche. Dans le cas où aucun atome n'a de paire duale, on ne peut qu'appliquer l'opérateur, ce qu'on fait, car on sait qu'on devra fermer la branche.
     \end{remark}
 \end{itemize}
 
 Dans notre implémentation, à chaque fois que l'utilisateur fait un choix, la représentation résultante est autocomplétée itérativement, jusqu'à ce que ce ne soit plus possible. Pour ne pas perdre l'utilisateur, chaque autocomplétion est affichée, avec le cas qui l'a engendrée.
 
-Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite à sa place. Nous revenons donc complètement en arrière, et rejetons son choix. Cela renforce la correction que nous avions déjà justifiée.
+Si, au cours des autocomplétions, on viole l'une de nos deux conditions sur la correction partielle (voir section~\ref{correction_section}), cela veut dire que l'utilisateur a fait un mauvais choix, puisqu'il aurait été obligé, en continuant, de faire l'opération incorrecte que nous avons faite à sa place. Nous revenons donc complètement en arrière, et rejetons son choix.
+
+Cela enrichit la correction, au sens de la remarque \ref{correction_desc}. En effet, nous ne garantissons toujours pas que chaque choix permet d'aboutir, mais nous éliminons plus de choix incorrects. Nous facilitons ainsi le travail de l'utilisateur, en lui évitant plus souvent de se tromper, mais nous ne pouvons toujours pas montrer de correction plus forte.
 
 \subsection{Détection d'erreurs}
 
@@ -1322,8 +1325,7 @@ De même, listons quelques heuristiques pour la détection d'erreurs. À nouveau
     \end{remark}
 \end{itemize}
 
-Lorsqu'une de ces erreurs est détectée, cela produit le même effet que quand une de nos deux conditions de correction partielle est violée: on revient en arrière, et on rejette le choix de l'utilisateur. Cette détection d'erreur, combinée à l'autocomplétion, renforce à nouveau la correction que nous avions.
-
+Lorsqu'une de ces erreurs est détectée, cela produit le même effet que quand une de nos deux conditions de correction partielle est violée: on revient en arrière, et on rejette le choix de l'utilisateur. Ces heuristiques, combinées à l'autocomplétion, permettent à nouveau d'éliminer plus de mauvais choix, et donc, en un certain sens, d'enrichir la correction.
 
 \section{Conclusion}
 
@@ -1333,11 +1335,13 @@ Notre assistant de preuve offre, conformément à notre objectif, une solution p
     L'exemple en question:
 %
     $X_5, X_4, {X_1}\orth \tensor ({X_2}\orth \tensor ({X_3}\orth \tensor ({X_4}\orth \tensor {X_5}\orth))), X_1, X_3 \parr X_2$
+
+    Les suites d'instructions $5$ ou $(3, 2, 5)$ permettent par exemple de conclure avec notre prouveur. C'est plus rapide que dans Click \& Collect.
 \end{example}
 
-La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant, et les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non détectée.
+La correction et la complétude que nous avons prouvées garantissent la fiabilité de notre assistant. Les heuristiques d'autocomplétion et de détection d'erreurs rendent l'expérience de l'utilisateur plutôt fluide et agréable. Celle-ci pourrait cependant être améliorée en ajoutant une interface graphique, et en permettant à l'utilisateur de revenir en arrière dans ses choix, afin qu'il ne se retrouve pas bloqué par une erreur non détectée.
 
-De plus, l'autocomplétion pourrait être encore enrichie, en intégrant directement les approximations basses et hautes d'adresses aux représentations. Ceci donnerait une puissance de calcul supplémentaire, puisqu'on pourrait alors exploiter les liens entre les différents trous, et ainsi affiner itérativement nos approximations. On rentrerait de cette manière plus souvent dans des cas d'autocomplétion, et on détecterait également plus d'erreurs.
+De plus, l'autocomplétion pourrait être encore enrichie, en étiquettant directement les trous des représentations par leurs approximations d'adresses. Ceci permettrait d'avoir des approximations plus fines, en utilisant un algorithme global. Celui-ci prendrait en entrée une représentation partielle, et mettrait à jour ses étiquettes d'approximations de manière itérative. Les approximations ne seraient donc plus calculées individuellement, pour un trou donné, mais en même temps, et les unes par rapport aux autres. Elles seraient ainsi plus précises, et cela permettrait de rentrer plus souvent dans des cas d'autocomplétion, et donc de détecter plus d'erreurs.
 
 Enfin, nous n'avons considéré que le fragment multiplicatif MLL de la logique linéaire, mais notre assistant pourrait être étendu, en utilisant la même méthode, aux fragments plus grands, comme par exemple LL.
 
@@ -1359,35 +1363,117 @@ L'équipe Plume travaille plus particulièrement sur la théorie de la preuve et
 
 Au cours de mon stage, j'ai été encadré par Olivier Laurent, directeur de recherche au CNRS et chercheur permanent au LIP. J'ai eu l'occasion de participer aux groupes de travail et conférences hebdomadaires organisés par l'équipe Plume, ainsi qu'à la rencontre nationale CHoCoLa de juin. J'ai également pu discuter et interagir avec des doctorants et chercheurs, dont Samuel Arsac, Amélie Rima, Le Thanh Dung ‘Tito’ Nguyen, Denis Kuperberg et Daniel Hirschkoff.
 
-\section{Une trace d'exécution de notre assistant}
+\section{Une trace d'exécution}
 \label{exec_trace}
+Décrivons l'exécution de notre assistant dans un cas où l'on a prouvé le séquent $X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3$.
+
+Le programme affiche tout d'abord un pseudo-code \LaTeX{}, associé à la représentation partielle minimale $\unknown \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3$. Ce pseudo-code est celui d'un arbre de preuve partiel, où les trous de la représentation apparaissent comme des hypothèses. Celles-ci portent des séquents, calculés à partir des approximations basse et haute: les sous-formules affichées correspondent aux adresses de l'ensemble $\highapprox$, et les formules liées à l'ensemble $\lowapprox$ y sont surlignées par les caractères $<>$. 
+
+Ici, l'arbre est réduit à un trou, ce qui explique que toutes les formules sont obligatoires:
+
 \begin{minted}{shell-session}
 \hypv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+Comme il n'y a qu'un seul trou, il est sélectionné automatiquement:
+
+\begin{minted}{shell-session}
 Unique hole 1 automatically selected
+\end{minted}
+
+Le séquent lié au trou est ensuite affiché:
+
+\begin{minted}{shell-session}
 Selected hole:
   <(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>
 Please choose the rule to apply:
-3
+\end{minted}
 
+L'utilisateur choisit la règle qu'il applique, en donnant un entier correspondant à l'indice d'une formule dans le séquent (numérotées de gauche à droite à partir de 1):
+
+\begin{minted}{shell-session}
+3
+\end{minted}
+
+La règle est appliquée par l'assistant, et on obtient la représentation partielle suivante:
+
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{3 \epsilon}$}
+        child {node {$\unknown$}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+L'arbre partiel associé à cette représentation est affiché:
+
+\begin{minted}{shell-session}
    \hypv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+À nouveau, cet arbre ne contient qu'un seul trou, qui est automatiquement sélectionné:
+
+\begin{minted}{shell-session}
 Unique hole 1 automatically selected
 Selected hole:
   <(1) * (2^)>, <(2) * (3^)>, <1^>, <3>
 Please choose the rule to apply:
-1
+\end{minted}
 
+L'utilisateur fait un nouveau choix:
+\begin{minted}{shell-session}
+1
+\end{minted}
+
+On obtient la représentation partielle suivante:
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{1 \epsilon}$}
+        child {node {$B_{1 \Right}$}
+            child {node {$\unknown$}}
+            child {node {$\unknown$}}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+Et on l'affiche:
+
+\begin{minted}{shell-session}
       \hypv{<1>, (2) * (3^), 1^, 3}
 
       \hypv{<2^>, (2) * (3^), 1^, 3}
    \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+Ici, on rentre dans un cas d'autocomplétion: le trou de droite ne peut être remplacé que par des atomes, à l'exception d'un tenseur. Or, aucun atome n'a de paire duale. On en déduit qu'on doit appliquer le tenseur:
+
+\begin{minted}{shell-session}
 Quasi-atomic sequent <2^>, (2) * (3^), 1^, 3 with a unique mandatory (or possible)
 tensor operator: applying it
+\end{minted}
 
+On obtient la représentation partielle suivante:
+
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{1 \epsilon}$}
+        child {node {$B_{1 \Right}$}
+            child {node {$\unknown$}}
+            child {node {$B_{2 \epsilon}$}
+                child{node {$\unknown$}}
+                child{node {$\unknown$}}}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+Et on l'affiche:
+
+\begin{minted}{shell-session}
       \hypv{<1>, 1^, 3}
 
          \hypv{2^, <2>, 1^, 3}
@@ -1396,10 +1482,32 @@ tensor operator: applying it
       \tensorv{<2^>, <(2) * (3^)>, 1^, 3}
    \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+On rencontre un nouveau cas d'autocomplétion: le trou de gauche ne peut être remplacé que par des atomes, et seul l'un d'entre eux est obligatoire et a une paire duale. On applique donc une feuille:
+
+\begin{minted}{shell-session}
 Atomic sequent <1>, 1^, 3 with a unique mandatory atom having a unique
 complement: applying it
+\end{minted}
 
+On obtient la représentation partielle suivante:
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{1 \epsilon}$}
+        child {node {$B_{1 \Right}$}
+            child {node {$F_{1 \Left, \; 3 \Left}$}}
+            child {node {$B_{2 \epsilon}$}
+                child{node {$\unknown$}}
+                child{node {$\unknown$}}}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+On l'affiche:
+
+\begin{minted}{shell-session}
       \axv{<1>, <1^>}
 
          \hypv{2^, <2>, 3}
@@ -1408,10 +1516,31 @@ complement: applying it
       \tensorv{<2^>, <(2) * (3^)>, <3>}
    \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+On rencontre encore un cas d'autocomplétion, similaire:
+\begin{minted}{shell-session}
 Atomic sequent 2^, <2>, 3 with a unique mandatory atom having a unique
 complement: applying it
+\end{minted}
 
+On obtient la représentation partielle suivante:
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{1 \epsilon}$}
+        child {node {$B_{1 \Right}$}
+            child {node {$F_{1 \Left, \; 3 \Left}$}}
+            child {node {$B_{2 \epsilon}$}
+                child{node {$F_{1 \Right, \; 2 \Left}$}}
+                child{node {$\unknown$}}}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+On l'affiche:
+
+\begin{minted}{shell-session}
       \axv{<1>, <1^>}
 
          \axv{<2^>, <2>}
@@ -1420,12 +1549,36 @@ complement: applying it
       \tensorv{<2^>, <(2) * (3^)>, <3>}
    \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
+\end{minted}
 
+On tombe sur un dernier cas d'autocomplétion, toujours similaire:
+\begin{minted}{shell-session}
 Atomic sequent <3^>, <3> having only two mandatory and dual atoms: 
 applying them
+\end{minted}
 
+On obtient alors une représentation complète:
+\begin{equation*}
+    \begin{tikzpicture}%
+        [level 2/.style={sibling distance=3.5cm}]
+        \node {$U_{1 \epsilon}$}
+        child {node {$B_{1 \Right}$}
+            child {node {$F_{1 \Left, \; 3 \Left}$}}
+            child {node {$B_{2 \epsilon}$}
+                child{node {$F_{1 \Right, \; 2 \Left}$}}
+                child{node {$F_{2 \Right, \; 3 \Right}$}}}
+        };
+    \end{tikzpicture} \vdash X_1 \tensor {X_2}\orth, X_2 \tensor {X_3}\orth, {X_1}\orth \parr X_3
+\end{equation*}
+
+Le séquent a été prouvé:
+\begin{minted}{shell-session}
 Proven!
+\end{minted}
 
+La représentation complète est décodée, et le code en \LaTeX{} d'une preuve correspondante est affiché:
+
+\begin{minted}{shell-session}
 \begin{prooftree}
       \axv{{X_1}\orth, X_1}
 
@@ -1433,11 +1586,27 @@ Proven!
 
          \axv{{X_3}\orth, X_3}
       \tensorv{{X_2}\orth, (X_2) \tensor ({X_3}\orth), X_3}
-   \tensorv{{X_1}\orth, (X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), X_3}
-   \permv{3 \;1 \;2 \;4}{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), {X_1}\orth, X_3}
+   \tensorv{{X_1}\orth, (X_1) \tensor ({X_2}\orth), (X_2) \tensor 
+   ({X_3}\orth), X_3}
+   \permv{3 \;1 \;2 \;4}{(X_1) \tensor ({X_2}\orth), (X_2) \tensor 
+   ({X_3}\orth), {X_1}\orth, X_3}
 \parrv{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), ({X_1}\orth) \parr (X_3)}
 \end{prooftree}
 \end{minted}
+
+\begin{equation*}
+    \begin{prooftree}
+          \axv{{X_1}\orth, X_1}
+    
+             \axv{{X_2}\orth, X_2}
+    
+             \axv{{X_3}\orth, X_3}
+          \tensorv{{X_2}\orth, (X_2) \tensor ({X_3}\orth), X_3}
+       \tensorv{{X_1}\orth, (X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), X_3}
+       \permv{3 \;1 \;2 \;4}{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), {X_1}\orth, X_3}
+    \parrv{(X_1) \tensor ({X_2}\orth), (X_2) \tensor ({X_3}\orth), ({X_1}\orth) \parr (X_3)}
+    \end{prooftree}
+\end{equation*}
 
 \section{Démonstrations annexes}
 
