@@ -931,22 +931,41 @@ On a $\lowapprox\subseteq\highapprox$.
 Comme notre algorithme termine dans ses cas d'application, nous pouvons le spécifier, en commençant par l'approximation haute:
 
 \begin{definition}[Spécification de l'approximation haute]
-    Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. On pose
-    \begin{align*}
-        \begin{multlined}
-            \highapproxspec \left( t, \; \sequent, \; a' \right) = \{ a \in \addresses, \; \exists t' \in \treespartial, \; t \relapprox t' \; \text{en ayant remplacé le trou adressé par $a'$}, \\
-            (t', \sequent) \in \representationspartial, \; \text{$a$ étiquette le nouveau noeud de $t'$} \}
-        \end{multlined}
-    \end{align*}
+    \label{lowapprox_branch}
+    Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $t$ a un trou adressé par $a'$.
 
-    \begin{remark}
-         On ne peut pas avoir $t \in \trees$.
-    \end{remark}
-
-    \begin{remark}
-         Cet ensemble est l'ensemble des adresses possibles pour un trou, c'est-à-dire les adresses par lesquelles on peut remplacer le trou en conservant la correction partielle de la représentation.
-    \end{remark}
+    On pose $\highapproxspec \left( t, \; \sequent, \; a' \right)$ l'ensemble des adresses n'apparaissant pas dans $t$, qui sont des adresses racines correctes, ou des adresses correctes descendant immédiatement (en respectant les conditions gauche et droite de descendance) d'une adresse présente sur la branche racine--trou de $t$.
 \end{definition}
+
+\begin{remark}
+     On ne peut pas avoir $t \in \trees$.
+\end{remark}
+
+\begin{remark}
+    Une adresse racine est une adresse de la forme $(n, \; \epsilon)$.
+    
+    Une adresse correcte est une adresse pointant vers une sous-formule de $\sequent$.
+\end{remark}
+
+\begin{example}Considérons la représentation suivante:
+    \begin{equation*}
+        \begin{tikzpicture}%
+            [level 2/.style={sibling distance=3.5cm}]
+            \node {$U_{1 \epsilon}$}
+            child {node {$B_{1 \Right}$}
+                child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
+                child {node {$H$}}
+            };
+        \end{tikzpicture}
+        \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
+    \end{equation*}
+
+    L'ensemble $\highapproxspec$ contient les adresses $1 \Right \cdot \Right$ et $2 \epsilon$.
+\end{example}
+
+\begin{remark}
+     Cet ensemble est celui des adresses possibles pour le trou. On montrera, en justifiant la correction de l'assistant, que les utiliser pour substituer le trou conserve la correction partielle de la représentation.
+\end{remark}
 
 \begin{theorem}[Correction de l'approximation haute]
     \label{highapprox_correction}
@@ -1002,47 +1021,18 @@ Avant de donner la démonstration, définissons une notion qui lui sera utile:
 \end{proof}
 
 Spécifions maintenant l'approximation basse, en ne considérant qu'un cas particulier. Cette spécification restreinte suffira à justifier la correction de notre assistant, et nous nous en contenterons. Pour justifier la complétude, il nous faudra en effet recourir à un autre type de propriété sur les approximations, différent des spécifications.
-
-\begin{definition}[Spécification de l'approximation basse pour une branche]
-    \label{lowapprox_branch}
-    Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $t$ a un unique trou adressé par $a'$.
-
-    On pose $\lowapproxspec \left( t, \; \sequent, \; a' \right)$ l'ensemble des adresses n'apparaissant pas dans $t$, qui sont des adresses racines correctes, ou des adresses correctes descendant immédiatement d'une adresse présente sur la branche racine--trou de $t$.
-\end{definition}
-
-\begin{remark}
-    Une adresse racine est une adresse de la forme $(n, \; \epsilon)$.
-    
-    Une adresse correcte est une adresse pointant vers une sous-formule de $\sequent$.
-\end{remark}
-
-\begin{example}Considérons la représentation suivante:
-    \begin{equation*}
-        \begin{tikzpicture}%
-            [level 2/.style={sibling distance=3.5cm}]
-            \node {$U_{1 \epsilon}$}
-            child {node {$B_{1 \Right}$}
-                child {node {$F_{1 \Left, \; 1 \Right \cdot \Left}$}}
-                child {node {$H$}}
-            };
-        \end{tikzpicture}
-        \vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
-    \end{equation*}
-
-    L'ensemble $\lowapprox'$ contient les adresses $1 \Right \cdot \Right$ et $2 \epsilon$.
-\end{example}
     
 \begin{theorem}[Propriété de branche de l'approximation basse]
     \label{lowapprox_correction}
     
     Soient $(t, \; \sequent) \in \representationspartial$ et $a' \in \treeaddresses$, tels que $t$ a un unique trou adressé par $a'$.
-    On a, dans ce cas, $\lowapprox = \lowapproxspec \left( t, \; \sequent, \; a' \right)$. 
+    On a, dans ce cas, $\lowapprox = \highapproxspec \left( t, \; \sequent, \; a' \right)$. 
 \end{theorem}
 
 \begin{proof}
-    À nouveau, on prouve un invariant: au début du $i$\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a ${\lowapprox}^i = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
+    À nouveau, on prouve un invariant: au début du $i$\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a ${\lowapprox}^i = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
 
-    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction}, et la correction en découle.
+    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction_proof}, et la correction en découle.
 \end{proof}
 
 \subsection{Correction de l'assistant de preuve}
@@ -1059,10 +1049,10 @@ Lors de l'interaction, celui-ci impose, comme on l'a dit, des contraintes à l'u
     On dit que $(t_i)$ est une suite exacte selon $\sequent$, ssi les deux conditions suivantes sont vérifiées:
     \begin{enumerate}
         \item[$\exactcond$:]
-        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud interne (et pas une feuille) étiqueté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox(t_i, \; \sequent, \; \beta)$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
+        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ un noeud (et pas une feuille) étiqueté par $a$, alors l'arité de ce noeud correspond à celle de la sous-formule de $\sequent$ adressée par $a$, et $a \in \highapprox(t_i, \; \sequent, \; \beta)$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé. Si l'on ajouté une feuille étiquetée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $a_1, a_2 \in \highapprox(t_i, \; \sequent, \; \beta)$.
 
         \item[$\exactcondbis$:]
-        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ une feuille $F$ étiquetée par $a_1$ et $a_2$, alors $a_1$ et $a_2$ adressent des atomes duaux de $\sequent$, et $\lowapprox(t_i, \; \sequent, \; \beta) \subseteq \{a_1, \; a_2\}$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
+        Pour tout $0 \leq i \leq n-1$, si l'on a ajouté à $t_i$ une feuille $F$ étiquetée par $a_1$ et $a_2$, alors $\lowapprox(t_i, \; \sequent, \; \beta) \subseteq \{a_1, \; a_2\}$, où $\beta$ est l'adresse du trou de $t_i$ qu'on a remplacé.
     \end{enumerate}
 \end{definition}
 
@@ -1953,23 +1943,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     
             De manière évidente, $t_1$ est sous-arbre de $t$, et $a'_1$ adresse dans $t_1$ le trou adressé par $a'$ dans $t$.
             
-            On vérifie de plus que $\highapprox = \highapproxspec \left( \treesimplify( t, \; \epsilon ), \sequent, \; \epsilon \right) = \highapproxspec \left( H, \sequent, \; \epsilon \right)$:
-    
-            \begin{description}
-                \item[$\subseteq$] 
-                Soit $\beta \in \Sigma$. On peut utiliser $\beta$ pour substituer le trou et obtenir une représentation $(t', \; \sequent) \in \representationspartial$ partiellement correcte :
-        
-                \begin{enumerate}
-                    \item[\caddpartial] L'adresse $\beta$ pointe par construction $\Sigma$ vers une formule de $\sequent$. On choisissant le bon constructeur, on respecte donc le bon adressage.
-        
-                    \item[\clinpartial] $t$ étant un trou, $t'$ n'aura qu'un seul n\oe ud, ce qui assure de respecter la sous-linéarité.
-        
-                    \item[\cdespartial] $\beta$ étant une adresse racine, la descendance ne pose pas problème.
-                \end{enumerate}
-    
-                \item[$\supseteq$]
-                Supposons par l'absurde qu'il existe $\beta \in \highapproxspec \left( H, \sequent, \; \epsilon \right)$ telle que $\beta \notin \Sigma$. Une telle adresse serait nécessairement de la forme $(i, \alpha \cdot \someadd)$, et devrait pourtant étiqueter la racine de $t'$, ce qui ne respecterait pas la condition \cdespartial{} de descendance.
-            \end{description}
+            On vérifie de plus que $\highapprox = \highapproxspec \left( \treesimplify( t, \; \epsilon ), \sequent, \; \epsilon \right) = \highapproxspec \left( H, \sequent, \; \epsilon \right)$: aucune adresse n'apparaît dans $\unknown$, et $\Sigma$ est bien l'ensemble des adresses racines correctes de $(\unknown, \sequent)$.
 
         \item[Hérédité:] Supposons que l'invariant est vérifié au début du $i$\ieme{} appel. On regarde le n\oe ud présent à la racine de $t_i$:
 
@@ -1988,28 +1962,24 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
             
             Par ailleurs, d'après le pseudo-code, ${\highapprox}^{i+1} = ({\highapprox}^{i}\setminus (\mathcal{M} \cup \{ (m, \someadd) \})) \cup \left\{ (m, \someadd \cdot \Left) \right\}$, où $\mathcal{M}$ est l'ensemble des adresses minimales de $t''$.
 
-            Montrons que ${\highapprox}^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
+            Montrons que ${\highapprox}^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$:
 
             \begin{description}
                 \item[$\subseteq$] 
-                    Remarquons d'abord que $(t, \sequent) \in \representationspartial$. Par propriété sur la simplification, il vient donc $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$. Soit $\beta = (m, \someadd) \in {\highapprox}^{i+1}$. On a deux cas:
+                    Comme $(t, \sequent) \in \representationspartial$, on a par propriété sur la simplification que $(s(t, \alpha_{i}), \sequent) \in \representationspartial$. Soit $\beta = (m, \someadd) \in {\highapprox}^{i+1}$. On a deux cas:
 
                     \begin{description}
                         \item[Si $m = n$:] 
-                            Nécessairement, $\beta = (n, \rho \cdot \Left)$, car, par hypothèse de récurrence, ${\highapprox}^{i}$ était correct, et, comme $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$, cet ensemble ne contenait qu'une seule adresse d'entier $n$, à savoir $(n, \rho)$.
+                            Nécessairement, $\beta = (n, \rho \cdot \Left)$, car, par hypothèse de récurrence, ${\highapprox}^{i}$ était correct, et, comme $(s(t, \alpha_{i}), \sequent) \in \representationspartial$, cet ensemble ne contenait qu'une seule adresse d'entier $n$, à savoir $(n, \rho)$. Cela vient du fait que $(n, \rho)$ étiquette la racine de $t_i$, et donc que $(n, \rho)$ descend immédiatement d'une adresse sur la branche racine--trou de $s(t, \alpha_{i})$.
                             
-                            Or, le trou que l'on remplace par $\beta$ est le fils gauche d'un n\oe ud $B$ étiqueté par $(n, \rho)$, cela ne pose donc aucun problème.
+                            Ainsi, $\beta = (n, \rho \cdot \Left)$ descend immédiatement d'une adresse de $s(t_{i+1}, \alpha_{i+1})$, en respectant la condition gauche de descendance. De plus, c'est une adresse correcte, car $(t, \sequent) \in \representationspartial$, et cet arbre contient un n\oe ud $B(n \rho, t', t'')$ (la racine de $t_i$). On en déduit que $(n \rho)$ adresse un tenseur, qui a donc bien un fils gauche. 
+                            
+                            L'adresse $(n, \rho \cdot \Left)$ ne peut enfin pas apparaître dans $s(t, \alpha_{i+1})$. En effet, elle n'apparaît pas dans $t''$ à cause de la condition de descendance \ref{clin}, et elle n'apparaît pas non plus dans le reste de l'arbre car elle n'apparaissait déjà pas dans $s(t, \alpha_{i})$, par HR (car $(n, \rho)$ n'y apparaissait pas).
+
+                            Finalement, $\beta \in \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
                             
                         \item[Si $m \neq n$:] 
-                            Nécessairement, $\beta \in {\highapprox}^{i}$, et, de plus, $\beta \notin \mathcal{M}$. Le fait que $\beta \in {\highapprox}^{i}$ assure qu'on peut remplacer le n\oe ud $\alpha_i$ de $s(t, \alpha_i)$ par un n\oe ud étiqueté par $\beta$, en conservant les trois conditions partielles \caddpartial, \clinpartial, \cdespartial{} $\bigstar$. Il en découle qu'on peut également remplacer le n\oe ud $\alpha_{i+1} = \alpha_i \cdot \Right$ de $s(t, \alpha_{i+1})$ par un n\oe ud étiqueté par $\beta$ en conservant \caddpartial, \clinpartial, et \cdespartial.
-    
-                        \begin{enumerate}
-                            \item Cela découle de $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$ et de $\bigstar$, car la condition à vérifier est la même, qu'on substitue dans $(s(t, \alpha_{i}), \sequent)$ ou dans $(s(t, \alpha_{i+1}), \sequent)$.
-    
-                            \item Idem, en ajoutant que $\beta$ est également distincte du n\oe ud que $(s(t, \alpha_{i+1}))$ a en plus que $(s(t, \alpha_{i}))$, car $m \neq n$.
-    
-                            \item D'après $(s(t, \alpha_{i+1}), \sequent) \in \representationspartial$, on sait que, dans $(s(t, \alpha_{i+1}), \sequent)$ où l'on a fait le remplacement de $\alpha_{i+1}$ par $\beta$, \cdespartial{} est respectée pour tous les n\oe uds, sauf éventuellement celui adressé par $\alpha_{i+1}$. Or, $m \neq n$ et $\beta \notin \mathcal{M}$, ce qui assure que ce n\oe ud ne pose pas problème non plus.
-                        \end{enumerate}
+                            Nécessairement, $\beta \in {\highapprox}^{i}$, et, de plus, $\beta \notin \mathcal{M}$. Le fait que $\beta \in {\highapprox}^{i}$ assure qu'il s'agit d'une adresse racine correcte, ou d'une adresse correcte descendant immédiatement d'une adresse de la branche racine--trou de $s(t, \alpha_{i})$, et n'y apparaisssant pas. Comme $m \neq n$ et $\beta \notin \mathcal{M}$, ces conditions sont toujours vérifiées pour $s(t, \alpha_{i+1})$.
                         
                         D'où $\beta \in \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$, et donc ${\highapprox}^{i+1} \subseteq \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$.
                     \end{description}
@@ -2017,11 +1987,11 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
                 \item[$\supseteq$]
                     Supposons par l'absurde qu'il existe $\beta \in \highapproxspec \left( \treesimplify( t_{i+1}, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$, telle que $\beta \notin {\highapprox}^{i+1}$. 
                     
-                    Nécessairement, $\beta \neq (n, \someadd \cdot \Left)$ car $\beta \notin {\highapprox}^{i+1}$. On en déduit, par un argument de descendance, que $\beta = (m, \someadd')$ avec $m \neq n$. En utilisant un argument similaire à ceux du cas $\subseteq$, il en découle que $\beta \in \highapproxspec \left( \treesimplify( t_{i}, \; {\alpha}_{i} ) \right)$. Par hypothèse de récurrence, ${\highapprox}^{i}$ est correct, d'où $\beta \in {\highapprox}^{i}$.
+                    Nécessairement, $\beta \neq (n, \someadd \cdot \Left)$, car $\beta \notin {\highapprox}^{i+1}$. On en déduit, par un argument de descendance, que $\beta = (m, \someadd')$ avec $m \neq n$. En utilisant un argument similaire à la disjonction du cas $\subseteq$, il en découle que $\beta \in \highapproxspec \left( \treesimplify( t_{i}, \; {\alpha}_{i} ) \right)$. Par hypothèse de récurrence, ${\highapprox}^{i}$ est correct, d'où $\beta \in {\highapprox}^{i}$.
                     
-                    Or, la racine de $t_{i+1}$, dont on cherche à remplacer le fils droit dans $\treesimplify( t, \; {\alpha}_{i+1} )$, est étiquetée par $(n, \rho)$, et a un fils gauche portant les adresses de l'ensemble $\mathcal{M}$. Ainsi, pour que la descendance soit respectée, on a $\beta \notin \mathcal{M} \cup \{ (n, \someadd) \}$.
+                    De plus, $\beta$ n'apparaît pas dans $s(t, \alpha_{i+1})$, d'où en particulier $\beta \notin \mathcal{M}$, et donc $\beta \notin \mathcal{M} \cup \{ (n, \someadd) \}$.
 
-                    Par construction de ${\highapprox}^{i+1}$, on devrait donc avoir $\beta \in {\highapprox}^{i+1}$, ce qui est absurde.
+                    Par construction de ${\highapprox}^{i+1}$, on devrait alors avoir $\beta \in {\highapprox}^{i+1}$, ce qui est absurde.
             \end{description}
 
             On a bien ${\highapprox}^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ), \sequent, \; {\alpha}_{i+1} \right)$, l'invariant est conservé.
@@ -2041,7 +2011,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     \begin{description}
         \item[Initialisation:] Lors du premier appel, on a $t_1 = t$, $a'_1 = a'$, et $\alpha_1 = \epsilon$. Ainsi, $\treesimplify( t, \; {\alpha}_i ) = H$, qui ne contient aucune adresse.
         
-        $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$ est donc l'ensemble des adresses correctes racines de $\sequent$, qui est bien l'ensemble $\Sigma$ qu'on renvoie.
+        $\highapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$ est donc l'ensemble des adresses correctes racines de $\sequent$, qui est bien l'ensemble $\Sigma$ qu'on renvoie.
 
         \item[Hérédité:] Supposons que l'invariant est vérifié au début du $i$\ieme{} appel. On regarde le n\oe ud présent à la racine de $t_i$:
 
@@ -2056,9 +2026,9 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
 
             On a $a_i' = \alpha \cdot a_{i+1}'$. Détaillons le cas où $\alpha = \Left$.
 
-            Par hypothèse de récurrence, $\lowapprox^{i} = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$. 
+            Par hypothèse de récurrence, $\lowapprox^{i} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$. 
             
-            On veut désormais calculer $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$. On a deux transformations à appliquer à $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$, qui correspondent au remplacement du trou $\alpha_{i}$ de $\treesimplify( t, \; {\alpha}_i )$.
+            On veut désormais calculer $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$. On a deux transformations à appliquer à $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$, qui correspondent au remplacement du trou $\alpha_{i}$ de $\treesimplify( t, \; {\alpha}_i )$.
             
             D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t'$, on a $t'' \in \trees$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t''$. D'après la condition \cdespartial{} de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine--trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
 
@@ -2066,9 +2036,9 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
 
             Ces deux transformations correspondent à celles effectuées par le code.
 
-            On vérifie ensuite, comme dans la preuve du théorème~\ref{highapprox_correction}, que les adresses de $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$ qu'on n'a pas modifiées sont toujours valides dans $\treesimplify( t, \; {\alpha}_{i+1} )$. De plus, il n'existe pas d'autre adresse valide que celles qu'on a gardées ou ajoutées.
+            On vérifie ensuite, comme dans la preuve du théorème~\ref{highapprox_correction}, que les adresses de $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$ qu'on n'a pas modifiées sont toujours valides dans $\treesimplify( t, \; {\alpha}_{i+1} )$. De plus, il n'existe pas d'autre adresse valide que celles qu'on a gardées ou ajoutées.
 
-            Ainsi, $\lowapprox^{i+1} = \lowapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$, et l'invariant est conservé.
+            Ainsi, $\lowapprox^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$, et l'invariant est conservé.
 
             \item[$U$] Si $t_i = U(n\rho, t') \in \representations$.
 
