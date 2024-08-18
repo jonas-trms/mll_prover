@@ -868,16 +868,16 @@ Donnons maintenant l'algorithme d'approximation: algorithme~\ref{algo_approx}.
                 \State \Return $\highapprox, \lowapprox$
             \EndCase
     
-            \Case{$U((m, \someadd), t'), \; \Left \cdot \someaddbis$}
+            \Case{$U((m, \someadd), t_1), \; \Left \cdot \someaddbis$}
                 \State $\highapprox \gets ({\highapprox}\setminus \{ (m, \someadd) \}) \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
                 
                 \State $\lowapprox \gets ({\lowapprox}\setminus \{ (m, \someadd) \}) \cup \left\{ (m, \someadd \cdot \Left), (m, \someadd \cdot \Right)\right\}$
                 
-                \State \Return $\text{APPROX}(t', \; \someaddbis, \; \highapprox, \; \lowapprox)$
+                \State \Return $\text{APPROX}(t_1, \; \someaddbis, \; \highapprox, \; \lowapprox)$
             \EndCase
     
             \Case{$B((m, \someadd), t_1, t_2), \; \Left \cdot \someaddbis$}
-                \State $\mathcal{M} \gets \left\{\text{$a$, où $a$ est une adresse minimale apparaissant dans $t_2$}\right\}$
+                \State $\mathcal{M} \gets \left\{a \mid a \text{ est une adresse minimale apparaissant dans $t_2$}\right\}$
                 
                 \State $\highapprox \gets ({\highapprox}\setminus (\mathcal{M} \cup \{ (m, \someadd) \})) \cup \left\{ (m, \someadd \cdot \Left) \right\}$
     
@@ -887,7 +887,7 @@ Donnons maintenant l'algorithme d'approximation: algorithme~\ref{algo_approx}.
                     \State $\lowapprox \gets \left\{ (m, \someadd \cdot \Left) \right\}$
                 \EndIf
                 
-                \State \Return $\text{APPROX}(t', \; \someaddbis, \; \highapprox, \; \lowapprox)$
+                \State \Return $\text{APPROX}(t_1, \; \someaddbis, \; \highapprox, \; \lowapprox)$
             \EndCase
     
             \Case{$B((m, \someadd), t_1, t_2), \; \Right \cdot \someaddbis$}
