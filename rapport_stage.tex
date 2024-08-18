@@ -1030,9 +1030,9 @@ Spécifions maintenant l'approximation basse, en ne considérant qu'un cas parti
 \end{theorem}
 
 \begin{proof}
-    À nouveau, on prouve un invariant: au début du $i$\ieme{} appel à APPROX$(t_i, a'_i, {\highapprox}^i, {\lowapprox}^i)$, en posant $a' = {\alpha}_i \cdot a'_i$, on a ${\lowapprox}^i = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ), \sequent, \; {\alpha}_i \right)$.
-
-    La preuve de l'invariant est en démonstration annexe~\ref{lowapprox_correction_proof}, et la correction en découle.
+    On peut simplement montrer qu'on a, dans ce cas, $\lowapprox=\highapprox$, et se servir du théorème \ref{highapprox_correction}. Cela se montrerait à nouveau par un invariant, de manière très directe. 
+    
+    En effet, l'arbre ayant un unique trou, on rentre toujours dans le cas $t_2 \in \trees$ du constructeur $B$, et on vérifie donc aisément que les opérations récursives effectuées sur $\lowapprox$ et $\highapprox$ sont toujours les mêmes.
 \end{proof}
 
 \subsection{Correction de l'assistant de preuve}
@@ -2001,50 +2001,6 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
             \item[$U$] Si $t_i = U(n\rho, t') \in \representations$.
     
             $a_i'$ adresse dans $t_i$ le trou adressé par $a'$ dans $t$, d'où, nécessairement, $a_i' = \Left \cdot a_{i+1}'$ (d'après la convention d'adressage dans un arbre). Ce cas correspond bien à celui du pseudo-code, et l'argument de correction est similaire au cas du constructeur $B$.
-\qed
-        \end{description}
-    \end{description}
-\end{demonstrationappendix}
-
-\begin{demonstrationappendix}
-    \label{lowapprox_correction_proof}
-    On montre à nouveau l'invariant de la démonstration du théorème~\ref{lowapprox_correction} par récurrence sur le nombre d'appels. On se servira, sans le préciser, de l'invariant montré dans la preuve du théorème~\ref{highapprox_correction}, qui donne des informations sur $t_i$, $a'_i$, $\alpha_i$, et leur lien avec le trou. Les raisonnements seront, de plus, assez similaires.
-
-    \begin{description}
-        \item[Initialisation:] Lors du premier appel, on a $t_1 = t$, $a'_1 = a'$, et $\alpha_1 = \epsilon$. Ainsi, $\treesimplify( t, \; {\alpha}_i ) = H$, qui ne contient aucune adresse.
-        
-        $\highapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$ est donc l'ensemble des adresses correctes racines de $\sequent$, qui est bien l'ensemble $\Sigma$ qu'on renvoie.
-
-        \item[Hérédité:] Supposons que l'invariant est vérifié au début du $i$\ieme{} appel. On regarde le n\oe ud présent à la racine de $t_i$:
-
-        \begin{description}
-            \item[$F$]
-                À nouveau, ce cas est impossible.
-                
-            \item[$H$]
-                On n'a rien à vérifier, car les appels s'arrêtent ici. 
-
-            \item[$B$] Si $t_i = B(n\rho, t', t'')$.
-
-            On a $a_i' = \alpha \cdot a_{i+1}'$. Détaillons le cas où $\alpha = \Left$.
-
-            Par hypothèse de récurrence, $\lowapprox^{i} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$. 
-            
-            On veut désormais calculer $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$. On a deux transformations à appliquer à $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$, qui correspondent au remplacement du trou $\alpha_{i}$ de $\treesimplify( t, \; {\alpha}_i )$.
-            
-            D'une part, comme $t$ n'a qu'un trou, et que celui-ci apparaît dans $t'$, on a $t'' \in \trees$. Posons $\mathcal{M}$ l'ensemble des adresses minimales apparaissant dans $t''$. D'après la condition \cdespartial{} de descendance sur $\treesimplify( t, \; {\alpha}_{i+1} )$, aucune adresse descendant immédiatement d'une adresse de la branche racine--trou ne peut descendre, indirectement ou pas, d'une adresse de $\mathcal{M}$. On peut donc retirer ces adresses.
-
-            D'autre part, comme on a ajouté l'adresse $n\rho$ sur la branche racine--trou, le descendant immédiat d'une adresse de cette branche ayant pour entier $n$, qui était auparavant $n\rho$ d'après \cdespartial{} sur $\treesimplify( t, \; {\alpha}_{i} )$, devient $n\rho \cdot \Right$. On met cela à jour.
-
-            Ces deux transformations correspondent à celles effectuées par le code.
-
-            On vérifie ensuite, comme dans la preuve du théorème~\ref{highapprox_correction}, que les adresses de $\highapproxspec \left( \treesimplify( t, \; {\alpha}_{i} ) \right)$ qu'on n'a pas modifiées sont toujours valides dans $\treesimplify( t, \; {\alpha}_{i+1} )$. De plus, il n'existe pas d'autre adresse valide que celles qu'on a gardées ou ajoutées.
-
-            Ainsi, $\lowapprox^{i+1} = \highapproxspec \left( \treesimplify( t, \; {\alpha}_{i+1} ) \right)$, et l'invariant est conservé.
-
-            \item[$U$] Si $t_i = U(n\rho, t') \in \representations$.
-
-            L'argument est similaire au cas du constructeur $B$.
 \qed
         \end{description}
     \end{description}
