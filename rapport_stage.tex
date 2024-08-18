@@ -724,7 +724,7 @@ Les représentations partielles correctes ont bien le sens dont on vient de parl
     \end{enumerate}
 \end{proof}
 
-\begin{remark}
+\begin{remark}\label{remholecorrect}
     En particulier, pour tout séquent $\sequent$, $(\unknown, \; \sequent) \in \representationspartial$. 
     
     Cette observation est cohérente, puisqu'un arbre réduit à un trou est un arbre ne contenant aucune information. Il s'agit en fait d'une représentation partielle correcte minimale.
@@ -914,7 +914,7 @@ On a $\lowapprox\subseteq\highapprox$.
 \end{remark}
 
 \begin{remark}
-    Dans les cas où l'on appelle APPROX sur $t \in \treespartial$ et $a \in \treeaddresses$, tels que $a$ adresse un trou dans $t$, l'algorithme termine. Ce cas est celui qui nous intéresse, puisqu'on cherchera toujours à calculer des approximations d'adresses pour un trou.
+    Dans les cas où l'on appelle APPROX sur $t \in \treespartial$ et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$, l'algorithme termine. Ce cas est celui qui nous intéresse, puisqu'on cherchera toujours à calculer des approximations d'adresses pour un trou.
     
     Dans ce cas, on vérifie qu'on rentre à chaque appel dans une des clauses du switch. De plus, la longueur de l'adresse $a'$ décroît strictement au fil des appels, et est minorée par 0 ($a' = \epsilon$ est un cas de base).
 \end{remark}
@@ -1101,16 +1101,15 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 \end{remark}
 
 \begin{proof}
-    D'après la condition $\exactcond$ et la spécification de $\highapprox$ (théorème~\ref{highapprox_correction}), on a, par récurrence immédiate, $(t_i, \sequent) \in \representationspartial, \; \; \forall 0 \leq i \leq n$.
-    
-    En effet, à chaque fois qu'on pioche une adresse dans $\highapprox$, et qu'on s'en sert pour substituer un trou, la spécification $\highapproxspec$ garantit que l'adresse que l'adresse est correcte. En associant ce résultat à la condition $\exactcond$, on déduit que le bon adressage \caddpartial{} est conservé. Par ailleurs, la spécification $\highapproxspec$ garantit que les adresses utilisées n'apparaissaient pas dans l'arbre qu'on a modifié, et donc que la sous-linéarité \clinpartial{} est conservée. Enfin, toujours d'après la spécification $\highapproxspec$, les adresses utilisées descendent immédiatement d'une adresse présente sur la branche racine--trou, en respectant les conditions gauche et droite. Cela assure que la descendance \cdespartial{} est conservée. Les représentations partielles sont donc toutes dans $\representationspartial$.
+    D'après la condition $\exactcond$ et la spécification de $\highapprox$ (théorème~\ref{highapprox_correction}), on a, par récurrence, $(t_i, \sequent) \in \representationspartial, \; \; \forall 0 \leq i \leq n$.
+    En effet, $(t_0=\unknown, \; \sequent) \in \representationspartial$ (remarque~\ref{remholecorrect}) et à chaque fois qu'on pioche une adresse dans $\highapprox$, et qu'on s'en sert pour substituer un trou, la spécification $\highapproxspec$ garantit que l'adresse est correcte. En associant ce résultat à la condition $\exactcond$, on déduit que le bon adressage \caddpartial{} est conservé. Par ailleurs, la spécification $\highapproxspec$ garantit que les adresses utilisées n'apparaissaient pas dans l'arbre qu'on a modifié, et donc que la sous-linéarité \clinpartial{} est conservée. Enfin, toujours d'après la spécification $\highapproxspec$, les adresses utilisées descendent immédiatement d'une adresse racine ou présente sur la branche racine--trou, en respectant les conditions gauche et droite. Cela assure que la descendance \cdespartial{} est conservée. Les représentations partielles sont donc toutes dans $\representationspartial$.
 
     Supposons par l'absurde qu'on ait $(t_n, \sequent) \notin \representations$. Comme $(t_n, \sequent) \in \representationspartial$, il existe nécessairement des adresses de sous-formules de $\sequent$ n'apparaissant pas dans $t_n$. Choisissons une telle adresse $a \in \addresses$ minimale (au sens de la remarque~\ref{min_address}). On a deux cas:
 
     \begin{description}
         \item[$\bm{a = (m, \epsilon)}$] $t_{n-1}$ contient un unique trou, et celui-ci est nécessairement remplacé par une feuille, car $t_n \in \trees$. Notons $a_1$ et $a_2$ les adresses de cette feuille, et $\beta$ l'adresse du trou.
         
-        $a$ est une adresse racine correcte n'apparaissant pas dans $t$. D'après le théorème~\ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_i, \sequent, \; \beta)$, d'où $\lowapprox(t_i, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$.
+        $a$ est une adresse racine correcte n'apparaissant pas dans $t$. D'après le théorème~\ref{lowapprox_correction}, $t$ n'ayant qu'un trou adressé par $\beta$, on a donc $a = (m, \epsilon) \in \lowapprox(t_{n-1}, \sequent, \; \beta)$, d'où $\lowapprox(t_{n-1}, \sequent, \; \beta) \nsubseteq \{a_1, \; a_2\}$.
         Ceci contredit la condition $\exactcondbis$, c'est absurde.
 
         \item[$\bm{a = (m, \someadd \cdot \alpha)}$] $a$ étant une adresse non utilisée minimale, $a' = (m, \someadd)$ apparaît nécessairement dans $t_n$. Notons $\beta$ l'adresse du n\oe ud étiqueté par $a'$.
