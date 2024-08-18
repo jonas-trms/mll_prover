@@ -951,12 +951,12 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons le spéc
 \begin{theorem}[Correction de l'approximation haute]
     \label{highapprox_correction}
     
-    Soient $(t, \; \sequent) \in \representationspartial$, et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. Posons $\Sigma = \{ (j, \epsilon), \; 1 \leq j \leq |\sequent| \}$, et considérons l'ensemble $\highapprox$ calculé par APPROX$(t, a', \Sigma, \Sigma)$.
+    Soient $(t, \; \sequent) \in \representationspartial$, et $a' \in \treeaddresses$, tels que $a'$ adresse un trou dans $t$. Posons $\Sigma = \{ (j, \epsilon), \; 1 \leq j \leq |\sequent|, \,$ tq $(j, \epsilon)$ adresse un opérateur dans $\sequent$, ou un atome ayant une paire duale également adressée par $\Sigma \}$, et considérons l'ensemble $\highapprox$ calculé par APPROX$(t, a', \Sigma, \Sigma)$.
     On a $\highapprox = \highapproxspec \left( t, \; \sequent, \; a' \right)$.
 \end{theorem}
 
 \begin{remark}
-    L'invariant qu'on prouvera dans la démonstration vient de la remarque~\ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représentation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent.
+    L'invariant qu'on prouvera dans la démonstration vient de la remarque~\ref{algo_expl}, qui explique également pourquoi l'appel initial se fait sur l'ensemble $\Sigma$: pour une représentation réduite à un trou, l'ensemble $\highapprox'$ est celui des adresses minimales du séquent pouvant être appliquées.
 \end{remark}
 
 \begin{remark}
@@ -1960,7 +1960,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
                 Soit $\beta \in \Sigma$. On peut utiliser $\beta$ pour substituer le trou et obtenir une représentation $(t', \; \sequent) \in \representationspartial$ partiellement correcte :
         
                 \begin{enumerate}
-                    \item[\caddpartial] L'adresse $\beta$ pointe par construction $\Sigma$ vers une formule de $\sequent$. On choisissant le bon constructeur, on respecte donc le bon adressage.
+                    \item[\caddpartial] L'adresse $\beta$ pointe par construction de $\Sigma$ vers une formule de $\sequent$. On choisissant le bon constructeur, on respecte donc le bon adressage.
         
                     \item[\clinpartial] $t$ étant un trou, $t'$ n'aura qu'un seul n\oe ud, ce qui assure de respecter la sous-linéarité.
         
@@ -2041,7 +2041,7 @@ Remarquons que l'utilisateur n'a eu besoin de donner que deux informations, et q
     \begin{description}
         \item[Initialisation:] Lors du premier appel, on a $t_1 = t$, $a'_1 = a'$, et $\alpha_1 = \epsilon$. Ainsi, $\treesimplify( t, \; {\alpha}_i ) = H$, qui ne contient aucune adresse.
         
-        $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$ est donc l'ensemble des adresses correctes racines de $\sequent$, qui est bien l'ensemble $\Sigma$ qu'on renvoie.
+        $\lowapproxspec \left( \treesimplify( t, \; {\alpha}_i ) \right)$ est donc l'ensemble des adresses correctes racines de $\sequent$ pouvant être appliquées, qui est bien l'ensemble $\Sigma$ que l'on renvoie.
 
         \item[Hérédité:] Supposons que l'invariant est vérifié au début du $i$\ieme{} appel. On regarde le n\oe ud présent à la racine de $t_i$:
 
