@@ -935,7 +935,7 @@ Comme notre algorithme termine dans ses cas d'application, nous pouvons le spéc
     \begin{align*}
         \begin{multlined}
             \highapproxspec \left( t, \; \sequent, \; a' \right) = \{ a \in \addresses, \; \exists t' \in \treespartial, \; t \relapprox t' \; \text{en ayant remplacé le trou adressé par $a'$}, \\
-            (t, \sequent) \in \representationspartial, \; \text{$a$ étiquette le nouveau noeud de $t'$} \}
+            (t', \sequent) \in \representationspartial, \; \text{$a$ étiquette le nouveau noeud de $t'$} \}
         \end{multlined}
     \end{align*}
 
@@ -1111,7 +1111,7 @@ Dans les cas où l'utilisateur a abouti, cependant, il a construit une suite exa
 \end{remark}
 
 \begin{proof}
-    D'après la condition $\exactcond$ et la spécification de $\highapprox$, on a, par récurrence immédiate, $(t_i, \sequent) \in \representationspartial, \; \; \forall 0 \leq i \leq n$.
+    D'après la condition $\exactcond$ et la spécification de $\highapprox$ (théorème~\ref{highapprox_correction}), on a, par récurrence immédiate, $(t_i, \sequent) \in \representationspartial, \; \; \forall 0 \leq i \leq n$.
 
     Supposons par l'absurde qu'on ait $(t_n, \sequent) \notin \representations$. Comme $(t_n, \sequent) \in \representationspartial$, il existe nécessairement des adresses de sous-formules de $\sequent$ n'apparaissant pas dans $t_n$. Choisissons une telle adresse $a \in \addresses$ minimale (au sens de la remarque~\ref{min_address}). On a deux cas:
 
@@ -1257,7 +1257,7 @@ $f: \representationspartial \rightarrow \representationspartial$ est une fonctio
     Remarquons qu'on utilise la relation d'approximation large, puisque notre autocomplétion peut modifier l'ordre dans lequel l'utilisateur aurait fait ses opérations. Cela n'a pas beaucoup d'importance, puisque la représentation obtenue à l'issue reste la même.
 \end{remark}
 
-Listons brièvement les heuristiques que nous utilisons dans notre code. Il est assez clair, au vu des spécification des approximations basse et haute, qu'elles sont des autocomplétions. Les démonstrations ne seront donc pas détaillées. Notons qu'il serait possible, si l'on trouvait d'autres heuristiques, de les ajouter à celles déjà présentes, sans que cela ne pose problème.
+Listons brièvement les heuristiques que nous utilisons dans notre code. Il est assez clair, au vu des spécifications des approximations basse et haute, qu'elles sont des autocomplétions. Les démonstrations ne seront donc pas détaillées. Notons qu'il serait possible, si l'on trouvait d'autres heuristiques, de les ajouter à celles déjà présentes, sans que cela ne pose problème.
 
 \begin{implementation}
     L'autocomplétion est implémentée dans notre code par:
