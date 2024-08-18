@@ -1149,7 +1149,7 @@ Justifions maintenant une complétude, qui garantit que, si notre assistant n'em
             De la même manière que dans la preuve du théorème~\ref{rep_inversion}, on a $t = F(1 \epsilon, \; 2 \epsilon)$, et $\sequent = X\orth, X$ ou $\sequent = X, X\orth$, avec $X$ un atome. Dans les deux cas, la suite $H \relapprox \; F(1 \epsilon, \; 2 \epsilon)$ convient. En effet, celle-ci est une suite d'approximations immédiates, et les deux conditions d'exactitude par rapport à $\sequent$ sont vérifiées:
     
             \begin{enumerate}
-                \item[$\exactcond$:] On a ajouté une feuille, étiquetée par $1 \epsilon$ et $2 \epsilon$. Ces adresses étiquettent bien deux atomes duaux, et, de plus, d'après le théorème \ref{highapprox_correction} de spécification de l'approximation haute, on a $\highapproxspec = \{ 1 \epsilon$, $2 \epsilon\}$. La condition $\exactcond$ est bien vérifiée.
+                \item[$\exactcond$:] On a ajouté une feuille, étiquetée par $1 \epsilon$ et $2 \epsilon$. Ces adresses étiquettent bien deux atomes duaux, et, de plus, d'après le théorème~\ref{highapprox_correction} de spécification de l'approximation haute, on a $\highapproxspec = \{ 1 \epsilon$, $2 \epsilon\}$. La condition $\exactcond$ est bien vérifiée.
     
                 \item[$\exactcondbis$:] L'ensemble des sous-adresses de $\sequent$ est $\{ 1 \epsilon, 2 \epsilon \}$. De plus, $H$ n'a qu'un seul trou, d'où, d'après le théorème~\ref{lowapprox_correction} spécifiant $\lowapprox$, la propriété d'inclusion à vérifier pour $\exactcondbis$ ne peut être violée.
             \end{enumerate}
@@ -1437,7 +1437,7 @@ Et on l'affiche:
    \tensorv{<(1) * (2^)>, <(2) * (3^)>, <1^>, <3>}
 \parrv{<(1) * (2^)>, <(2) * (3^)>, <(1^) | (3)>}
 \end{minted}
-Elle correspond à la pseudo-preuve partielle suivante (pseudo dans la mesure où les règles d'échange n'apparaissent pas) munie des approximations basse et haute (les formules en rouge sont les formules obligatoires, les autres sont les formules possibles):
+Elle correspond à la pseudo-preuve partielle suivante (``pseudo'' dans la mesure où les règles d'échange n'apparaissent pas) munie des approximations basse et haute (les formules en rouge sont les formules obligatoires, les autres sont les formules possibles):
 \begin{prooftree*}
       \hypv{\foblig{X_1}, X_2\tensor X_3\orth, X_1\orth, X_3}
 
