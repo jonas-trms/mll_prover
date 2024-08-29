@@ -166,7 +166,12 @@
     \begin{itemize}
         \item Concevoir un outil pour les utilisateurs experts.
             \pause
-        \item Notre contribution: \pause minimiser l'information requise.
+        \item Notre contribution:
+            \begin{itemize}
+                \item Travailler sur un formalisme du calcul des séquents éliminant les redondances.
+                
+                \item Concevoir une interface interactive automatisant certains choix, et minimisant l'information requise par ailleurs.
+            \end{itemize}
             \pause
         \item Résultat: mll\_prover, implémenté en OCaml !
     \end{itemize}
@@ -231,7 +236,7 @@
             \end{prooftree}
             \end{equation*}
             \pause
-        \item Règle $\textit{ex}_{\someperm}$: \pause les séquents sont des \textit{multi--ensembles} réalisés par des \textit{listes}.
+        \item Règle $\textit{ex}_{\someperm}$: les séquents sont des \textit{multi-ensembles} (où l'on distingue les occurences), réalisés par des \textit{listes}.
             \pause
         \item Règle $\tensor$: introduit la notion de coût sur les hypothèses.\\
         \pause Prouver $A \tensor B$ revient à prouver $A$ et $B$. Pour prouver $A \tensor B$ à partir d'un ensemble d'hypothèses $\Sigma$, on doit en choisir une partition $\sequent, \sequentbis$, et prouver $A$ avec toutes les hypothèses de $\sequent$, et $B$ avec toutes celles de $\sequentbis$.
@@ -330,7 +335,7 @@
 
 \begin{frame}{Notre solution}
     \begin{itemize}
-        \item L'assistant manipule en arrière--plan des représentations non--redondantes, équivalentes aux preuves.
+        \item Manipuler en arrière-plan des représentations non-redondantes, équivalentes aux preuves.
             \pause
         \item Utiliser des heuristiques d'autocomplétion et de détection d'erreurs.
      \end{itemize}
