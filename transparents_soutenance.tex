@@ -18,6 +18,7 @@
 \usepackage{minted}
 \usepackage{authblk}
 \usepackage[backend=biber,style=alphabetic,sorting=ynt]{biblatex}
+\usepackage[export]{adjustbox}
 
 % dessins arbres : tikz
 \tikzset{baseline=(current bounding box.center)}
@@ -123,63 +124,71 @@
 
 \begin{frame}{Introduction}
     \begin{itemize}
-        \item Logique linéaire: \pause introduite en 1987 par Jean-Yves Girard.
+        \item Logique linéaire: introduite en 1987 par Jean-Yves Girard.
             \pause
         \item On s'intéresse au fragment multiplicatif MLL.
             \pause
-        \item Intérêt: \pause voir les hypothèses comme des ressources.
+        \item Intérêt: voir les hypothèses comme des ressources.
             \pause
-        \item Nombreuses applications en informatique: \pause programmation fonctionnelle, \pause théorie de la preuve...
+        \item Nombreuses applications en informatique: programmation fonctionnelle, théorie de la preuve...
             \pause
-        \item D'où une nécessité... \pause écrire facilement des preuves!
+        \item D'où une nécessité... écrire facilement des preuves!
     \end{itemize}    
 \end{frame}
 
 \begin{frame}{Problématique}
     \begin{itemize}
-        \item Plusieurs syntaxes possibles, dont... \pause le calcul des séquents!
+        \item Plusieurs syntaxes possibles, dont... le calcul des séquents!
             \pause
-        \item Notre objectif: \pause concevoir un assitant de preuve interactif pour le calcul des séquents\pause, guidant l'utilisateur efficacement et pas à pas.
+        \item Notre objectif: concevoir un assitant de preuve interactif pour le calcul des séquents, guidant l'utilisateur efficacement et pas à pas.
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Un prédecesseur}
     \centering
-    \includegraphics[scale=0.35]{Click_and_collect.png}
+    \includegraphics[scale=0.35]{images/C&C_home.png}
 
     \pause
     
     \begin{itemize}
-        \item L'une des premières interfaces graphiques pour le calcul interactif des séquents.
+        \item L'une des premières interfaces graphiques pour le calcul des séquents linéaire.
             \pause
-        \item Cependant... \pause but pédagogique, s'adresse à des débutants.
+        \item Cependant... but pédagogique, s'adresse à des débutants.
             \pause
-        \item Problème: \pause inadapté à utilisateur expert, \pause l'information demandée est redondante.
+        \item Problème: inadapté à utilisateur expert, l'information demandée est redondante.
     \end{itemize}
+
+%%démo? ou après "La structure des preuves est redondante"
+
 \end{frame}
 
 \begin{frame}{Objectif du stage}
     \begin{itemize}
         \item Concevoir un outil pour les utilisateurs experts.
             \pause
-        \item Notre contribution: \pause minimiser l'information requise.
+        \item Notre contribution:
+            \begin{itemize}
+                \item Travailler sur un formalisme du calcul des séquents éliminant les redondances.
+                
+                \item Concevoir une interface interactive automatisant certains choix, et minimisant l'information requise par ailleurs.
+            \end{itemize}
             \pause
-        \item Résultat: \pause mll\_prover, implémenté en OCaml !
+        \item Résultat: mll\_prover, implémenté en OCaml !
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Séquents en logique linéaire}
     \begin{itemize}
-        \item Formules: \pause $F := X \mid X\orth \mid F \parr F \mid F \tensor F$.
+        \item Formules: $F := X \mid X\orth \mid F \parr F \mid F \tensor F$.
             \pause
-        \item Intuition: \pause $\orth \sim \neg$\pause, $\parr \sim \lor$\pause, $\tensor \sim \land$.
+        \item Intuition: $\orth \sim \neg$, $\parr \sim \lor$, $\tensor \sim \land$.
             \pause
-        \item Remarque: \pause on ne peut nier que les atomes.
+        \item Remarque: on ne peut nier que les atomes.
             \pause \\ 
-        \item Les séquents sont unilatéraux: \pause en logique classique, \\ $A \vdash B$ \pause $\; \sim \; \; \vdash A \implies B$ \pause $\; \sim \; \; \vdash \neg A \lor B$.\\         \pause
-        \item Séquent: \pause liste de formules. \pause Un séquent est intuitivement une disjonction\pause: $\vdash X_1, X_2, X_3$ \pause $\sim \; \vdash X_1 \lor X_2 \lor X_3$. 
+        \item Les séquents sont unilatéraux: en logique classique, \\ $A \vdash B$ $\; \sim \; \; \vdash A \implies B$ $\; \sim \; \; \vdash \neg A \lor B$.\\         \pause
+        \item Séquent: liste de formules. Un séquent est intuitivement une disjonction: $\vdash X_1, X_2, X_3$ $\sim \; \vdash X_1 \lor X_2 \lor X_3$. 
         \pause\\
-        $\rightarrow$ En logique linéaire: \pause $\vdash A\orth{}, B$.
+        $\rightarrow$ En logique linéaire: $\vdash A\orth{}, B$.
     \end{itemize}
 \end{frame}
 
@@ -189,16 +198,16 @@
         $\orth \sim \neg$, $\parr \sim \lor$, $\tensor \sim \land$.\\
         Séquent: liste de formules (intuitivement leur disjonction).
             \pause
-        \item $X\orth{}, X$ \pause $\; \sim \; \neg X \lor X$. \\
+        \item $X\orth{}, X$ $\; \sim \; \neg X \lor X$. \\
         \pause $\rightarrow$ C'est une tautologie!
             \pause
-        \item $A, B \tensor C$ \pause $\; \sim \; A \lor (B \land C)$.
+        \item $A, B \tensor C$ $\; \sim \; A \lor (B \land C)$.
             \pause
-        \item $A,B \parr C\orth{}$ \pause $\; \sim \; A \lor B \lor \neg C$ \pause $\; \sim \; A, B, C\orth{}$. \\
+        \item $A,B \parr C\orth{}$ $\; \sim \; A \lor B \lor \neg C$ $\; \sim \; A, B, C\orth{}$. \\
         \pause $\rightarrow$ Utilité du par?
             \pause
         \item Formules imbriquées:\\
-        \pause $(A \parr B) \tensor C$ \pause $\; \sim \; (A \lor B) \land C$.
+        \pause $(A \parr B) \tensor C$ $\; \sim \; (A \lor B) \land C$.
     \end{itemize}
 \end{frame}
 
@@ -209,17 +218,17 @@
             \begin{prooftree}
               \axv{X\orth, X}
             \end{prooftree}
-            \; \; \; \pause
+            \; \; \;
             \begin{prooftree}
               \hypv{\sequent}
               \permv{\someperm}{\permapp{\someperm}{\sequent}}
             \end{prooftree}
-            \; \; \; \pause
+            \; \; \;
             \begin{prooftree}
               \hypv{\sequent, A, B, \sequentbis}
               \parrv{\sequent, A \parr B, \sequentbis}
             \end{prooftree}
-            \; \; \; \pause
+            \; \; \;
             \begin{prooftree}
               \hypv{\sequent, A}
               \hypv{B, \sequentbis}
@@ -227,9 +236,9 @@
             \end{prooftree}
             \end{equation*}
             \pause
-        \item Règle $\textit{ex}_{\someperm}$: \pause les séquents sont des \textit{multi--ensembles} réalisés par des \textit{listes}.
+        \item Règle $\textit{ex}_{\someperm}$: les séquents sont des \textit{multi-ensembles} (où l'on distingue les occurences), réalisés par des \textit{listes}.
             \pause
-        \item Règle $\tensor$: \pause introduit la notion de coût sur les hypothèses.\\
+        \item Règle $\tensor$: introduit la notion de coût sur les hypothèses.\\
         \pause Prouver $A \tensor B$ revient à prouver $A$ et $B$. Pour prouver $A \tensor B$ à partir d'un ensemble d'hypothèses $\Sigma$, on doit en choisir une partition $\sequent, \sequentbis$, et prouver $A$ avec toutes les hypothèses de $\sequent$, et $B$ avec toutes celles de $\sequentbis$.
     \end{itemize}
 \end{frame}
@@ -271,47 +280,6 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Un autre exemple de preuve}
-    \begin{itemize}
-        \item Règles: 
-            \begin{equation*}
-            \begin{prooftree}
-              \axv{X\orth, X}
-            \end{prooftree}
-            \; \; \;
-            \begin{prooftree}
-              \hypv{\sequent}
-              \permv{\someperm}{\permapp{\someperm}{\sequent}}
-            \end{prooftree}
-            \; \; \;
-            \begin{prooftree}
-              \hypv{\sequent, A, B, \sequentbis}
-              \parrv{\sequent, A \parr B, \sequentbis}
-            \end{prooftree}
-            \; \; \;
-            \begin{prooftree}
-              \hypv{\sequent, A}
-              \hypv{B, \sequentbis}
-              \tensorv{\sequent, A \tensor B, \sequentbis}
-            \end{prooftree}
-            \end{equation*}
-        \item
-        \begin{equation*}
-        \begin{prooftree}
-                 \axv{{X_1}\orth, X_1}
-                 \permv{(2, 1)}{X_1, {X_1}\orth}
-                 \axv{{X_2}\orth, X_2}
-              \tensorv{X_1, {X_1}\orth \tensor {X_2}\orth, X_2}
-              \permv{(1, 3, 2)}{X_1, X_2, {X_1}\orth \tensor {X_2}\orth}
-              \axv{{X_3}\orth, X_3}
-              \permv{(2, 1)}{X_3, {X_3}\orth}
-           \tensorv{X_1, X_2, ({X_1}\orth \tensor {X_2}\orth) \tensor X_3, {X_3}\orth}
-        \parrv{X_1 \parr X_2, ({X_1}\orth \tensor {X_2}\orth) \tensor X_3, {X_3}\orth}
-        \end{prooftree}
-        \end{equation*}
-    \end{itemize}
-\end{frame}
-
 \begin{frame}{La structure des preuves est redondante}
     \begin{itemize}
         \item L'information nécessaire est en rouge:
@@ -328,22 +296,53 @@
                     \axv{\foblig{{X_1}\orth, X_1}}
                     \axv{\foblig{{X_2}\orth, X_2}}
                     \permv{(2, 1)}{X_2, {X_2}\orth}
-                    {\infer{2}[\foblig{\ensuremath{\tensor}}]{{X_1}\orth, X_1 \tensor X_2, {X_2}\orth}}
+                    {\infer{2}[\foblig{\ensuremath{\tensor}}]{{X_1}\orth, X_1 \mathbin{\foblig{\tensor}} X_2, {X_2}\orth}}
                     \permv{(3, 2, 1)}{\foblig{{X_2}\orth, X_1 \tensor X_2, {X_1}\orth}}
                 \end{prooftree}
             \end{equation*}
     \end{itemize}
 \end{frame}
 
+\begin{frame}{Cette redondance se retrouve dans Click \& Collect}
+    \begin{center}
+        \adjincludegraphics[height=5.5cm,trim={{.25\width} {.35\height} {.25\width} {.15\height}},clip]{images/C&C_demo1.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Cette redondance se retrouve dans Click \& Collect}
+    \begin{center}
+        \adjincludegraphics[height=5.5cm,trim={{.25\width} {.35\height} {.25\width} {.15\height}},clip]{images/C&C_demo2.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Cette redondance se retrouve dans Click \& Collect}
+    \begin{center}
+        \adjincludegraphics[height=5.5cm,trim={{.25\width} {.30\height} {.25\width} {.15\height}},clip]{images/C&C_demo3.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Cette redondance se retrouve dans Click \& Collect}
+    \begin{center}
+        \adjincludegraphics[height=5.5cm,trim={{.25\width} {.30\height} {.25\width} {.15\height}},clip]{images/C&C_demo4.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Cette redondance se retrouve dans Click \& Collect}
+    \begin{center}
+        \adjincludegraphics[height=5.5cm,trim={{.25\width} {.30\height} {.25\width} {.15\height}},clip]{images/C&C_demo5.png}
+    \end{center}
+\end{frame}
+
 \begin{frame}{Notre solution}
     \begin{itemize}
-        \item L'assistant manipule en arrière--plan des représentations non--redondantes, équivalentes aux preuves.
+        \item Manipuler en arrière-plan des représentations non-redondantes, équivalentes aux preuves.
             \pause
-        \item Représentation: couple $(t, \sequent)$\pause, où $t$ est un arbre encodant le squelette de la preuve\pause, et $\sequent$ est le séquent prouvé par $\someproof$.
+        \item Utiliser des heuristiques d'autocomplétion et de détection d'erreurs.
      \end{itemize}
 \end{frame}
 
-\begin{frame}{Un exemple}
+\begin{frame}{Représentations}
+    Couple $(t, \sequent)$, où $t$ est un arbre encodant le squelette de la preuve, et $\sequent$ est le séquent prouvé.
     \begin{equation*}
     \begin{prooftree}
         \axv{{X_1}\orth, X_1}
@@ -363,7 +362,10 @@
         };
     \end{tikzpicture}\vdash {X_1}\orth \parr (X_1 \tensor X_2), {X_2}\orth
     \end{equation*}
+%%couleurs pour relier éléments en calcul des séquents et dans l'arbre (adresses notamment)
 \end{frame}
+
+%% ajouter théorèmes d'équivalence
 
 \begin{frame}{Représentations partielles}
     \begin{itemize}
@@ -478,10 +480,9 @@
     \begin{itemize}
         \item Correction: \pause si l'utilisateur aboutit, le guidage de notre assistant assure que la preuve construite est correcte.
             \pause
-        \item Complétude: \pause à permutations intermédiaires près, il est possible de construire n'importe quelle preuve grâce à notre assistant.
+        \item Complétude: à permutations intermédiaires près, il est possible de construire n'importe quelle preuve grâce à notre assistant.
             \pause
-        \item En plus: \pause heuristiques d'autocomplétion et de détection d'erreurs.\\
-        $\rightarrow$ permettent de gagner du temps.
+        \item Les heuristiques d'autocomplétion et de détection d'erreurs sont correctes, et ne retirent pas d'expressivité à l'utilisateur.
     \end{itemize}
 \end{frame}
 
@@ -492,9 +493,14 @@
         \item Par exemple: prouver $X_5, X_4, {X_1}\orth \tensor ({X_2}\orth \tensor ({X_3}\orth \tensor ({X_4}\orth \tensor {X_5}\orth))), X_1, X_3 \parr X_2$.\\
         Entre $1$ et $3$ opérations avec mll\_prover, plusieurs dizaines avec Click \& Collect.
             \pause
-        \item Pistes d'améliorations: ajouter une interface graphique\pause, pouvoir annuler un choix\pause, enrichir les heuristiques d'autocomplétion\pause, étendre l'assistant à LL.
+        \item Pistes d'améliorations:
+            \begin{itemize}
+                \item ajouter une interface graphique.
+                \item revenir en arrière dans les choix.
+                \item enrichir les heuristiques d'autocomplétion.
+                \item étendre l'assistant à LL.
+            \end{itemize}
     \end{itemize}
 \end{frame}
 
 \end{document}
-
